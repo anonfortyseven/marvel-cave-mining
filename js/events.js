@@ -1,0 +1,533 @@
+// events.js - Event system for The Marvel Cave Mining Company
+// Random events by zone with probability tables
+
+window.EventSystem = {
+  // Cooldown period (in days) before same event can repeat
+  DEFAULT_COOLDOWN: 3,
+
+  // --- CAVE EVENT DEFINITIONS ---
+  caveEvents: {
+    'cave_in': {
+      name: 'Cave-In',
+      description: 'Rocks collapse from the ceiling!',
+      zones: ['zone1', 'zone2', 'zone3', 'zone4', 'zone5'],
+      probability: 0.04,
+      cooldown: 5,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        // Random crew member takes damage
+        var living = window.GameState.getLivingParty();
+        if (living.length === 0) return results;
+        var victim = living[Math.floor(Math.random() * living.length)];
+        var damage = 30 + Math.floor(Math.random() * 40); // 30-70 damage
+        results.messages.push(victim.name + ' is struck by falling rocks!');
+        var died = window.HealthSystem.applyDamage(victim, damage);
+        if (died) {
+          results.messages.push(victim.name + ' was killed in the cave-in.');
+          results.deaths.push(victim.name);
+        } else {
+          results.messages.push(victim.name + '\'s health: ' + window.HealthSystem.getHealthLabel(victim.health));
+        }
+        // May lose timber
+        if (state.timber > 0) {
+          var lost = Math.min(state.timber, Math.floor(Math.random() * 5) + 1);
+          state.timber -= lost;
+          results.messages.push(lost + ' timber lost in the collapse.');
+        }
+        return results;
+      }
+    },
+
+    'flooding': {
+      name: 'Flooding',
+      description: 'Water rushes through the passage!',
+      zones: ['zone3', 'zone4', 'zone5'],
+      probability: 0.05,
+      cooldown: 4,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        results.messages.push('Water floods the passage!');
+        // Everyone takes minor damage, supplies may be lost
+        var living = window.GameState.getLivingParty();
+        for (var i = 0; i < living.length; i++) {
+          var damage = 10 + Math.floor(Math.random() * 15);
+          window.HealthSystem.applyDamage(living[i], damage);
+        }
+        results.messages.push('The entire party is soaked and chilled.');
+        // Lose some food and candles
+        var foodLost = Math.min(state.food, Math.floor(Math.random() * 10) + 5);
+        state.food -= foodLost;
+        results.messages.push(foodLost + ' lbs of food ruined by water.');
+        var candlesLost = Math.min(state.candles, Math.floor(Math.random() * 5) + 2);
+        state.candles -= candlesLost;
+        results.messages.push(candlesLost + ' candles soaked and useless.');
+        return results;
+      }
+    },
+
+    'bad_air': {
+      name: 'Bad Air',
+      description: 'Foul, poisonous air fills the chamber.',
+      zones: ['zone3', 'zone4', 'zone5'],
+      probability: 0.06,
+      cooldown: 3,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        results.messages.push('The air grows thick and foul!');
+        var living = window.GameState.getLivingParty();
+        for (var i = 0; i < living.length; i++) {
+          var damage = 15 + Math.floor(Math.random() * 20);
+          var died = window.HealthSystem.applyDamage(living[i], damage);
+          if (died) {
+            results.messages.push(living[i].name + ' succumbed to the bad air.');
+            results.deaths.push(living[i].name);
+          }
+        }
+        if (results.deaths.length === 0) {
+          results.messages.push('Everyone feels dizzy and nauseous.');
+        }
+        return results;
+      }
+    },
+
+    'bat_swarm': {
+      name: 'Bat Swarm',
+      description: 'A massive swarm of bats erupts from the darkness!',
+      zones: ['zone1', 'zone2', 'zone3', 'zone4'],
+      probability: 0.07,
+      cooldown: 2,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        results.messages.push('Thousands of bats swarm around the party!');
+        var living = window.GameState.getLivingParty();
+        for (var i = 0; i < living.length; i++) {
+          var damage = 5 + Math.floor(Math.random() * 10);
+          window.HealthSystem.applyDamage(living[i], damage);
+        }
+        results.messages.push('Minor scratches and bites from the swarm.');
+        // Oil consumption spikes from panicked movement
+        state.lanternOil = Math.max(0, state.lanternOil - 0.25);
+        results.messages.push('Lantern oil spilled in the commotion.');
+        return results;
+      }
+    },
+
+    'rockfall': {
+      name: 'Rockfall',
+      description: 'Loose rocks tumble down!',
+      zones: ['zone2', 'zone3', 'zone4', 'zone5'],
+      probability: 0.05,
+      cooldown: 3,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        var living = window.GameState.getLivingParty();
+        if (living.length === 0) return results;
+        var victim = living[Math.floor(Math.random() * living.length)];
+        var damage = 15 + Math.floor(Math.random() * 25);
+        results.messages.push('Rocks tumble down onto ' + victim.name + '!');
+        var died = window.HealthSystem.applyDamage(victim, damage);
+        if (died) {
+          results.messages.push(victim.name + ' was crushed by falling rocks.');
+          results.deaths.push(victim.name);
+        }
+        return results;
+      }
+    },
+
+    'equipment_break': {
+      name: 'Equipment Break',
+      description: 'Mining equipment breaks!',
+      zones: ['zone1', 'zone2', 'zone3', 'zone4', 'zone5'],
+      probability: 0.06,
+      cooldown: 4,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        // Lose a random piece of equipment
+        var options = [];
+        if (state.rope > 20) options.push('rope');
+        if (state.timber > 3) options.push('timber');
+        if (state.dynamite > 2) options.push('dynamite');
+        if (options.length === 0) {
+          results.messages.push('Equipment is wearing down but nothing breaks.');
+          return results;
+        }
+        var broken = options[Math.floor(Math.random() * options.length)];
+        switch (broken) {
+          case 'rope':
+            var lost = Math.floor(Math.random() * 30) + 10;
+            state.rope = Math.max(0, state.rope - lost);
+            results.messages.push(lost + ' feet of rope snapped!');
+            break;
+          case 'timber':
+            var lost2 = Math.floor(Math.random() * 5) + 1;
+            state.timber = Math.max(0, state.timber - lost2);
+            results.messages.push(lost2 + ' timber supports cracked!');
+            break;
+          case 'dynamite':
+            var lost3 = Math.floor(Math.random() * 3) + 1;
+            state.dynamite = Math.max(0, state.dynamite - lost3);
+            results.messages.push(lost3 + ' sticks of dynamite ruined by moisture!');
+            break;
+        }
+        return results;
+      }
+    },
+
+    'snakebite': {
+      name: 'Snakebite',
+      description: 'A cave snake strikes!',
+      zones: ['zone1', 'zone2'],
+      probability: 0.04,
+      cooldown: 5,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        var living = window.GameState.getLivingParty();
+        if (living.length === 0) return results;
+        var victim = living[Math.floor(Math.random() * living.length)];
+        var damage = 20 + Math.floor(Math.random() * 30);
+        results.messages.push(victim.name + ' was bitten by a copperhead!');
+        var died = window.HealthSystem.applyDamage(victim, damage);
+        if (died) {
+          results.messages.push(victim.name + ' died from the venom.');
+          results.deaths.push(victim.name);
+        } else {
+          results.messages.push(victim.name + ' needs rest to recover.');
+        }
+        return results;
+      }
+    },
+
+    'bat_fever': {
+      name: 'Bat Fever',
+      description: 'A crew member falls ill with cave fever.',
+      zones: ['zone1', 'zone2', 'zone3', 'zone4'],
+      probability: 0.03,
+      cooldown: 7,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        var living = window.GameState.getLivingParty();
+        if (living.length === 0) return results;
+        var victim = living[Math.floor(Math.random() * living.length)];
+        var damage = 25 + Math.floor(Math.random() * 20);
+        results.messages.push(victim.name + ' has come down with bat fever!');
+        window.HealthSystem.applyDamage(victim, damage);
+        results.messages.push(victim.name + ' shivers uncontrollably and cannot work.');
+        return results;
+      }
+    },
+
+    'lost': {
+      name: 'Lost',
+      description: 'The party loses their way in the darkness.',
+      zones: ['zone3', 'zone4', 'zone5'],
+      probability: 0.04,
+      cooldown: 4,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        results.messages.push('The passages all look the same... the party is lost!');
+        // Extra resource consumption (wandering uses oil and food)
+        state.lanternOil = Math.max(0, state.lanternOil - 0.5);
+        var foodLost = Math.floor(Math.random() * 5) + 3;
+        state.food = Math.max(0, state.food - foodLost);
+        results.messages.push('Lost half a day finding the way back. Extra rations consumed.');
+        // Minor health hit from stress
+        var living = window.GameState.getLivingParty();
+        for (var i = 0; i < living.length; i++) {
+          window.HealthSystem.applyDamage(living[i], 5);
+        }
+        return results;
+      }
+    },
+
+    'exhaustion': {
+      name: 'Exhaustion',
+      description: 'The crew is pushed beyond their limits.',
+      zones: ['zone1', 'zone2', 'zone3', 'zone4', 'zone5'],
+      probability: 0.05,
+      cooldown: 3,
+      // Only triggers on grueling pace
+      condition: function(state) { return state.workPace === 'grueling'; },
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        results.messages.push('The grueling pace takes its toll!');
+        var living = window.GameState.getLivingParty();
+        for (var i = 0; i < living.length; i++) {
+          var damage = 10 + Math.floor(Math.random() * 15);
+          window.HealthSystem.applyDamage(living[i], damage);
+        }
+        results.messages.push('Everyone is bone-tired. Work output suffers.');
+        return results;
+      }
+    },
+
+    'hypothermia': {
+      name: 'Hypothermia',
+      description: 'The damp cold seeps into the bones.',
+      zones: ['zone4', 'zone5'],
+      probability: 0.04,
+      cooldown: 4,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        results.messages.push('The bone-chilling cold and damp are unbearable!');
+        var living = window.GameState.getLivingParty();
+        for (var i = 0; i < living.length; i++) {
+          var damage = 12 + Math.floor(Math.random() * 15);
+          // Clothing reduces damage
+          if (state.clothing > 0) damage = Math.floor(damage * 0.5);
+          window.HealthSystem.applyDamage(living[i], damage);
+        }
+        if (state.clothing > 0) {
+          state.clothing = Math.max(0, state.clothing - 1);
+          results.messages.push('Heavy clothing helps but wears down.');
+        } else {
+          results.messages.push('Without proper clothing, the cold is devastating.');
+        }
+        return results;
+      }
+    },
+
+    'lung_sickness': {
+      name: 'Lung Sickness',
+      description: 'Breathing guano dust causes illness.',
+      zones: ['zone1', 'zone2', 'zone3', 'zone4'],
+      probability: 0.03,
+      cooldown: 7,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        var living = window.GameState.getLivingParty();
+        if (living.length === 0) return results;
+        var victim = living[Math.floor(Math.random() * living.length)];
+        var damage = 20 + Math.floor(Math.random() * 25);
+        results.messages.push(victim.name + ' develops a terrible cough from the guano dust!');
+        var died = window.HealthSystem.applyDamage(victim, damage);
+        if (died) {
+          results.messages.push(victim.name + ' choked to death on cave dust.');
+          results.deaths.push(victim.name);
+        } else {
+          results.messages.push(victim.name + ' will have trouble breathing for days.');
+        }
+        return results;
+      }
+    },
+
+    'broken_bone': {
+      name: 'Broken Bone',
+      description: 'Someone slips on the wet rock.',
+      zones: ['zone1', 'zone2', 'zone3', 'zone4', 'zone5'],
+      probability: 0.03,
+      cooldown: 6,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        var living = window.GameState.getLivingParty();
+        if (living.length === 0) return results;
+        var victim = living[Math.floor(Math.random() * living.length)];
+        var damage = 35 + Math.floor(Math.random() * 25);
+        results.messages.push(victim.name + ' slips and breaks a bone!');
+        window.HealthSystem.applyDamage(victim, damage);
+        results.messages.push(victim.name + ' will need time to heal.');
+        return results;
+      }
+    }
+  },
+
+  // --- SURFACE EVENT DEFINITIONS ---
+  surfaceEvents: {
+    'bald_knobber_raid': {
+      name: 'Bald Knobber Raid',
+      description: 'The Bald Knobbers have come calling!',
+      probability: 0.03,
+      cooldown: 7,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        results.messages.push('Bald Knobbers ride into camp under cover of night!');
+        // Steal cash and supplies
+        var cashStolen = Math.min(state.cash, Math.floor(Math.random() * 50) + 20);
+        state.cash -= cashStolen;
+        results.messages.push('They steal $' + cashStolen.toFixed(2) + ' from the strongbox.');
+        // May steal food
+        if (Math.random() < 0.5) {
+          var foodStolen = Math.min(state.food, Math.floor(Math.random() * 20) + 10);
+          state.food -= foodStolen;
+          results.messages.push(foodStolen + ' lbs of food taken.');
+        }
+        // May injure someone
+        if (Math.random() < 0.3) {
+          var living = window.GameState.getLivingParty();
+          if (living.length > 0) {
+            var victim = living[Math.floor(Math.random() * living.length)];
+            window.HealthSystem.applyDamage(victim, 20);
+            results.messages.push(victim.name + ' was roughed up by the raiders.');
+          }
+        }
+        state.baldKnobberThreat = Math.min(10, state.baldKnobberThreat + 2);
+        return results;
+      }
+    },
+
+    'stagecoach_delay': {
+      name: 'Stagecoach Delay',
+      description: 'Supply delivery is delayed.',
+      probability: 0.05,
+      cooldown: 5,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        results.messages.push('The supply stagecoach has been delayed!');
+        // Delay all pending payments by an extra 3 days
+        for (var i = 0; i < state.pendingPayments.length; i++) {
+          state.pendingPayments[i].dueDate = new Date(
+            state.pendingPayments[i].dueDate.getTime() + (3 * 86400000)
+          );
+        }
+        results.messages.push('All incoming payments delayed by 3 days.');
+        return results;
+      }
+    },
+
+    'supply_wagon': {
+      name: 'Supply Wagon',
+      description: 'A passing supply wagon offers goods at a discount!',
+      probability: 0.04,
+      cooldown: 6,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        results.messages.push('A supply wagon passes through! They offer surplus goods.');
+        // Give some free supplies
+        var foodGain = Math.floor(Math.random() * 20) + 10;
+        state.food += foodGain;
+        results.messages.push('You receive ' + foodGain + ' lbs of food.');
+        if (Math.random() < 0.5) {
+          var candleGain = Math.floor(Math.random() * 10) + 5;
+          state.candles += candleGain;
+          results.messages.push('Plus ' + candleGain + ' candles!');
+        }
+        return results;
+      }
+    },
+
+    'traveler': {
+      name: 'Traveler',
+      description: 'A traveler passes through with news.',
+      probability: 0.06,
+      cooldown: 4,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        var tips = [
+          'A traveler warns of Bald Knobber activity in the area.',
+          'A traveler mentions rich guano deposits deeper in the cave.',
+          'A traveler shares news from Springfield - guano prices are holding steady.',
+          'A weary traveler shares a meal and some advice about cave mining.',
+          'A traveler mentions another mining operation failed last month.'
+        ];
+        var tip = tips[Math.floor(Math.random() * tips.length)];
+        results.messages.push(tip);
+        // Small morale boost (minor healing)
+        var living = window.GameState.getLivingParty();
+        for (var i = 0; i < living.length; i++) {
+          window.HealthSystem.applyHealing(living[i], 3);
+        }
+        results.messages.push('The company lifts everyone\'s spirits.');
+        return results;
+      }
+    },
+
+    'fire': {
+      name: 'Camp Fire',
+      description: 'Fire breaks out in camp!',
+      probability: 0.02,
+      cooldown: 10,
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        results.messages.push('Fire breaks out in the supply tent!');
+        // Destroy some supplies
+        var foodLost = Math.min(state.food, Math.floor(Math.random() * 30) + 15);
+        state.food -= foodLost;
+        results.messages.push(foodLost + ' lbs of food destroyed.');
+        if (state.dynamite > 0 && Math.random() < 0.3) {
+          var dynLost = Math.min(state.dynamite, Math.floor(Math.random() * 5) + 1);
+          state.dynamite -= dynLost;
+          results.messages.push(dynLost + ' sticks of dynamite lost! (Carefully moved the rest.)');
+        }
+        // Someone may get burned
+        if (Math.random() < 0.4) {
+          var living = window.GameState.getLivingParty();
+          if (living.length > 0) {
+            var victim = living[Math.floor(Math.random() * living.length)];
+            window.HealthSystem.applyDamage(victim, 15);
+            results.messages.push(victim.name + ' was burned fighting the fire.');
+          }
+        }
+        return results;
+      }
+    }
+  },
+
+  // Roll for random events based on current state
+  rollForEvents: function(state) {
+    var triggered = [];
+    var events = state.isUnderground ? this.caveEvents : this.surfaceEvents;
+
+    for (var eventId in events) {
+      var event = events[eventId];
+
+      // Check cooldown
+      if (state.eventCooldowns[eventId] && state.eventCooldowns[eventId] > 0) {
+        continue;
+      }
+
+      // Check zone restriction (cave events only)
+      if (event.zones && event.zones.indexOf(state.currentZone) === -1) {
+        continue;
+      }
+
+      // Check condition (if any)
+      if (event.condition && !event.condition(state)) {
+        continue;
+      }
+
+      // Roll probability
+      if (Math.random() < event.probability) {
+        // Event triggers!
+        var result = event.effect(state);
+        result.eventId = eventId;
+        result.eventName = event.name;
+        result.eventDescription = event.description;
+        triggered.push(result);
+
+        // Set cooldown
+        state.eventCooldowns[eventId] = event.cooldown || this.DEFAULT_COOLDOWN;
+      }
+    }
+
+    return triggered;
+  },
+
+  // Decrease all cooldowns by 1 (call each day)
+  tickCooldowns: function(state) {
+    for (var eventId in state.eventCooldowns) {
+      if (state.eventCooldowns[eventId] > 0) {
+        state.eventCooldowns[eventId]--;
+      }
+      if (state.eventCooldowns[eventId] <= 0) {
+        delete state.eventCooldowns[eventId];
+      }
+    }
+  },
+
+  // Get a random discovery event for a chamber (one-time events)
+  checkDiscovery: function(chamber, state) {
+    if (!chamber || !chamber.discovery) return null;
+
+    var flag = chamber.discovery.flag;
+    if (state[flag]) return null; // already discovered
+
+    // Mark as discovered
+    state[flag] = true;
+
+    return {
+      name: chamber.discovery.name,
+      description: chamber.discovery.description,
+      messages: [chamber.discovery.description],
+      points: chamber.discovery.points || 0
+    };
+  }
+};
