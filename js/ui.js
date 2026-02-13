@@ -7,13 +7,24 @@
   'use strict';
 
   var screenEl = null;
+  var statusBarEl = null;
+  var actionBarEl = null;
   var currentKeyHandler = null;
+  var activeAnimations = [];
 
   function getScreen() {
-    if (!screenEl) {
-      screenEl = document.getElementById('screen');
-    }
+    if (!screenEl) screenEl = document.getElementById('screen');
     return screenEl;
+  }
+
+  function getStatusBar() {
+    if (!statusBarEl) statusBarEl = document.getElementById('status-bar');
+    return statusBarEl;
+  }
+
+  function getActionBar() {
+    if (!actionBarEl) actionBarEl = document.getElementById('action-bar');
+    return actionBarEl;
   }
 
   // Remove any active keyboard handler
@@ -38,6 +49,151 @@
     el.innerHTML += content;
   }
 
+  // === STATUS BAR ===
+  function renderStatusBar(state) {
+    var bar = getStatusBar();
+    if (!state) { bar.classList.remove('visible'); return; }
+
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var dateStr = state.date ? months[state.date.getMonth()] + ' ' + state.date.getDate() : '';
+
+    var loc = 'Marmaros';
+    if (state.isUnderground && window.CaveData) {
+      var ch = window.CaveData.getChamber(state.currentChamber);
+      if (ch) loc = ch.name;
+    }
+
+    var partyCount = (state.foreman && state.foreman.alive ? 1 : 0);
+    for (var i = 0; i < (state.crew || []).length; i++) {
+      if (state.crew[i].alive) partyCount++;
+    }
+
+    var morale = state.morale !== undefined ? state.morale : 50;
+    var moraleCls = morale > 60 ? 'morale-high' : (morale > 30 ? 'morale-mid' : 'morale-low');
+
+    bar.innerHTML =
+      sbItem('', dateStr) +
+      sbItem('', loc) +
+      sbItem('Crew', partyCount + '/5') +
+      sbItem('HP', getShortHealth(state.foreman ? state.foreman.health : 0)) +
+      sbItem('$', state.cash.toFixed(0)) +
+      sbItem('Food', Math.round(state.food)) +
+      sbItem('Oil', state.lanternOil.toFixed(1)) +
+      sbItem('Guano', state.guanoShipped.toFixed(1) + '/' + state.contractTarget + 't') +
+      '<span class="sb-item"><span class="sb-label">Morale</span>' +
+      '<span class="morale-bar"><span class="morale-fill ' + moraleCls + '" style="width:' + morale + '%"></span></span></span>';
+
+    bar.classList.add('visible');
+  }
+
+  function sbItem(label, value) {
+    if (label) {
+      return '<span class="sb-item"><span class="sb-label">' + label + '</span> <span class="sb-value">' + value + '</span></span>';
+    }
+    return '<span class="sb-item"><span class="sb-value">' + value + '</span></span>';
+  }
+
+  function getShortHealth(val) {
+    if (val <= 34) return '<span class="health-good">OK</span>';
+    if (val <= 69) return '<span class="health-fair">Fair</span>';
+    if (val <= 104) return '<span class="health-poor">Poor</span>';
+    return '<span class="health-bad">Bad</span>';
+  }
+
+  // === ACTION BAR ===
+  // actions: [{key: '1', label: 'Mine', value: 'mine', primary: bool, danger: bool}, ...]
+  // callback: function(value)
+  function renderActionBar(actions, callback) {
+    var bar = getActionBar();
+    clearKeyHandler();
+
+    var html = '<div class="action-grid">';
+    var keyMap = {};
+
+    for (var i = 0; i < actions.length; i++) {
+      var a = actions[i];
+      var key = a.key || String(i + 1);
+      var cls = 'action-btn';
+      if (a.primary) cls += ' btn-primary';
+      if (a.danger) cls += ' btn-danger';
+
+      html += '<button class="' + cls + '" data-key="' + key + '" data-value="' + (a.value !== undefined ? a.value : i) + '">';
+      html += '<span class="btn-key">' + key + '</span> ' + escapeHtml(a.label);
+      html += '</button>';
+
+      keyMap[key.toLowerCase()] = a.value !== undefined ? a.value : i;
+    }
+    html += '</div>';
+    bar.innerHTML = html;
+    bar.classList.add('visible');
+
+    // Click/touch handlers
+    var btns = bar.querySelectorAll('.action-btn');
+    for (var j = 0; j < btns.length; j++) {
+      btns[j].addEventListener('click', function () {
+        var val = this.getAttribute('data-value');
+        // Try to match original value type
+        if (keyMap.hasOwnProperty(this.getAttribute('data-key').toLowerCase())) {
+          val = keyMap[this.getAttribute('data-key').toLowerCase()];
+        }
+        clearKeyHandler();
+        bar.classList.remove('visible');
+        callback(val);
+      });
+    }
+
+    // Keyboard handler
+    function handler(e) {
+      var pressed = e.key.toLowerCase();
+      if (keyMap.hasOwnProperty(pressed)) {
+        e.preventDefault();
+        clearKeyHandler();
+        bar.classList.remove('visible');
+        callback(keyMap[pressed]);
+      }
+    }
+    currentKeyHandler = handler;
+    document.addEventListener('keydown', handler);
+  }
+
+  function hideActionBar() {
+    var bar = getActionBar();
+    bar.classList.remove('visible');
+    bar.innerHTML = '';
+  }
+
+  // Show/hide bars for gameplay vs non-gameplay screens
+  function showBars() {
+    getStatusBar().classList.add('visible');
+  }
+
+  function hideBars() {
+    getStatusBar().classList.remove('visible');
+    getStatusBar().innerHTML = '';
+    hideActionBar();
+  }
+
+  // === ANIMATION SYSTEM ===
+  function startAnimation(element, frames, intervalMs) {
+    if (!element || !frames || frames.length === 0) return null;
+    intervalMs = intervalMs || 500;
+    var idx = 0;
+    var id = setInterval(function () {
+      idx = (idx + 1) % frames.length;
+      element.textContent = frames[idx];
+    }, intervalMs);
+    var anim = { id: id, element: element };
+    activeAnimations.push(anim);
+    return anim;
+  }
+
+  function stopAllAnimations() {
+    for (var i = 0; i < activeAnimations.length; i++) {
+      clearInterval(activeAnimations[i].id);
+    }
+    activeAnimations = [];
+  }
+
   // Typewriter effect - returns a promise
   function typeWriter(el, text, speed) {
     speed = speed || 30;
@@ -60,9 +216,7 @@
     });
   }
 
-  // Show numbered menu choices and handle keyboard selection
-  // options: [{key: '1', label: 'text', value: any}, ...]
-  // callback: function(selectedValue)
+  // Show numbered menu choices and handle keyboard/click selection
   function promptChoice(options, callback) {
     clearKeyHandler();
     var html = '<div class="menu-options">';
@@ -76,18 +230,15 @@
     html += '</div>';
     append(html);
 
-    // Scroll to bottom
     var el = getScreen();
     el.scrollTop = el.scrollHeight;
 
-    // Build lookup
     var keyMap = {};
     for (var j = 0; j < options.length; j++) {
       var k = options[j].key || String(j + 1);
       keyMap[k.toLowerCase()] = options[j].value !== undefined ? options[j].value : j;
     }
 
-    // Click support
     var menuOptions = el.querySelectorAll('.menu-option');
     menuOptions.forEach(function (optEl) {
       optEl.addEventListener('click', function () {
@@ -113,7 +264,6 @@
   }
 
   // Text input prompt
-  // label: prompt text, callback: function(value)
   function promptText(label, callback, opts) {
     clearKeyHandler();
     opts = opts || {};
@@ -242,6 +392,7 @@
     el.classList.add('screen-fade-out');
     setTimeout(function () {
       el.classList.remove('screen-fade-out');
+      stopAllAnimations();
       callback();
       el.classList.add('screen-fade-in');
       setTimeout(function () {
@@ -265,33 +416,57 @@
     }
   }
 
-  // "Press ENTER to continue" prompt
+  // "Press ENTER to continue" prompt (also responds to tap)
   function pressEnter(callback) {
     clearKeyHandler();
-    append('<div class="text-dim" style="margin-top:12px">Press ENTER to continue...</div>');
+    append('<div class="text-dim" style="margin-top:12px;cursor:pointer" id="press-enter-prompt">Press ENTER to continue...</div>');
 
     var el = getScreen();
     el.scrollTop = el.scrollHeight;
 
+    function fire() {
+      clearKeyHandler();
+      var prompt = document.getElementById('press-enter-prompt');
+      if (prompt) prompt.removeEventListener('click', fire);
+      callback();
+    }
+
+    // Click/tap support
+    setTimeout(function () {
+      var prompt = document.getElementById('press-enter-prompt');
+      if (prompt) prompt.addEventListener('click', fire);
+    }, 50);
+
     function handler(e) {
       if (e.key === 'Enter') {
         e.preventDefault();
-        clearKeyHandler();
-        callback();
+        fire();
       }
     }
     currentKeyHandler = handler;
     document.addEventListener('keydown', handler);
   }
 
-  // Wait for any key
+  // Wait for any key (also responds to tap)
   function pressAnyKey(callback) {
     clearKeyHandler();
-    append('<div class="text-dim" style="margin-top:8px">Press any key...</div>');
+    append('<div class="text-dim" style="margin-top:8px;cursor:pointer" id="press-any-prompt">Press any key...</div>');
+
+    function fire() {
+      clearKeyHandler();
+      var prompt = document.getElementById('press-any-prompt');
+      if (prompt) prompt.removeEventListener('click', fire);
+      callback();
+    }
+
+    setTimeout(function () {
+      var prompt = document.getElementById('press-any-prompt');
+      if (prompt) prompt.addEventListener('click', fire);
+    }, 50);
+
     function handler(e) {
       e.preventDefault();
-      clearKeyHandler();
-      callback();
+      fire();
     }
     currentKeyHandler = handler;
     document.addEventListener('keydown', handler);
@@ -316,12 +491,10 @@
     return str.replace(/<[^>]*>/g, '');
   }
 
-  // Format currency
   function formatMoney(amount) {
     return '$' + (Math.round(amount * 100) / 100).toFixed(2);
   }
 
-  // Health to label (health: 0=best, 140+=dead, lower is better)
   function healthLabel(val) {
     if (window.HealthSystem && window.HealthSystem.getHealthLabel) {
       var label = window.HealthSystem.getHealthLabel(val);
@@ -334,13 +507,12 @@
     return '<span class="health-bad">Very Poor</span>';
   }
 
-  // Progress bar HTML
   function progressBar(value, max, width) {
     max = max || 100;
     width = width || 180;
     var pct = Math.max(0, Math.min(100, (value / max) * 100));
     var cls = pct > 60 ? 'good' : (pct > 25 ? '' : 'danger');
-    return '<div class="progress-bar" style="width:' + width + 'px">' +
+    return '<div class="progress-bar" style="width:min(' + width + 'px,80vw)">' +
       '<div class="progress-fill ' + cls + '" style="width:' + pct + '%"></div></div>';
   }
 
@@ -364,7 +536,15 @@
     healthLabel: healthLabel,
     progressBar: progressBar,
     repeat: repeat,
-    getScreen: getScreen
+    getScreen: getScreen,
+    // New APIs
+    renderStatusBar: renderStatusBar,
+    renderActionBar: renderActionBar,
+    hideActionBar: hideActionBar,
+    showBars: showBars,
+    hideBars: hideBars,
+    startAnimation: startAnimation,
+    stopAllAnimations: stopAllAnimations
   };
 
 })();

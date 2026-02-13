@@ -131,6 +131,9 @@ window.Engine = {
       }
     }
 
+    // 11. Morale updates
+    this.updateMorale(state, results);
+
     return results;
   },
 
@@ -187,12 +190,22 @@ window.Engine = {
     }
 
     // Dynamite bonus for breaking through hard rock
-    // (consumed when used, passive bonus for having some)
     if (state.dynamite > 0) {
       output *= 1.1; // 10% bonus
     }
 
-    return Math.round(output * 1000) / 1000; // round to 3 decimal places
+    // Equipment bonuses
+    if (state.equipment) {
+      if (state.equipment.pickaxeUpgrade) output *= 1.10;
+      if (state.equipment.timberHandles) output *= 1.05;
+    }
+
+    // Morale multiplier (50 = neutral, >50 = bonus, <50 = penalty)
+    var morale = state.morale !== undefined ? state.morale : 50;
+    var moraleMod = 0.8 + (morale / 250); // range 0.8 (morale=0) to 1.2 (morale=100)
+    output *= moraleMod;
+
+    return Math.round(output * 1000) / 1000;
   },
 
   // Check game over conditions
@@ -282,6 +295,34 @@ window.Engine = {
     var months = ['January', 'February', 'March', 'April', 'May', 'June',
                   'July', 'August', 'September', 'October', 'November', 'December'];
     return months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+  },
+
+  // Update morale for the day
+  updateMorale: function(state, results) {
+    if (state.morale === undefined) state.morale = 50;
+    var old = state.morale;
+
+    if (state.isUnderground) {
+      state.morale -= 1; // decay underground
+      if (state.workPace === 'grueling') state.morale -= 1;
+    } else {
+      state.morale += 2; // recover on surface
+    }
+
+    // Low food penalty
+    if (state.food <= 0) state.morale -= 3;
+    else if (state.rationLevel === 'scraps') state.morale -= 1;
+
+    // Clamp
+    state.morale = Math.max(0, Math.min(100, state.morale));
+
+    // Mutiny warning
+    if (state.morale < 20 && old >= 20) {
+      results.messages.push('The crew grumbles about conditions. Morale is dangerously low!');
+    }
+    if (state.morale <= 10) {
+      results.messages.push('The crew threatens mutiny! Rest or improve conditions soon.');
+    }
   },
 
   // Get a summary of current status

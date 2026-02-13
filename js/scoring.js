@@ -119,6 +119,19 @@ window.Scoring = {
       breakdown.multiplierReasons.push('All discoveries found (x' + this.MULTIPLIERS.ALL_DISCOVERIES + ')');
     }
 
+    // Morale bonus
+    var morale = state.morale !== undefined ? state.morale : 50;
+    if (morale >= 70) {
+      breakdown.subtotal += 100;
+      breakdown.multiplierReasons.push('High morale (+100 pts)');
+    }
+
+    // Town visitor bonus
+    if (window.Town && window.Town.visitedShops && window.Town.visitedShops.length >= 6) {
+      breakdown.multiplier *= 1.1;
+      breakdown.multiplierReasons.push('Visited all shops (x1.1)');
+    }
+
     // --- Final score ---
     breakdown.finalScore = Math.floor(breakdown.subtotal * breakdown.multiplier);
 

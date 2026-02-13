@@ -19,7 +19,8 @@
     EVENT: 'event',
     ENDING: 'ending',
     SCORING: 'scoring',
-    GAMEOVER: 'gameover'
+    GAMEOVER: 'gameover',
+    TOWN: 'town'
   };
 
   var currentFlow = FLOW.TITLE;
@@ -82,6 +83,9 @@
         break;
       case FLOW.GAMEOVER:
         UI.fadeTransition(function () { Screens.gameOver(data); });
+        break;
+      case FLOW.TOWN:
+        UI.fadeTransition(function () { if (window.Town) Town.show(function () { Screens.status(); }); });
         break;
     }
   }

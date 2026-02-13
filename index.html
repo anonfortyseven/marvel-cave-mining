@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>The Marvel Cave Mining Company</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div id="game-container">
+    <div id="status-bar"></div>
     <div id="screen" class="screen"></div>
+    <div id="action-bar"></div>
     <canvas id="minigame-canvas" class="hidden" width="640" height="400"></canvas>
   </div>
 
@@ -22,14 +24,22 @@
   <script src="js/engine.js"></script>
   <script src="js/scoring.js"></script>
 
+  <!-- Art & Content -->
+  <script src="js/ascii-art.js"></script>
+
   <!-- UI & Screens -->
   <script src="js/ui.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/town.js"></script>
   <script src="js/screens.js"></script>
 
   <!-- Mini-games -->
   <script src="js/mining-game.js"></script>
   <script src="js/descent-game.js"></script>
+  <script src="js/sharpen-game.js"></script>
+  <script src="js/taffy-game.js"></script>
+  <script src="js/carve-game.js"></script>
+  <script src="js/cards-game.js"></script>
 
   <!-- Entry Point -->
   <script src="js/main.js"></script>

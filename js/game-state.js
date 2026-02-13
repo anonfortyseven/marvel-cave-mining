@@ -62,6 +62,20 @@ window.GameState = {
     contracts: [],
     inflationRate: 1.0,
 
+    // Morale & Equipment
+    morale: 50,
+    equipment: {
+      pickaxeUpgrade: false,
+      lanternRepair: false,
+      huntingKnife: false,
+      beltKnife: false,
+      walkingStick: false,
+      timberHandles: false
+    },
+    taffy: 0,
+    hardCandy: 0,
+    whiskey: 0,
+
     // Event tracking
     activeEvents: [],
     eventCooldowns: {},
