@@ -93,11 +93,14 @@
   }
 
   // Get image for a cave chamber — per-chamber image with zone fallback
-  function getCaveImage(chamberId) {
+  // compact: true uses smaller banner class for dashboard
+  function getCaveImage(chamberId, compact) {
+    var cls = compact ? 'pixel-banner-sm' : 'pixel-banner';
+
     // Try per-chamber image first
     var chamberPath = CHAMBER_IMAGE_MAP[chamberId];
     if (chamberPath) {
-      return '<div class="pixel-banner">' +
+      return '<div class="' + cls + '">' +
         '<img src="' + chamberPath + '" class="pixel-banner-img" alt="" loading="lazy"' +
         ' onerror="this.parentNode.style.display=\'none\'">' +
         '</div>';
@@ -110,7 +113,11 @@
 
     var zone = chamber.zone || 'zone1';
     var imgKey = ZONE_IMAGE_MAP[zone] || 'cave_entrance';
-    return getImageHtml(imgKey);
+    var path = IMAGE_MAP[imgKey];
+    if (!path) return '';
+    return '<div class="' + cls + '">' +
+      '<img src="' + path + '" class="pixel-banner-img" alt="" loading="lazy">' +
+      '</div>';
   }
 
   // Get shop image

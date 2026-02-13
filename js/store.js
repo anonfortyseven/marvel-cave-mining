@@ -28,7 +28,7 @@
       unit: 'pounds',
       price: 0.20,
       description: 'Hardtack, jerky, beans & coffee',
-      recommended: { investor: 600, miner: 400, farmer: 300 },
+      recommended: { mine_foreman: 200, geologist: 150, farmer: 120, drifter: 80 },
       min: 0,
       max: 2000
     },
@@ -39,7 +39,7 @@
       unit: 'gallons',
       price: 3.00,
       description: 'Kerosene for carbide lanterns',
-      recommended: { investor: 30, miner: 25, farmer: 15 },
+      recommended: { mine_foreman: 10, geologist: 8, farmer: 6, drifter: 4 },
       min: 0,
       max: 100
     },
@@ -50,7 +50,7 @@
       unit: 'feet',
       price: 0.10,
       description: 'Hemp rope for descents and hauling',
-      recommended: { investor: 500, miner: 400, farmer: 300 },
+      recommended: { mine_foreman: 300, geologist: 250, farmer: 200, drifter: 100 },
       min: 0,
       max: 1000
     },
@@ -61,7 +61,7 @@
       unit: 'boards',
       price: 0.50,
       description: 'Pine boards for shoring tunnels',
-      recommended: { investor: 80, miner: 60, farmer: 40 },
+      recommended: { mine_foreman: 40, geologist: 30, farmer: 25, drifter: 15 },
       min: 0,
       max: 200
     },
@@ -72,7 +72,7 @@
       unit: 'sticks',
       price: 2.00,
       description: 'Nobel blasting sticks',
-      recommended: { investor: 25, miner: 20, farmer: 10 },
+      recommended: { mine_foreman: 15, geologist: 12, farmer: 10, drifter: 5 },
       min: 0,
       max: 50
     }
@@ -99,9 +99,9 @@
 
   function getProfession() {
     if (window.GameState && window.GameState.state) {
-      return window.GameState.state.profession || 'miner';
+      return window.GameState.state.profession || 'mine_foreman';
     }
-    return 'miner';
+    return 'mine_foreman';
   }
 
   function getCartTotal() {

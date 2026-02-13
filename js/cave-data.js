@@ -117,7 +117,7 @@
       id: 'cathedral_floor',
       name: 'Cathedral Room Floor',
       zone: 'zone1',
-      depth: 230,
+      depth: 235,
       guanoYield: 'medium',
       primaryHazard: 'bat_swarm',
       hazardModifiers: { bat_swarm: 0.10, bad_air: 0.05 },

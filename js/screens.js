@@ -342,10 +342,10 @@
     var dayNum = Math.min(state.totalDays + 1, duration);
     var daysLeft = Math.max(0, duration - state.totalDays);
 
-    // Chamber image
+    // Chamber image (compact for dashboard)
     var chamberId = state.currentChamber || 'marmaros';
     if (window.Images) {
-      html += state.isUnderground ? Images.getCaveImage(chamberId) : Images.getImageHtml('town');
+      html += state.isUnderground ? Images.getCaveImage(chamberId, true) : Images.getCaveImage('marmaros', true);
     }
 
     // Day counter (large, prominent)
@@ -557,9 +557,17 @@
     var chamber = getChamberData(state.currentChamber);
     if (!chamber) { UI.showNotification('Cannot descend', 1200); setTimeout(statusScreen, 1300); return; }
 
+    var curRouteIdx = window.CaveData ? window.CaveData.getMainRouteIndex(state.currentChamber) : -1;
     var deeper = (chamber.connectedTo || []).filter(function (id) {
       var c = getChamberData(id);
-      return c && c.depth > chamber.depth;
+      if (!c) return false;
+      if (c.depth > chamber.depth) return true;
+      // Allow same-depth progression if it's the next chamber on the main route
+      if (c.depth === chamber.depth && window.CaveData) {
+        var targetIdx = window.CaveData.getMainRouteIndex(id);
+        return targetIdx > curRouteIdx && targetIdx !== -1;
+      }
+      return false;
     });
 
     if (deeper.length === 0) {
