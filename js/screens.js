@@ -336,11 +336,17 @@
       else screen.classList.add('depth-shallow');
     }
 
-    // === BUILD COMPACT DASHBOARD (no image, info-first) ===
+    // === BUILD DASHBOARD ===
     var html = '';
     var duration = state.gameDuration || 30;
     var dayNum = Math.min(state.totalDays + 1, duration);
     var daysLeft = Math.max(0, duration - state.totalDays);
+
+    // Chamber image
+    var chamberId = state.currentChamber || 'marmaros';
+    if (window.Images) {
+      html += state.isUnderground ? Images.getCaveImage(chamberId) : Images.getImageHtml('town');
+    }
 
     // Day counter (large, prominent)
     var dayClass = daysLeft <= 5 ? 'sb-danger' : (daysLeft <= 10 ? 'sb-warn' : '');

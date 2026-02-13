@@ -224,7 +224,7 @@
 
   function resetGame(p) {
     params = p || {};
-    playerCash = params.cash || 0;
+    playerCash = params.playerCash || params.cash || 0;
     gamePhase = 'instructions';
     gameRunning = true;
     keys = {};
