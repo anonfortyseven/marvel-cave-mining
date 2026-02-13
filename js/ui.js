@@ -52,38 +52,93 @@
   // === STATUS BAR ===
   function renderStatusBar(state) {
     var bar = getStatusBar();
-    if (!state) { bar.classList.remove('visible'); return; }
+    if (!state) { bar.classList.remove('visible'); bar.classList.remove('underground'); return; }
 
+    if (state.isUnderground) {
+      renderUndergroundBar(bar, state);
+    } else {
+      renderSurfaceBar(bar, state);
+    }
+    bar.classList.add('visible');
+  }
+
+  function renderSurfaceBar(bar, state) {
+    bar.classList.remove('underground');
     var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     var dateStr = state.date ? months[state.date.getMonth()] + ' ' + state.date.getDate() : '';
-
-    var loc = 'Marmaros';
-    if (state.isUnderground && window.CaveData) {
-      var ch = window.CaveData.getChamber(state.currentChamber);
-      if (ch) loc = ch.name;
-    }
-
-    var partyCount = (state.foreman && state.foreman.alive ? 1 : 0);
-    for (var i = 0; i < (state.crew || []).length; i++) {
-      if (state.crew[i].alive) partyCount++;
-    }
-
+    var partyCount = getPartyCount(state);
     var morale = state.morale !== undefined ? state.morale : 50;
     var moraleCls = morale > 60 ? 'morale-high' : (morale > 30 ? 'morale-mid' : 'morale-low');
 
     bar.innerHTML =
       sbItem('', dateStr) +
-      sbItem('', loc) +
+      sbItem('', 'Marmaros') +
       sbItem('Crew', partyCount + '/5') +
       sbItem('HP', getShortHealth(state.foreman ? state.foreman.health : 0)) +
       sbItem('$', state.cash.toFixed(0)) +
       sbItem('Food', Math.round(state.food)) +
-      sbItem('Oil', state.lanternOil.toFixed(1)) +
       sbItem('Guano', state.guanoShipped.toFixed(1) + '/' + state.contractTarget + 't') +
       '<span class="sb-item"><span class="sb-label">Morale</span>' +
       '<span class="morale-bar"><span class="morale-fill ' + moraleCls + '" style="width:' + morale + '%"></span></span></span>';
+  }
 
-    bar.classList.add('visible');
+  function renderUndergroundBar(bar, state) {
+    bar.classList.add('underground');
+
+    // Location
+    var loc = 'Cave';
+    var depth = 0;
+    if (window.CaveData) {
+      var ch = window.CaveData.getChamber(state.currentChamber);
+      if (ch) { loc = ch.name; depth = ch.depth || 0; }
+    }
+
+    var partyCount = getPartyCount(state);
+    var morale = state.morale !== undefined ? state.morale : 50;
+    var moraleCls = morale > 60 ? 'morale-high' : (morale > 30 ? 'morale-mid' : 'morale-low');
+
+    // Days remaining calculations
+    var foodPerDay = 2.4; // default full rations per person
+    if (state.rationLevel === 'half') foodPerDay = 1.2;
+    else if (state.rationLevel === 'scraps') foodPerDay = 0.6;
+    else if (state.rationLevel === 'none') foodPerDay = 0;
+    var totalFoodPerDay = foodPerDay * partyCount + (state.donkeys ? state.donkeys.count : 0);
+    var foodDays = totalFoodPerDay > 0 ? Math.floor(state.food / totalFoodPerDay) : 999;
+    var oilDays = Math.floor(state.lanternOil / 0.5);
+
+    var foodCls = foodDays > 10 ? 'sb-ok' : (foodDays >= 4 ? 'sb-warn' : 'sb-danger');
+    var oilCls = oilDays > 8 ? 'sb-ok' : (oilDays >= 3 ? 'sb-warn' : 'sb-danger');
+    var crewCls = partyCount >= 4 ? 'sb-ok' : (partyCount >= 2 ? 'sb-warn' : 'sb-danger');
+
+    // Guano progress
+    var guanoPct = state.contractTarget > 0 ? Math.min(100, (state.guanoShipped / state.contractTarget) * 100) : 0;
+
+    // Row 1: Vitals
+    var row1 = '<div class="status-row-vitals">' +
+      '<span class="sb-item sb-location">' + escapeHtml(loc) + (depth > 0 ? ' <span class="sb-depth">' + depth + 'ft</span>' : '') + '</span>' +
+      '<span class="sb-item">' + getShortHealth(state.foreman ? state.foreman.health : 0) + '</span>' +
+      '<span class="sb-item ' + crewCls + '">Crew ' + partyCount + '/5</span>' +
+      '<span class="sb-item"><span class="morale-bar-ug"><span class="morale-fill ' + moraleCls + '" style="width:' + morale + '%"></span></span></span>' +
+      '</div>';
+
+    // Row 2: Resources
+    var row2 = '<div class="status-row-resources">' +
+      '<span class="sb-item ' + foodCls + '">Food ' + Math.round(state.food) + ' <span class="sb-days">~' + foodDays + 'd</span></span>' +
+      '<span class="sb-item ' + oilCls + '">Oil ' + state.lanternOil.toFixed(1) + ' <span class="sb-days">~' + oilDays + 'd</span></span>' +
+      '<span class="sb-item sb-guano-item">Guano ' + state.guanoShipped.toFixed(1) + '/' + state.contractTarget + 't ' +
+        '<span class="sb-guano-bar"><span class="sb-guano-fill" style="width:' + guanoPct + '%"></span></span></span>' +
+      '<span class="sb-item">$' + state.cash.toFixed(0) + '</span>' +
+      '</div>';
+
+    bar.innerHTML = row1 + row2;
+  }
+
+  function getPartyCount(state) {
+    var count = (state.foreman && state.foreman.alive ? 1 : 0);
+    for (var i = 0; i < (state.crew || []).length; i++) {
+      if (state.crew[i].alive) count++;
+    }
+    return count;
   }
 
   function sbItem(label, value) {
@@ -488,7 +543,11 @@
   }
 
   // Fade transition between screens
+  var transitioning = false;
+
   function fadeTransition(callback) {
+    if (transitioning) { callback(); return; }
+    transitioning = true;
     var el = getScreen();
     el.classList.add('screen-fade-out');
     setTimeout(function () {
@@ -498,8 +557,117 @@
       el.classList.add('screen-fade-in');
       setTimeout(function () {
         el.classList.remove('screen-fade-in');
+        transitioning = false;
       }, 300);
     }, 300);
+  }
+
+  // Pixel dissolve transition
+  function pixelDissolveTransition(callback) {
+    if (transitioning) { callback(); return; }
+    transitioning = true;
+
+    var container = document.getElementById('game-container');
+    var overlay = document.createElement('div');
+    overlay.className = 'pixel-dissolve-overlay';
+
+    // Create 300 cells (20x15)
+    var cells = [];
+    for (var i = 0; i < 300; i++) {
+      var cell = document.createElement('div');
+      cell.className = 'px-cell';
+      overlay.appendChild(cell);
+      cells.push(cell);
+    }
+    container.appendChild(overlay);
+
+    // Shuffle cell indices
+    var indices = [];
+    for (var j = 0; j < 300; j++) indices.push(j);
+    for (var k = indices.length - 1; k > 0; k--) {
+      var r = Math.floor(Math.random() * (k + 1));
+      var tmp = indices[k]; indices[k] = indices[r]; indices[r] = tmp;
+    }
+
+    // Phase 1: Cover old content (activate cells in batches)
+    var batchSize = 20;
+    var batchDelay = 18;
+    var coverBatches = Math.ceil(300 / batchSize);
+    var batchIdx = 0;
+
+    function coverNext() {
+      if (batchIdx >= coverBatches) {
+        // Content swap
+        stopAllAnimations();
+        callback();
+
+        // Phase 2: Reveal new content (deactivate cells)
+        var revealIdx = 0;
+        function revealNext() {
+          if (revealIdx >= coverBatches) {
+            if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            transitioning = false;
+            return;
+          }
+          var start = revealIdx * batchSize;
+          var end = Math.min(start + batchSize, 300);
+          for (var n = start; n < end; n++) {
+            cells[indices[n]].classList.remove('active');
+          }
+          revealIdx++;
+          setTimeout(revealNext, batchDelay);
+        }
+        setTimeout(revealNext, 60);
+        return;
+      }
+
+      var start = batchIdx * batchSize;
+      var end = Math.min(start + batchSize, 300);
+      for (var m = start; m < end; m++) {
+        cells[indices[m]].classList.add('active');
+      }
+      batchIdx++;
+      setTimeout(coverNext, batchDelay);
+    }
+
+    coverNext();
+  }
+
+  // Scanline wipe transition
+  function scanlineWipeTransition(callback) {
+    if (transitioning) { callback(); return; }
+    transitioning = true;
+
+    var container = document.getElementById('game-container');
+    var wipe = document.createElement('div');
+    wipe.className = 'scanline-wipe';
+    container.appendChild(wipe);
+
+    // Wipe down (cover)
+    wipe.style.animation = 'scanWipeDown 0.35s ease-in forwards';
+    setTimeout(function () {
+      stopAllAnimations();
+      callback();
+
+      // Wipe away (reveal)
+      wipe.style.animation = 'scanWipeUp 0.35s ease-out forwards';
+      setTimeout(function () {
+        if (wipe.parentNode) wipe.parentNode.removeChild(wipe);
+        transitioning = false;
+      }, 380);
+    }, 380);
+  }
+
+  // Context-aware transition wrapper - randomly picks a style
+  function transition(callback) {
+    var roll = Math.random();
+    if (roll < 0.35) {
+      pixelDissolveTransition(callback);
+    } else if (roll < 0.65) {
+      scanlineWipeTransition(callback);
+    } else {
+      fadeTransition(callback);
+    }
   }
 
   // Bat animation on title screen
@@ -633,6 +801,9 @@
     showNotification: showNotification,
     drawBox: drawBox,
     fadeTransition: fadeTransition,
+    pixelDissolveTransition: pixelDissolveTransition,
+    scanlineWipeTransition: scanlineWipeTransition,
+    transition: transition,
     animateBats: animateBats,
     pressEnter: pressEnter,
     pressAnyKey: pressAnyKey,

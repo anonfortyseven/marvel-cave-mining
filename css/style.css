@@ -892,6 +892,145 @@ body {
   display: block;
 }
 
+/* === Underground Status Bar (two-row, readable) === */
+#status-bar.underground {
+  flex-direction: column;
+  gap: 2px;
+  font-size: clamp(8px, 1.6vmin, 10px);
+  padding: 6px 12px;
+  white-space: normal;
+}
+
+.status-row-vitals,
+.status-row-resources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 12px;
+  align-items: center;
+  width: 100%;
+}
+
+.status-row-vitals {
+  border-bottom: 1px solid var(--color-brown);
+  padding-bottom: 3px;
+}
+
+.sb-location {
+  color: var(--color-amber-bright);
+  text-shadow: var(--glow-amber);
+}
+
+.sb-depth {
+  color: var(--color-amber-dim);
+  font-size: 0.85em;
+}
+
+.sb-days {
+  color: var(--color-gray-light);
+  font-size: 0.85em;
+}
+
+.sb-ok { color: var(--color-green-bright); }
+.sb-warn { color: var(--color-yellow-bright); }
+.sb-danger { color: var(--color-red-bright); text-shadow: var(--glow-red); }
+
+.sb-guano-item {
+  color: var(--color-amber-bright) !important;
+}
+
+.sb-guano-bar {
+  display: inline-block;
+  width: min(100px, 22vw);
+  height: 8px;
+  border: 1px solid var(--color-copper);
+  vertical-align: middle;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.sb-guano-fill {
+  height: 100%;
+  background: var(--color-green);
+  transition: width 0.5s ease;
+}
+
+.morale-bar-ug {
+  display: inline-block;
+  width: min(80px, 18vw);
+  height: 8px;
+  border: 1px solid var(--color-copper);
+  vertical-align: middle;
+}
+
+/* === Pixel Dissolve Transition === */
+.pixel-dissolve-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  grid-template-rows: repeat(15, 1fr);
+  z-index: 8;
+  pointer-events: none;
+}
+
+.pixel-dissolve-overlay .px-cell {
+  background: var(--color-bg);
+  opacity: 0;
+  transition: opacity 0.08s linear;
+}
+
+.pixel-dissolve-overlay .px-cell.active {
+  opacity: 1;
+}
+
+/* === Scanline Wipe Transition === */
+.scanline-wipe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0%;
+  background: var(--color-bg);
+  z-index: 8;
+  pointer-events: none;
+  box-shadow: 0 2px 12px rgba(212, 160, 85, 0.6),
+              0 1px 3px rgba(212, 160, 85, 0.9);
+}
+
+@keyframes scanWipeDown {
+  from { height: 0%; top: 0; }
+  to { height: 100%; top: 0; }
+}
+
+@keyframes scanWipeUp {
+  from { height: 100%; top: 0; }
+  to { height: 0%; top: 0; }
+}
+
+/* === CRT Boot Effect === */
+@keyframes crtBoot {
+  0% { opacity: 0; }
+  8% { opacity: 0.9; filter: brightness(2.5); }
+  16% { opacity: 0; }
+  30% { opacity: 0.7; filter: brightness(1.8); }
+  40% { opacity: 0; }
+  55% { opacity: 1; filter: brightness(1.2); }
+  70% { opacity: 1; filter: brightness(1); }
+  100% { opacity: 1; filter: brightness(1); }
+}
+
+.crt-boot {
+  animation: crtBoot 0.8s ease-out forwards;
+}
+
+/* === Depth Color Themes === */
+.depth-shallow { --color-amber: #d4a055; --color-amber-bright: #f0c070; --color-amber-dim: #8a6830; }
+.depth-mid { --color-amber: #baa060; --color-amber-bright: #d4c078; --color-amber-dim: #7a7040; }
+.depth-deep { --color-amber: #70a090; --color-amber-bright: #88c8b0; --color-amber-dim: #4a7a68; }
+.depth-abyss { --color-amber: #6088a8; --color-amber-bright: #78a8d0; --color-amber-dim: #406880; }
+
 /* === Hidden Utility === */
 .hidden {
   display: none !important;
@@ -1005,6 +1144,13 @@ body {
     padding: 3px 12px;
     font-size: clamp(5px, 1vmin, 7px);
   }
+
+  #status-bar.underground {
+    font-size: clamp(6px, 1.2vmin, 8px);
+    padding: 2px 12px;
+  }
+
+  .status-row-vitals { padding-bottom: 1px; }
 
   .action-btn {
     min-height: 38px;

@@ -23,10 +23,7 @@
     // Town shops
     general_store: 'images/general_store.png',
     blacksmith: 'images/blacksmith.png',
-    tavern: 'images/tavern.png',
-    candy_shop: 'images/general_store.png',
-    knife_works: 'images/blacksmith.png',
-    woodcraft: 'images/general_store.png'
+    tavern: 'images/tavern.png'
   };
 
   // Map cave zones to image keys
@@ -89,13 +86,7 @@
 
   // Get shop image
   function getShopImage(shopId) {
-    var key = shopId;
-    if (shopId === 'general') key = 'general_store';
-    if (shopId === 'knife') key = 'knife_works';
-    if (shopId === 'candy') key = 'candy_shop';
-    if (shopId === 'wood') key = 'woodcraft';
-
-    return getImageHtml(key);
+    return getImageHtml(shopId);
   }
 
   // Start preloading when DOM ready

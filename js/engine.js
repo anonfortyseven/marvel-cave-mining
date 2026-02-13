@@ -123,15 +123,7 @@ window.Engine = {
       results.messages.push(contractResults[c].message);
     }
 
-    // 10. Clothing wear (underground)
-    if (state.isUnderground && Math.random() < 0.05) {
-      if (state.clothing > 0) {
-        state.clothing--;
-        results.messages.push('A set of clothing is worn out.');
-      }
-    }
-
-    // 11. Morale updates
+    // 10. Morale updates
     this.updateMorale(state, results);
 
     return results;
@@ -196,8 +188,7 @@ window.Engine = {
 
     // Equipment bonuses
     if (state.equipment) {
-      if (state.equipment.pickaxeUpgrade) output *= 1.10;
-      if (state.equipment.timberHandles) output *= 1.05;
+      if (state.equipment.toolUpgrade) output *= 1.15;
     }
 
     // Morale multiplier (50 = neutral, >50 = bonus, <50 = penalty)

@@ -55,37 +55,37 @@
 
     switch (screenName) {
       case FLOW.TITLE:
-        UI.fadeTransition(function () { Screens.title(); });
+        UI.transition(function () { Screens.title(); });
         break;
       case FLOW.PROFESSION:
-        UI.fadeTransition(function () { Screens.profession(); });
+        UI.transition(function () { Screens.profession(); });
         break;
       case FLOW.CREW:
-        UI.fadeTransition(function () { Screens.crew(); });
+        UI.transition(function () { Screens.crew(); });
         break;
       case FLOW.SEASON:
-        UI.fadeTransition(function () { Screens.season(); });
+        UI.transition(function () { Screens.season(); });
         break;
       case FLOW.STORE:
-        UI.fadeTransition(function () { Screens.store(); });
+        UI.transition(function () { Screens.store(); });
         break;
       case FLOW.GAMEPLAY:
-        UI.fadeTransition(function () { Screens.status(); });
+        UI.transition(function () { Screens.status(); });
         break;
       case FLOW.EVENT:
-        UI.fadeTransition(function () { Screens.event(data); });
+        UI.transition(function () { Screens.event(data); });
         break;
       case FLOW.ENDING:
-        UI.fadeTransition(function () { Screens.ending(data); });
+        UI.transition(function () { Screens.ending(data); });
         break;
       case FLOW.SCORING:
-        UI.fadeTransition(function () { Screens.scoring(); });
+        UI.transition(function () { Screens.scoring(); });
         break;
       case FLOW.GAMEOVER:
-        UI.fadeTransition(function () { Screens.gameOver(data); });
+        UI.transition(function () { Screens.gameOver(data); });
         break;
       case FLOW.TOWN:
-        UI.fadeTransition(function () { if (window.Town) Town.show(function () { Screens.status(); }); });
+        UI.transition(function () { if (window.Town) Town.show(function () { Screens.status(); }); });
         break;
     }
   }

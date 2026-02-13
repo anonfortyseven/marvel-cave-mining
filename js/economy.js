@@ -13,11 +13,9 @@ window.Economy = {
   basePrices: {
     food:       0.10,   // per lb
     lanternOil: 1.50,   // per gallon
-    candles:    0.15,   // each
     rope:       0.08,   // per foot
     timber:     0.50,   // per board
     dynamite:   2.00,   // per stick
-    clothing:   8.00,   // per set
     donkey:     40.00   // each
   },
 
@@ -67,11 +65,9 @@ window.Economy = {
     switch (item) {
       case 'food':       state.food += quantity; break;
       case 'lanternOil': state.lanternOil += quantity; break;
-      case 'candles':    state.candles += quantity; break;
       case 'rope':       state.rope += quantity; break;
       case 'timber':     state.timber += quantity; break;
       case 'dynamite':   state.dynamite += quantity; break;
-      case 'clothing':   state.clothing += quantity; break;
       case 'donkey':
         state.donkeys.count += quantity;
         break;
@@ -244,13 +240,6 @@ window.Economy = {
         state.lanternOil = 0;
       }
 
-      // Candle consumption (1 per day as backup/supplemental)
-      if (state.candles >= 1) {
-        state.candles -= 1;
-        result.candlesConsumed = 1;
-      } else {
-        result.shortages.push('candles');
-      }
     }
 
     return result;
@@ -266,11 +255,9 @@ window.Economy = {
     var inventoryValue = 0;
     inventoryValue += state.food * this.basePrices.food;
     inventoryValue += state.lanternOil * this.basePrices.lanternOil;
-    inventoryValue += state.candles * this.basePrices.candles;
     inventoryValue += state.rope * this.basePrices.rope;
     inventoryValue += state.timber * this.basePrices.timber;
     inventoryValue += state.dynamite * this.basePrices.dynamite;
-    inventoryValue += state.clothing * this.basePrices.clothing;
     inventoryValue += state.donkeys.count * this.basePrices.donkey;
     inventoryValue += state.guanoStockpile * this.GUANO_PRICE_PER_TON;
 

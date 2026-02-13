@@ -75,28 +75,6 @@
       recommended: { investor: 25, miner: 20, farmer: 10 },
       min: 0,
       max: 50
-    },
-    {
-      key: 'clothing',
-      stateKey: 'clothing',
-      name: 'Clothing Sets',
-      unit: 'sets',
-      price: 8.00,
-      description: 'Durable work clothes per person',
-      recommended: { investor: 6, miner: 5, farmer: 5 },
-      min: 0,
-      max: 15
-    },
-    {
-      key: 'candles',
-      stateKey: 'candles',
-      name: 'Candles',
-      unit: 'candles',
-      price: 0.15,
-      description: 'Tallow candles for backup light',
-      recommended: { investor: 100, miner: 80, farmer: 60 },
-      min: 0,
-      max: 200
     }
   ];
 

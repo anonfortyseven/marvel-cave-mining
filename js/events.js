@@ -58,9 +58,9 @@ window.EventSystem = {
         var foodLost = Math.min(state.food, Math.floor(Math.random() * 10) + 5);
         state.food -= foodLost;
         results.messages.push(foodLost + ' lbs of food ruined by water.');
-        var candlesLost = Math.min(state.candles, Math.floor(Math.random() * 5) + 2);
-        state.candles -= candlesLost;
-        results.messages.push(candlesLost + ' candles soaked and useless.');
+        var oilLost = Math.min(state.lanternOil, (Math.random() * 0.5) + 0.25);
+        state.lanternOil = Math.max(0, state.lanternOil - oilLost);
+        results.messages.push('Lantern oil spilled in the flood.');
         return results;
       }
     },
@@ -272,16 +272,9 @@ window.EventSystem = {
         var living = window.GameState.getLivingParty();
         for (var i = 0; i < living.length; i++) {
           var damage = 12 + Math.floor(Math.random() * 15);
-          // Clothing reduces damage
-          if (state.clothing > 0) damage = Math.floor(damage * 0.5);
           window.HealthSystem.applyDamage(living[i], damage);
         }
-        if (state.clothing > 0) {
-          state.clothing = Math.max(0, state.clothing - 1);
-          results.messages.push('Heavy clothing helps but wears down.');
-        } else {
-          results.messages.push('Without proper clothing, the cold is devastating.');
-        }
+        results.messages.push('The damp, freezing air saps everyone\'s strength.');
         return results;
       }
     },
@@ -322,6 +315,10 @@ window.EventSystem = {
         if (living.length === 0) return results;
         var victim = living[Math.floor(Math.random() * living.length)];
         var damage = 35 + Math.floor(Math.random() * 25);
+        if (state.equipment && state.equipment.walkingStick) {
+          damage = Math.floor(damage * 0.8);
+          results.messages.push(victim.name + '\'s walking stick helps break the fall.');
+        }
         results.messages.push(victim.name + ' slips and breaks a bone!');
         window.HealthSystem.applyDamage(victim, damage);
         results.messages.push(victim.name + ' will need time to heal.');
@@ -342,6 +339,10 @@ window.EventSystem = {
         results.messages.push('Bald Knobbers ride into camp under cover of night!');
         // Steal cash and supplies
         var cashStolen = Math.min(state.cash, Math.floor(Math.random() * 50) + 20);
+        if (state.equipment && state.equipment.huntingKnife) {
+          cashStolen = Math.floor(cashStolen * 0.5);
+          results.messages.push('Your hunting knife deters the worst of the theft.');
+        }
         state.cash -= cashStolen;
         results.messages.push('They steal $' + cashStolen.toFixed(2) + ' from the strongbox.');
         // May steal food
@@ -396,9 +397,9 @@ window.EventSystem = {
         state.food += foodGain;
         results.messages.push('You receive ' + foodGain + ' lbs of food.');
         if (Math.random() < 0.5) {
-          var candleGain = Math.floor(Math.random() * 10) + 5;
-          state.candles += candleGain;
-          results.messages.push('Plus ' + candleGain + ' candles!');
+          var oilGain = Math.floor(Math.random() * 3) + 1;
+          state.lanternOil += oilGain;
+          results.messages.push('Plus ' + oilGain + ' gallons of oil!');
         }
         return results;
       }

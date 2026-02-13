@@ -9,20 +9,20 @@
 
   // ─── Town ASCII Art ──────────────────────────────────────────────
   var TOWN_ART = [
-    '          ~       ~        ~       ~',
-    '      ~  /|\\   ~ /|\\  ~  /|\\  ~  /|\\',
-    '    ____/ | \\__/ | \\__/ | \\__/ | \\____',
-    '   |  GENERAL |BLACKSMITH|SWEETS|KNIFE |',
-    '   |  STORE   | & FORGE  | SHOP |WORKS |',
-    '   |  [===]   |  [/\\/\\]  | [~~] | [/|] |',
-    '   |  |  |    |  |  |   | |  | | |  | |',
-    '   |__|__|____|__|__|___|_|__|_|_|__|_|',
-    '   ===================================',
-    '     MARMAROS -- Stone County, MO',
-    '   ==================================='
+    '            ~          ~          ~',
+    '        ~  /|\\     ~  /|\\     ~  /|\\',
+    '    ______/ | \\____/ | \\____/ | \\______',
+    '   |   GENERAL   |  BLACKSMITH  |      |',
+    '   |    STORE     |   & FORGE   |TAVERN|',
+    '   |   [=====]    |   [/\\/\\]    | [~~] |',
+    '   |   |    |     |   |    |    | |  | |',
+    '   |___|____|_____|___|____|____|_|__|_|',
+    '   =====================================',
+    '      MARMAROS -- Stone County, MO',
+    '   ====================================='
   ].join('\n');
 
-  // ─── Shop Definitions ────────────────────────────────────────────
+  // ─── Shop Definitions (3 shops) ─────────────────────────────────
   var SHOPS = [
     {
       id: 'general_store',
@@ -38,7 +38,7 @@
     },
     {
       id: 'blacksmith',
-      name: 'Ozark Blacksmith',
+      name: 'Ozark Blacksmith & Forge',
       keeper: 'Jebediah Colt',
       miniGame: 'SharpenGame',
       miniGamePrompt: 'Care to test your arm at the grindstone?',
@@ -50,115 +50,24 @@
       ],
       items: [
         {
-          name: 'Pickaxe Upgrade',
-          price: 25,
-          description: '+10% mining output',
-          stateKey: 'pickaxeUpgrade',
+          name: 'Tool Upgrade',
+          price: 20,
+          description: '+15% mining output',
+          stateKey: 'toolUpgrade',
           equipment: true
         },
-        {
-          name: 'Lantern Repair Kit',
-          price: 15,
-          description: '-15% oil consumption',
-          stateKey: 'lanternRepair',
-          equipment: true
-        },
-        {
-          name: 'Blade Sharpening',
-          price: 5,
-          description: 'Hones your tools to a fine edge',
-          stateKey: null,
-          equipment: false,
-          onPurchase: function (state) {
-            state.cash += 2;
-            return 'Jeb works the grindstone with practiced hands. Your blades sing.';
-          }
-        }
-      ]
-    },
-    {
-      id: 'sweet_shop',
-      name: 'Penny\'s Sweet Shop',
-      keeper: 'Penny Mae Dawson',
-      miniGame: 'TaffyGame',
-      miniGamePrompt: 'Help me pull this batch of taffy!',
-      greetings: [
-        '"Oh! A customer! Try the taffy, it\'s fresh pulled this mornin\'!"',
-        '"Welcome, welcome! You look like you could use somethin\' sweet."',
-        '"Penny Mae\'s got just the thing to lift your spirits, sugar."',
-        '"Come in out of the dust! I got candy that\'ll make you forget your troubles."'
-      ],
-      items: [
-        {
-          name: 'Taffy',
-          price: 0.50,
-          description: '+10 morale when consumed',
-          stateKey: 'taffy',
-          equipment: false,
-          consumable: true
-        },
-        {
-          name: 'Hard Candy',
-          price: 0.25,
-          description: '+5 morale when consumed',
-          stateKey: 'hardCandy',
-          equipment: false,
-          consumable: true
-        }
-      ]
-    },
-    {
-      id: 'knife_works',
-      name: 'Stone County Knife Works',
-      keeper: 'Silas Whitmore',
-      greetings: [
-        '"Fine steel. Won\'t find better this side of Springfield."',
-        '"Every blade I sell, I\'d carry myself. That\'s my guarantee."',
-        '"A man without a knife in these hills ain\'t much of a man."',
-        '"Don\'t touch the display blades. You want to hold one, you buy it."'
-      ],
-      items: [
         {
           name: 'Hunting Knife',
           price: 8,
-          description: '+5% survival in events',
+          description: 'Reduces raid losses, +survival',
           stateKey: 'huntingKnife',
           equipment: true
         },
         {
-          name: 'Belt Knife',
-          price: 5,
-          description: 'Reduces Bald Knobber losses',
-          stateKey: 'beltKnife',
-          equipment: true
-        }
-      ]
-    },
-    {
-      id: 'woodcraft',
-      name: 'Ridgetop Woodcraft',
-      keeper: 'Old Man Hemlock',
-      miniGame: 'CarveGame',
-      miniGamePrompt: 'Whittle a piece?',
-      greetings: [
-        '"Take your time... I ain\'t goin\' nowhere."',
-        '"Wood\'s got a soul, son. You just gotta listen for it."',
-        '"Been carvin\' since before your daddy was born. Reckon I know a thing or two."',
-        '"Sit a spell. Let me show you what these old hands can still do."'
-      ],
-      items: [
-        {
           name: 'Walking Stick',
           price: 6,
-          description: '-20% fall damage in events',
+          description: '-20% fall damage',
           stateKey: 'walkingStick',
-          equipment: true
-        },
-        {
-          name: 'Timber Handles',
-          price: 3,
-          description: '+5% mining output',
-          stateKey: 'timberHandles',
           equipment: true
         }
       ]
@@ -169,25 +78,19 @@
       keeper: 'Red Sullivan',
       miniGame: 'CardsGame',
       miniGamePrompt: 'Fancy a hand of Cave Draw?',
+      secondMiniGame: 'TaffyGame',
+      secondMiniGamePrompt: 'Penny Mae\'s taffy cart is here! Pull some taffy?',
       greetings: [
         '"Pull up a stool! What\'s your poison?"',
-        '"Welcome to the Lantern! Whiskey\'s strong and the stew\'s hot."',
+        '"Welcome to the Lantern! Stew\'s hot and Penny Mae\'s got fresh taffy."',
         '"Ain\'t seen you in a while, friend. Figured the cave got ya!"',
         '"Step on in! Leave your worries at the door -- they\'ll keep."'
       ],
       items: [
         {
-          name: 'Whiskey',
-          price: 1,
-          description: '+8 morale, -3 health',
-          stateKey: 'whiskey',
-          equipment: false,
-          consumable: true
-        },
-        {
           name: 'Hot Meal',
           price: 2,
-          description: '+5 morale, +5 health (immediate)',
+          description: '+5 morale, +5 health',
           stateKey: null,
           equipment: false,
           consumable: false,
@@ -198,6 +101,14 @@
             }
             return 'A steaming plate of venison stew with cornbread. Warms you to the bone.';
           }
+        },
+        {
+          name: 'Taffy',
+          price: 0.50,
+          description: '+10 morale when consumed',
+          stateKey: 'taffy',
+          equipment: false,
+          consumable: true
         }
       ]
     }
@@ -298,12 +209,12 @@
     UI.promptChoice(options, function (val) {
       if (val === 'leave') {
         if (townCallback) {
-          UI.fadeTransition(townCallback);
+          UI.transition(townCallback);
         }
       } else {
         var shop = SHOPS[val];
         trackVisit(shop.id);
-        UI.fadeTransition(function () {
+        UI.transition(function () {
           showShop(shop);
         });
       }
@@ -316,7 +227,7 @@
     if (shop.useExistingStore) {
       if (window.Store && window.Store.show) {
         window.Store.show(function () {
-          UI.fadeTransition(showTownHub);
+          UI.transition(showTownHub);
         });
         return;
       }
@@ -384,6 +295,17 @@
       idx++;
     }
 
+    // Second mini-game option (e.g. Taffy at the Tavern)
+    if (shop.secondMiniGame) {
+      menuOptions.push({
+        key: String(idx),
+        label: shop.secondMiniGamePrompt,
+        value: 'minigame2'
+      });
+      menuActions.push({ type: 'minigame2' });
+      idx++;
+    }
+
     // Leave shop
     menuOptions.push({
       key: '0',
@@ -393,12 +315,17 @@
 
     UI.promptChoice(menuOptions, function (val) {
       if (val === 'leave') {
-        UI.fadeTransition(showTownHub);
+        UI.transition(showTownHub);
         return;
       }
 
       if (val === 'minigame') {
         launchMiniGame(shop);
+        return;
+      }
+
+      if (val === 'minigame2') {
+        launchMiniGame(shop, true);
         return;
       }
 
@@ -531,8 +458,8 @@
   }
 
   // ─── Mini-Game Launcher ──────────────────────────────────────────
-  function launchMiniGame(shop) {
-    var gameGlobal = shop.miniGame;
+  function launchMiniGame(shop, useSecond) {
+    var gameGlobal = useSecond ? shop.secondMiniGame : shop.miniGame;
     var gameObj = window[gameGlobal];
 
     // Graceful fallback if mini-game not loaded

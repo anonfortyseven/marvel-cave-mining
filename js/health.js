@@ -85,9 +85,9 @@ window.HealthSystem = {
   },
 
   // Calculate darkness penalty (based on remaining light sources)
-  getDarknessPenalty: function(lanternOil, candles) {
-    if (lanternOil >= 0.5 && candles >= 2) return 0;  // well-lit
-    if (lanternOil >= 0.25 || candles >= 1) return 3;  // dim
+  getDarknessPenalty: function(lanternOil) {
+    if (lanternOil >= 0.5) return 0;   // well-lit
+    if (lanternOil >= 0.25) return 3;  // dim
     return 12; // near darkness - major penalty
   },
 
@@ -117,7 +117,7 @@ window.HealthSystem = {
     if (state.isUnderground) {
       airPenalty = this.getAirQualityPenalty(state.currentZone, state.daysUnderground);
       depthPenalty = this.getDepthPenalty(state.currentZone);
-      darknessPenalty = this.getDarknessPenalty(state.lanternOil, state.candles);
+      darknessPenalty = this.getDarknessPenalty(state.lanternOil);
     }
 
     // Sum total delta

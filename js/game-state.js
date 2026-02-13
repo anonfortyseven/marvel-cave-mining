@@ -15,11 +15,9 @@ window.GameState = {
     // Resources (flat)
     food: 200,
     lanternOil: 10,
-    candles: 50,
     rope: 200,
     timber: 50,
     dynamite: 20,
-    clothing: 5,
     cash: 800,
 
     // Progress
@@ -65,16 +63,11 @@ window.GameState = {
     // Morale & Equipment
     morale: 50,
     equipment: {
-      pickaxeUpgrade: false,
-      lanternRepair: false,
+      toolUpgrade: false,
       huntingKnife: false,
-      beltKnife: false,
-      walkingStick: false,
-      timberHandles: false
+      walkingStick: false
     },
     taffy: 0,
-    hardCandy: 0,
-    whiskey: 0,
 
     // Event tracking
     activeEvents: [],
@@ -223,6 +216,24 @@ window.GameState = {
           saveData.pendingPayments[i].dueDate = new Date(saveData.pendingPayments[i].dueDate);
         }
       }
+      // Migration: consolidate old equipment/items
+      if (saveData.equipment) {
+        if (saveData.equipment.pickaxeUpgrade || saveData.equipment.timberHandles) {
+          saveData.equipment.toolUpgrade = true;
+        }
+        if (saveData.equipment.beltKnife && !saveData.equipment.huntingKnife) {
+          saveData.equipment.huntingKnife = true;
+        }
+        delete saveData.equipment.pickaxeUpgrade;
+        delete saveData.equipment.lanternRepair;
+        delete saveData.equipment.beltKnife;
+        delete saveData.equipment.timberHandles;
+      }
+      if (saveData.hardCandy !== undefined) delete saveData.hardCandy;
+      if (saveData.whiskey !== undefined) delete saveData.whiskey;
+      if (saveData.candles !== undefined) delete saveData.candles;
+      if (saveData.clothing !== undefined) delete saveData.clothing;
+
       this.state = saveData;
       return true;
     } catch (e) { return false; }

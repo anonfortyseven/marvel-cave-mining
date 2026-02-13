@@ -127,7 +127,7 @@ window.Scoring = {
     }
 
     // Town visitor bonus
-    if (window.Town && window.Town.visitedShops && window.Town.visitedShops.length >= 6) {
+    if (window.Town && window.Town.visitedShops && window.Town.visitedShops.length >= 3) {
       breakdown.multiplier *= 1.1;
       breakdown.multiplierReasons.push('Visited all shops (x1.1)');
     }

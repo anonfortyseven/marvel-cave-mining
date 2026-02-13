@@ -109,6 +109,10 @@
     html += '<div class="subtitle">Stone County, Missouri &bull; 1884</div>\n';
     html += '<div style="margin-top:16px"></div>';
     UI.render(html);
+    // CRT boot flicker effect
+    var screen = UI.getScreen();
+    screen.classList.add('crt-boot');
+    setTimeout(function () { screen.classList.remove('crt-boot'); }, 850);
     UI.animateBats();
     UI.promptChoice([
       { key: '1', label: 'Start a New Expedition', value: 'new' },
@@ -117,17 +121,17 @@
       { key: '4', label: 'Top Ten Foremen', value: 'top' }
     ], function (val) {
       switch (val) {
-        case 'new': UI.fadeTransition(professionScreen); break;
+        case 'new': UI.transition(professionScreen); break;
         case 'load':
           if (window.GameState && window.GameState.hasSave()) {
             window.GameState.load();
-            UI.fadeTransition(statusScreen);
+            UI.transition(statusScreen);
           } else {
             UI.showNotification('No saved game found', 1500);
           }
           break;
-        case 'learn': UI.fadeTransition(learnScreen); break;
-        case 'top': UI.fadeTransition(topTenScreen); break;
+        case 'learn': UI.transition(learnScreen); break;
+        case 'top': UI.transition(topTenScreen); break;
       }
     });
   }
@@ -160,7 +164,7 @@
       { key: '3', label: 'Local Ozark Farmer', value: 'farmer' }
     ], function (val) {
       window.GameState.init({ profession: val });
-      UI.fadeTransition(crewScreen);
+      UI.transition(crewScreen);
     });
   }
 
@@ -193,7 +197,7 @@
         for (var i = 0; i < 4 && i < state.crew.length; i++) state.crew[i].name = names[i + 1];
       }
       UI.append('<div style="margin-top:10px" class="text-bright">Your crew is assembled!</div>');
-      UI.pressEnter(function () { UI.fadeTransition(seasonScreen); });
+      UI.pressEnter(function () { UI.transition(seasonScreen); });
     }
   }
 
@@ -221,7 +225,7 @@
         state.date = new Date(1884, m[val], 1);
         state.startDate = new Date(1884, m[val], 1);
       }
-      UI.fadeTransition(storeScreen);
+      UI.transition(storeScreen);
     });
   }
 
@@ -239,9 +243,9 @@
           state.currentZone = 'zone1';
           if (state.discoveredChambers.indexOf('cathedral_entrance') === -1) state.discoveredChambers.push('cathedral_entrance');
         }
-        UI.fadeTransition(landmarkScreen);
+        UI.transition(landmarkScreen);
       });
-    } else { UI.fadeTransition(statusScreen); }
+    } else { UI.transition(statusScreen); }
   }
 
   // =========================================
@@ -252,15 +256,47 @@
     var state = gs();
     var chamberId = state ? state.currentChamber : 'cathedral_entrance';
 
-    // Show chamber art
+    // Show chamber art line-by-line typewriter style
     var art = getArt(chamberId);
     var lines = window.Content ? window.Content.getLandmarkText(chamberId) : ['You descend into the cave...'];
 
     var html = '';
-    if (art) html += '<pre class="chamber-art">' + art + '</pre>';
-    html += '<div style="white-space:pre-wrap;line-height:2">' + UI.escapeHtml(lines.join('\n')) + '</div>';
+    if (art) html += '<pre class="chamber-art" id="landmark-art"></pre>';
+    html += '<div id="landmark-text" style="white-space:pre-wrap;line-height:2"></div>';
     UI.render(html);
-    UI.pressEnter(function () { UI.fadeTransition(statusScreen); });
+
+    var artEl = document.getElementById('landmark-art');
+    var textEl = document.getElementById('landmark-text');
+
+    // Typewriter: art lines, then description
+    var artLines = art ? art.split('\n') : [];
+    var artIdx = 0;
+
+    function typeArtLine() {
+      if (artIdx < artLines.length) {
+        artEl.textContent += (artIdx > 0 ? '\n' : '') + artLines[artIdx];
+        artIdx++;
+        setTimeout(typeArtLine, 60);
+      } else {
+        // Now typewriter the description
+        typeDescription(0);
+      }
+    }
+
+    function typeDescription(i) {
+      if (i < lines.length) {
+        textEl.textContent += (i > 0 ? '\n' : '') + lines[i];
+        setTimeout(function () { typeDescription(i + 1); }, 100);
+      } else {
+        UI.pressEnter(function () { UI.transition(statusScreen); });
+      }
+    }
+
+    if (artLines.length > 0) {
+      typeArtLine();
+    } else {
+      typeDescription(0);
+    }
   }
 
   // =========================================
@@ -281,6 +317,16 @@
     var chamber = getChamberData(state.currentChamber);
     var chamberName = chamber ? chamber.name : (state.isUnderground ? 'Unknown' : 'Marmaros');
     var depth = chamber ? chamber.depth : 0;
+
+    // Apply depth color theme
+    var screen = UI.getScreen();
+    screen.classList.remove('depth-shallow', 'depth-mid', 'depth-deep', 'depth-abyss');
+    if (state.isUnderground && chamber) {
+      if (depth >= 500) screen.classList.add('depth-abyss');
+      else if (depth >= 350) screen.classList.add('depth-deep');
+      else if (depth >= 200) screen.classList.add('depth-mid');
+      else screen.classList.add('depth-shallow');
+    }
 
     // === BUILD MAIN CONTENT ===
     var html = '';
@@ -310,10 +356,26 @@
       html += '<div class="zone-desc">' + UI.escapeHtml(chamber.description) + '</div>';
     }
 
-    // Ambient text
+    // Ambient text and animation
     if (state.isUnderground) {
       var ambient = getAmbient(state.currentChamber);
       if (ambient) html += '<div class="ambient-text">' + UI.escapeHtml(ambient) + '</div>';
+
+      // Pick ambient animation based on zone
+      var animId = null;
+      if (chamber) {
+        var zone = chamber.zone || '';
+        if (state.currentChamber === 'bat_colony' || state.currentChamber === 'cathedral_floor') animId = 'bat_wings';
+        else if (zone === 'zone4' || zone === 'zone5') animId = 'stalactite_drip';
+        else if (state.currentChamber === 'cloud_room' || state.currentChamber === 'the_narrows') animId = 'cave_wind';
+        else animId = 'torch_flicker';
+      }
+      if (animId && window.AsciiArt) {
+        var anim = window.AsciiArt.getAnimation(animId);
+        if (anim) {
+          html += '<pre class="ambient-anim" id="status-anim">' + anim.frames[0] + '</pre>';
+        }
+      }
     }
 
     html += '<hr class="separator">';
@@ -349,6 +411,25 @@
     html += '<div style="margin:4px 0">' + UI.progressBar(state.guanoShipped, state.contractTarget) + '</div>';
 
     UI.render(html);
+
+    // Start ambient animation if present
+    if (state.isUnderground) {
+      var animEl = document.getElementById('status-anim');
+      if (animEl && window.AsciiArt) {
+        var animId2 = null;
+        if (chamber) {
+          var zone2 = chamber.zone || '';
+          if (state.currentChamber === 'bat_colony' || state.currentChamber === 'cathedral_floor') animId2 = 'bat_wings';
+          else if (zone2 === 'zone4' || zone2 === 'zone5') animId2 = 'stalactite_drip';
+          else if (state.currentChamber === 'cloud_room' || state.currentChamber === 'the_narrows') animId2 = 'cave_wind';
+          else animId2 = 'torch_flicker';
+        }
+        if (animId2) {
+          var anim2 = window.AsciiArt.getAnimation(animId2);
+          if (anim2) UI.startAnimation(animEl, anim2.frames, anim2.interval);
+        }
+      }
+    }
 
     // === BUILD ACTION BAR ===
     var actions;
@@ -426,7 +507,7 @@
       var s = gs();
       if (s) s.workPace = v;
       UI.showNotification('Pace: ' + v, 1000);
-      setTimeout(function () { UI.fadeTransition(statusScreen); }, 1100);
+      setTimeout(function () { UI.transition(statusScreen); }, 1100);
     });
   }
 
@@ -441,7 +522,7 @@
       var s = gs();
       if (s) s.rationLevel = v;
       UI.showNotification('Rations: ' + v, 1000);
-      setTimeout(function () { UI.fadeTransition(statusScreen); }, 1100);
+      setTimeout(function () { UI.transition(statusScreen); }, 1100);
     });
   }
 
@@ -453,19 +534,19 @@
       state.currentZone = 'zone1';
       if (state.discoveredChambers.indexOf('cathedral_entrance') === -1) state.discoveredChambers.push('cathedral_entrance');
     }
-    UI.fadeTransition(landmarkScreen);
+    UI.transition(landmarkScreen);
   }
 
   function visitTown() {
     UI.hideBars();
     if (window.Town && window.Town.show) {
       window.Town.show(function () {
-        UI.fadeTransition(statusScreen);
+        UI.transition(statusScreen);
       });
     } else {
       // Fallback: just go to general store
       if (window.Store && window.Store.show) {
-        window.Store.show(function () { UI.fadeTransition(statusScreen); });
+        window.Store.show(function () { UI.transition(statusScreen); });
       } else {
         statusScreen();
       }
@@ -520,11 +601,11 @@
         var egg = window.Content.getEasterEgg(val);
         if (egg) {
           UI.render('<div class="event-highlight" style="margin:10px 0">' + egg.text.join('<br>') + '</div>');
-          UI.pressEnter(function () { UI.fadeTransition(landmarkScreen); });
+          UI.pressEnter(function () { UI.transition(landmarkScreen); });
           return;
         }
       }
-      UI.fadeTransition(landmarkScreen);
+      UI.transition(landmarkScreen);
     });
   }
 
@@ -643,9 +724,7 @@
       ['Lantern Oil', state.lanternOil.toFixed(1) + ' gal'],
       ['Rope', state.rope + ' ft'],
       ['Timber', state.timber],
-      ['Dynamite', state.dynamite],
-      ['Clothing', state.clothing + ' sets'],
-      ['Candles', state.candles]
+      ['Dynamite', state.dynamite]
     ];
     for (var i = 0; i < items.length; i++) {
       html += '<div class="store-item"><span>' + items[i][0] + '</span><span class="text-bright">' + items[i][1] + '</span></div>';
@@ -655,12 +734,9 @@
     if (state.equipment) {
       html += '<hr class="separator"><div class="text-bright">Equipment:</div>';
       var equips = [];
-      if (state.equipment.pickaxeUpgrade) equips.push('Pickaxe Upgrade');
-      if (state.equipment.lanternRepair) equips.push('Lantern Kit');
+      if (state.equipment.toolUpgrade) equips.push('Tool Upgrade');
       if (state.equipment.huntingKnife) equips.push('Hunting Knife');
-      if (state.equipment.beltKnife) equips.push('Belt Knife');
       if (state.equipment.walkingStick) equips.push('Walking Stick');
-      if (state.equipment.timberHandles) equips.push('Timber Handles');
       html += '<div class="text-dim">' + (equips.length > 0 ? equips.join(', ') : 'None') + '</div>';
     }
 
@@ -671,7 +747,6 @@
     html += '<div class="store-item"><span>Guano stockpile</span><span class="text-bright">' + state.guanoStockpile.toFixed(2) + ' tons</span></div>';
     html += '<div class="store-item"><span>Morale</span><span class="text-bright">' + morale + '%</span></div>';
     if (state.taffy > 0) html += '<div class="store-item"><span>Taffy</span><span class="text-bright">' + state.taffy + '</span></div>';
-    if (state.hardCandy > 0) html += '<div class="store-item"><span>Hard Candy</span><span class="text-bright">' + state.hardCandy + '</span></div>';
 
     UI.render(html);
     UI.pressEnter(function () { statusScreen(); });
@@ -802,7 +877,7 @@
       { key: '2', label: 'Return to title', value: 'title' }
     ], function (v) {
       if (v === 'score') scoringScreen();
-      else UI.fadeTransition(titleScreen);
+      else UI.transition(titleScreen);
     });
   }
 
@@ -880,9 +955,9 @@
       { key: '2', label: 'Play Again', value: 'again' },
       { key: '3', label: 'Title', value: 'title' }
     ], function (v) {
-      if (v === 'top') UI.fadeTransition(function () { topTenScreen(true); });
-      else if (v === 'again') UI.fadeTransition(professionScreen);
-      else UI.fadeTransition(titleScreen);
+      if (v === 'top') UI.transition(function () { topTenScreen(true); });
+      else if (v === 'again') UI.transition(professionScreen);
+      else UI.transition(titleScreen);
     });
   }
 
@@ -908,9 +983,9 @@
       UI.promptChoice([
         { key: '1', label: 'Play Again', value: 'a' },
         { key: '2', label: 'Title', value: 't' }
-      ], function (v) { UI.fadeTransition(v === 'a' ? professionScreen : titleScreen); });
+      ], function (v) { UI.transition(v === 'a' ? professionScreen : titleScreen); });
     } else {
-      UI.pressEnter(function () { UI.fadeTransition(titleScreen); });
+      UI.pressEnter(function () { UI.transition(titleScreen); });
     }
   }
 
@@ -938,7 +1013,7 @@
       UI.promptChoice(o, function (v) {
         if (v === 'n') show(idx + 1);
         else if (v === 'p') show(idx - 1);
-        else UI.fadeTransition(titleScreen);
+        else UI.transition(titleScreen);
       });
     }
   }
