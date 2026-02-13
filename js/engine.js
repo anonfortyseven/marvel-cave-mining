@@ -215,11 +215,11 @@ window.Engine = {
       return true;
     }
 
-    // Ran out of time (end of 1884)
-    var endDate = new Date(1885, 0, 1); // Jan 1 1885
-    if (state.date >= endDate) {
+    // Ran out of time (30-day contract expired)
+    var duration = state.gameDuration || 30;
+    if (state.totalDays >= duration) {
       state.gameOver = true;
-      state.gameOverReason = 'The year has ended. Time to settle accounts.';
+      state.gameOverReason = 'Your ' + duration + '-day mining contract has expired. Time to settle accounts.';
       return true;
     }
 

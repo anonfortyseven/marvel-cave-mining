@@ -102,11 +102,10 @@ window.Scoring = {
       breakdown.multiplierReasons.push('No deaths at all (x' + this.MULTIPLIERS.NO_DEATHS + ')');
     }
 
-    // Early finish (before October 1884)
-    var october = new Date(1884, 9, 1);
-    if (state.date < october && state.guanoShipped >= state.contractTarget) {
+    // Early finish (before day 20 of 30)
+    if (state.totalDays < 20 && state.guanoShipped >= state.contractTarget) {
       breakdown.multiplier *= this.MULTIPLIERS.EARLY_FINISH;
-      breakdown.multiplierReasons.push('Contract completed before October (x' + this.MULTIPLIERS.EARLY_FINISH + ')');
+      breakdown.multiplierReasons.push('Contract completed before Day 20 (x' + this.MULTIPLIERS.EARLY_FINISH + ')');
     }
 
     // All discoveries (match GameState flags)
@@ -143,12 +142,12 @@ window.Scoring = {
 
   // Get score rank/title
   getRank: function(score) {
-    if (score >= 5000) return 'Master Spelunker';
-    if (score >= 3000) return 'Expert Miner';
-    if (score >= 2000) return 'Skilled Foreman';
-    if (score >= 1000) return 'Journeyman';
-    if (score >= 500)  return 'Greenhorn';
-    if (score >= 100)  return 'Tenderfoot';
+    if (score >= 3000) return 'Master Spelunker';
+    if (score >= 2000) return 'Expert Miner';
+    if (score >= 1200) return 'Skilled Foreman';
+    if (score >= 700)  return 'Journeyman';
+    if (score >= 300)  return 'Greenhorn';
+    if (score >= 50)   return 'Tenderfoot';
     return 'Failed Prospector';
   },
 

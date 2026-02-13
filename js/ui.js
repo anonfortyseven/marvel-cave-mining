@@ -64,73 +64,37 @@
 
   function renderSurfaceBar(bar, state) {
     bar.classList.remove('underground');
-    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var dateStr = state.date ? months[state.date.getMonth()] + ' ' + state.date.getDate() : '';
+    var duration = state.gameDuration || 30;
+    var dayNum = Math.min(state.totalDays + 1, duration);
     var partyCount = getPartyCount(state);
-    var morale = state.morale !== undefined ? state.morale : 50;
-    var moraleCls = morale > 60 ? 'morale-high' : (morale > 30 ? 'morale-mid' : 'morale-low');
 
     bar.innerHTML =
-      sbItem('', dateStr) +
+      sbItem('Day', dayNum + '/' + duration) +
       sbItem('', 'Marmaros') +
-      sbItem('Crew', partyCount + '/5') +
-      sbItem('HP', getShortHealth(state.foreman ? state.foreman.health : 0)) +
+      sbItem('Crew', partyCount + '/' + (state.crew.length + 1)) +
       sbItem('$', state.cash.toFixed(0)) +
-      sbItem('Food', Math.round(state.food)) +
-      sbItem('Guano', state.guanoShipped.toFixed(1) + '/' + state.contractTarget + 't') +
-      '<span class="sb-item"><span class="sb-label">Morale</span>' +
-      '<span class="morale-bar"><span class="morale-fill ' + moraleCls + '" style="width:' + morale + '%"></span></span></span>';
+      sbItem('Guano', state.guanoShipped.toFixed(1) + '/' + state.contractTarget + 't');
   }
 
   function renderUndergroundBar(bar, state) {
     bar.classList.add('underground');
+    var duration = state.gameDuration || 30;
+    var dayNum = Math.min(state.totalDays + 1, duration);
+    var partyCount = getPartyCount(state);
 
     // Location
     var loc = 'Cave';
-    var depth = 0;
     if (window.CaveData) {
       var ch = window.CaveData.getChamber(state.currentChamber);
-      if (ch) { loc = ch.name; depth = ch.depth || 0; }
+      if (ch) { loc = ch.name; }
     }
 
-    var partyCount = getPartyCount(state);
-    var morale = state.morale !== undefined ? state.morale : 50;
-    var moraleCls = morale > 60 ? 'morale-high' : (morale > 30 ? 'morale-mid' : 'morale-low');
-
-    // Days remaining calculations
-    var foodPerDay = 2.4; // default full rations per person
-    if (state.rationLevel === 'half') foodPerDay = 1.2;
-    else if (state.rationLevel === 'scraps') foodPerDay = 0.6;
-    else if (state.rationLevel === 'none') foodPerDay = 0;
-    var totalFoodPerDay = foodPerDay * partyCount + (state.donkeys ? state.donkeys.count : 0);
-    var foodDays = totalFoodPerDay > 0 ? Math.floor(state.food / totalFoodPerDay) : 999;
-    var oilDays = Math.floor(state.lanternOil / 0.5);
-
-    var foodCls = foodDays > 10 ? 'sb-ok' : (foodDays >= 4 ? 'sb-warn' : 'sb-danger');
-    var oilCls = oilDays > 8 ? 'sb-ok' : (oilDays >= 3 ? 'sb-warn' : 'sb-danger');
-    var crewCls = partyCount >= 4 ? 'sb-ok' : (partyCount >= 2 ? 'sb-warn' : 'sb-danger');
-
-    // Guano progress
-    var guanoPct = state.contractTarget > 0 ? Math.min(100, (state.guanoShipped / state.contractTarget) * 100) : 0;
-
-    // Row 1: Vitals
-    var row1 = '<div class="status-row-vitals">' +
-      '<span class="sb-item sb-location">' + escapeHtml(loc) + (depth > 0 ? ' <span class="sb-depth">' + depth + 'ft</span>' : '') + '</span>' +
-      '<span class="sb-item">' + getShortHealth(state.foreman ? state.foreman.health : 0) + '</span>' +
-      '<span class="sb-item ' + crewCls + '">Crew ' + partyCount + '/5</span>' +
-      '<span class="sb-item"><span class="morale-bar-ug"><span class="morale-fill ' + moraleCls + '" style="width:' + morale + '%"></span></span></span>' +
-      '</div>';
-
-    // Row 2: Resources
-    var row2 = '<div class="status-row-resources">' +
-      '<span class="sb-item ' + foodCls + '">Food ' + Math.round(state.food) + ' <span class="sb-days">~' + foodDays + 'd</span></span>' +
-      '<span class="sb-item ' + oilCls + '">Oil ' + state.lanternOil.toFixed(1) + ' <span class="sb-days">~' + oilDays + 'd</span></span>' +
-      '<span class="sb-item sb-guano-item">Guano ' + state.guanoShipped.toFixed(1) + '/' + state.contractTarget + 't ' +
-        '<span class="sb-guano-bar"><span class="sb-guano-fill" style="width:' + guanoPct + '%"></span></span></span>' +
-      '<span class="sb-item">$' + state.cash.toFixed(0) + '</span>' +
-      '</div>';
-
-    bar.innerHTML = row1 + row2;
+    bar.innerHTML =
+      sbItem('Day', dayNum + '/' + duration) +
+      sbItem('', loc) +
+      sbItem('Crew', partyCount + '/' + (state.crew.length + 1)) +
+      sbItem('$', state.cash.toFixed(0)) +
+      sbItem('Guano', state.guanoShipped.toFixed(1) + '/' + state.contractTarget + 't');
   }
 
   function getPartyCount(state) {

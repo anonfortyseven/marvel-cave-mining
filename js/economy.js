@@ -5,7 +5,7 @@ window.Economy = {
   // Constants
   GUANO_PRICE_PER_TON: 700,        // $700 per ton of guano
   SHIPPING_COST_PER_TON: 50,        // $50 shipping per ton
-  PAYMENT_DELAY_DAYS: 14,           // 14-day payment delay
+  PAYMENT_DELAY_DAYS: 5,            // 5-day payment delay
   BASE_INFLATION_RATE: 0.10,        // 10% per month
   WINTER_INFLATION_MULTIPLIER: 2,   // 2x inflation in winter
 

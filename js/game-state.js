@@ -12,13 +12,13 @@ window.GameState = {
     ],
     donkeys: { count: 2, health: 0 },
 
-    // Resources (flat)
-    food: 200,
-    lanternOil: 10,
-    rope: 200,
-    timber: 50,
-    dynamite: 20,
-    cash: 800,
+    // Resources (flat) — balanced for 30-day game
+    food: 100,
+    lanternOil: 8,
+    rope: 150,
+    timber: 30,
+    dynamite: 10,
+    cash: 120,
 
     // Progress
     currentZone: 'surface',
@@ -26,9 +26,10 @@ window.GameState = {
     guanoMined: 0,
     guanoStockpile: 0,
     guanoShipped: 0,
-    contractTarget: 12,
+    contractTarget: 4,
 
-    // Time
+    // Time — 30-day fixed contract
+    gameDuration: 30,
     date: null, // set in init
     startDate: null,
     daysUnderground: 0,
@@ -37,8 +38,8 @@ window.GameState = {
     workPace: 'steady',
     rationLevel: 'full',
     season: 'summer',
-    profession: 'miner',
-    scoreMultiplier: 2,
+    profession: 'mine_foreman',
+    scoreMultiplier: 1,
 
     // Discovery
     discoveredChambers: [],
@@ -103,23 +104,17 @@ window.GameState = {
       if (options.foremanName) this.state.foreman.name = options.foremanName;
       if (options.profession) {
         this.state.profession = options.profession;
-        // Set cash and contract based on profession
-        switch (options.profession) {
-          case 'investor':
-            this.state.cash = 1600;
-            this.state.contractTarget = 8;
-            this.state.scoreMultiplier = 1;
-            break;
-          case 'miner':
-            this.state.cash = 800;
-            this.state.contractTarget = 12;
-            this.state.scoreMultiplier = 2;
-            break;
-          case 'farmer':
-            this.state.cash = 400;
-            this.state.contractTarget = 15;
-            this.state.scoreMultiplier = 3;
-            break;
+        // Look up profession data from CaveData
+        var profData = window.CaveData && window.CaveData.PROFESSIONS[options.profession];
+        if (profData) {
+          this.state.cash = profData.startingMoney;
+          this.state.contractTarget = profData.contractTarget;
+          this.state.scoreMultiplier = profData.scoreMultiplier;
+          // Adjust crew count based on profession
+          var targetCrew = profData.startingCrew;
+          while (this.state.crew.length > targetCrew) {
+            this.state.crew.pop();
+          }
         }
       }
       if (options.crewNames && Array.isArray(options.crewNames)) {

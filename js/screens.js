@@ -141,27 +141,28 @@
   // =========================================
   function professionScreen() {
     UI.hideBars();
+    var profs = window.CaveData ? window.CaveData.PROFESSIONS : {};
+    var keys = ['mine_foreman', 'geologist', 'farmer', 'drifter'];
+
     var html = '<div class="text-lg text-glow">Choose Your Background</div>';
     html += '<hr class="separator-double">';
-    html += '<div class="text-dim" style="margin:6px 0">Your choice determines starting funds and score multiplier.</div>';
+    html += '<div class="text-dim" style="margin:6px 0">Your 30-day mining contract with the Marble Cave Mining Co. begins now.</div>';
 
-    html += '<div class="box" style="margin:6px 0"><div class="box-title">1. Investor</div>';
-    html += '<div class="text-bright">$1,600 &bull; 8 ton contract &bull; Score: x1</div>';
-    html += '<div class="text-dim">You bankrolled this from your St. Louis parlor.</div></div>';
-
-    html += '<div class="box" style="margin:6px 0"><div class="box-title">2. Miner</div>';
-    html += '<div class="text-bright">$800 &bull; 12 ton contract &bull; Score: x2</div>';
-    html += '<div class="text-dim">You worked the lead mines in Joplin. You know rock.</div></div>';
-
-    html += '<div class="box" style="margin:6px 0"><div class="box-title">3. Farmer</div>';
-    html += '<div class="text-bright">$400 &bull; 15 ton contract &bull; Score: x3</div>';
-    html += '<div class="text-dim">You heard about the guano money and left your homestead.</div></div>';
+    for (var i = 0; i < keys.length; i++) {
+      var p = profs[keys[i]];
+      if (!p) continue;
+      var crew = p.startingCrew + 1; // +1 for foreman
+      html += '<div class="box" style="margin:6px 0"><div class="box-title">' + (i + 1) + '. ' + UI.escapeHtml(p.name) + '</div>';
+      html += '<div class="text-bright">$' + p.startingMoney + ' &bull; ' + p.contractTarget + ' ton contract &bull; Crew: ' + crew + ' &bull; Score: x' + p.scoreMultiplier + '</div>';
+      html += '<div class="text-dim">' + UI.escapeHtml(p.description) + '</div></div>';
+    }
 
     UI.render(html);
     UI.promptChoice([
-      { key: '1', label: 'Investor from St. Louis', value: 'investor' },
-      { key: '2', label: 'Experienced Miner', value: 'miner' },
-      { key: '3', label: 'Local Ozark Farmer', value: 'farmer' }
+      { key: '1', label: 'Mine Foreman', value: 'mine_foreman' },
+      { key: '2', label: 'Geologist', value: 'geologist' },
+      { key: '3', label: 'Farmer Turned Miner', value: 'farmer' },
+      { key: '4', label: 'Drifter', value: 'drifter' }
     ], function (val) {
       window.GameState.init({ profession: val });
       UI.transition(crewScreen);
@@ -173,28 +174,34 @@
   // =========================================
   function crewScreen() {
     UI.hideBars();
+    var state = gs();
+    var crewCount = state ? state.crew.length : 4;
+    var totalCount = crewCount + 1; // +1 for foreman
     var names = [];
     UI.render('<div class="text-lg text-glow">Name Your Mining Crew</div><hr class="separator-double">' +
-      '<div class="text-dim" style="margin:6px 0">Name your foreman and four miners.</div>');
+      '<div class="text-dim" style="margin:6px 0">Name your foreman and ' + crewCount + ' miner' + (crewCount !== 1 ? 's' : '') + '.</div>');
     askName(0);
 
     function askName(index) {
       var labels = ['Foreman', 'Rope Man', 'Lamp Keeper', 'Blast Man', 'Cart Driver'];
       var defaults = ['', 'Buck', 'Jesse', 'Hank', 'Earl'];
-      UI.promptText(labels[index] + ': ', function (val) {
-        if (!val) val = defaults[index] || labels[index];
+      if (index >= totalCount) { finishCrew(); return; }
+      var label = labels[index] || ('Miner ' + index);
+      var defVal = defaults[index] || label;
+      UI.promptText(label + ': ', function (val) {
+        if (!val) val = defVal;
         names.push(val);
-        UI.append('<div class="text-green"> -> ' + UI.escapeHtml(labels[index]) + ': ' + UI.escapeHtml(val) + '</div>');
-        if (index < 4) askName(index + 1);
+        UI.append('<div class="text-green"> -> ' + UI.escapeHtml(label) + ': ' + UI.escapeHtml(val) + '</div>');
+        if (index < totalCount - 1) askName(index + 1);
         else finishCrew();
-      }, { defaultValue: defaults[index] });
+      }, { defaultValue: defVal });
     }
 
     function finishCrew() {
       var state = gs();
       if (state) {
         state.foreman.name = names[0];
-        for (var i = 0; i < 4 && i < state.crew.length; i++) state.crew[i].name = names[i + 1];
+        for (var i = 0; i < state.crew.length; i++) if (names[i + 1]) state.crew[i].name = names[i + 1];
       }
       UI.append('<div style="margin-top:10px" class="text-bright">Your crew is assembled!</div>');
       UI.pressEnter(function () { UI.transition(seasonScreen); });
@@ -207,10 +214,11 @@
   function seasonScreen() {
     UI.hideBars();
     var html = '<div class="text-lg text-glow">Choose Starting Season</div><hr class="separator-double">';
-    html += '<div class="box" style="margin:6px 0"><div class="box-title">1. Spring</div><div class="text-dim">March. Flooding risk. Long runway.</div></div>';
-    html += '<div class="box" style="margin:6px 0"><div class="box-title">2. Summer</div><div class="text-dim">June. Ideal conditions. Bats active.</div></div>';
-    html += '<div class="box" style="margin:6px 0"><div class="box-title">3. Fall</div><div class="text-dim">September. Good conditions, short clock.</div></div>';
-    html += '<div class="box" style="margin:6px 0"><div class="box-title">4. Winter</div><div class="text-dim">December. Supply routes frozen. Hard mode.</div></div>';
+    html += '<div class="text-dim" style="margin:6px 0">Your 30-day contract begins on the 1st of the month.</div>';
+    html += '<div class="box" style="margin:6px 0"><div class="box-title">1. Spring</div><div class="text-dim">March. Spring rains swell the Lost River. Flash flooding risk is severe.</div></div>';
+    html += '<div class="box" style="margin:6px 0"><div class="box-title">2. Summer</div><div class="text-dim">June. The 40,000-strong bat colony is at peak activity. The ammonia is choking.</div></div>';
+    html += '<div class="box" style="margin:6px 0"><div class="box-title">3. Fall</div><div class="text-dim">September. Bats begin hibernation in the Mammoth Room. The cave grows quiet.</div></div>';
+    html += '<div class="box" style="margin:6px 0"><div class="box-title">4. Winter</div><div class="text-dim">December. Ice at the Devil\'s Den entrance. Inflation doubled. Hard mode.</div></div>';
     UI.render(html);
     UI.promptChoice([
       { key: '1', label: 'Spring (March)', value: 'spring' },
@@ -328,108 +336,79 @@
       else screen.classList.add('depth-shallow');
     }
 
-    // === BUILD MAIN CONTENT ===
+    // === BUILD COMPACT DASHBOARD (no image, info-first) ===
     var html = '';
+    var duration = state.gameDuration || 30;
+    var dayNum = Math.min(state.totalDays + 1, duration);
+    var daysLeft = Math.max(0, duration - state.totalDays);
 
-    // Pixel art image for location
-    if (window.Images) {
-      if (state.isUnderground) {
-        html += Images.getCaveImage(state.currentChamber);
-      } else {
-        html += Images.getImageHtml('town');
-      }
-    }
+    // Day counter (large, prominent)
+    var dayClass = daysLeft <= 5 ? 'sb-danger' : (daysLeft <= 10 ? 'sb-warn' : '');
+    html += '<div class="day-counter ' + dayClass + '">DAY ' + dayNum + ' of ' + duration + '</div>';
 
-    // Chamber art
-    var art = getArt(state.currentChamber);
-    if (art) {
-      html += '<pre class="chamber-art">' + art + '</pre>';
-    }
-
-    // Location header
-    html += '<div class="text-bright text-glow">' + UI.escapeHtml(chamberName);
-    if (state.isUnderground && depth > 0) html += ' <span class="text-dim">(' + depth + ' ft deep)</span>';
+    // Date + location line
+    html += '<div class="dash-location">';
+    html += '<span class="text-dim">' + formatDate(state) + '</span> &bull; ';
+    html += '<span class="text-bright">' + UI.escapeHtml(chamberName) + '</span>';
+    if (state.isUnderground && depth > 0) html += ' <span class="text-dim">(' + depth + ' ft)</span>';
     html += '</div>';
 
-    // Chamber description
+    html += '<hr class="separator">';
+
+    // Crew health row — compact chips
+    html += '<div class="crew-row">';
+    html += crewChip(state.foreman.name, state.foreman.health, state.foreman.alive, true);
+    for (var i = 0; i < state.crew.length; i++) {
+      html += crewChip(state.crew[i].name, state.crew[i].health, state.crew[i].alive, false);
+    }
+    if (state.donkeys.count > 0) {
+      html += '<span class="crew-chip crew-chip-donkey">' + state.donkeys.count + ' donkey' + (state.donkeys.count > 1 ? 's' : '') + '</span>';
+    }
+    html += '</div>';
+
+    // Resources grid (compact 2-column)
+    var partySize = countAlive(state);
+    var foodPerDay = 2.4;
+    if (state.rationLevel === 'half') foodPerDay = 1.2;
+    else if (state.rationLevel === 'scraps') foodPerDay = 0.6;
+    else if (state.rationLevel === 'none') foodPerDay = 0;
+    var totalFoodPerDay = foodPerDay * partySize + (state.donkeys ? state.donkeys.count : 0);
+    var foodDays = totalFoodPerDay > 0 ? Math.floor(state.food / totalFoodPerDay) : 99;
+    var oilDays = state.lanternOil > 0 ? Math.floor(state.lanternOil / 0.5) : 0;
+    var foodCls = foodDays > 10 ? 'sb-ok' : (foodDays >= 4 ? 'sb-warn' : 'sb-danger');
+    var oilCls = oilDays > 8 ? 'sb-ok' : (oilDays >= 3 ? 'sb-warn' : 'sb-danger');
+
+    var morale = state.morale !== undefined ? state.morale : 50;
+    var moraleCls = morale > 60 ? 'morale-high' : (morale > 30 ? 'morale-mid' : 'morale-low');
+
+    html += '<div class="resource-grid">';
+    html += si('Cash', '$' + state.cash.toFixed(0));
+    html += si('Food', '<span class="' + foodCls + '">' + Math.round(state.food) + ' lbs (~' + foodDays + 'd)</span>');
+    html += si('Oil', '<span class="' + oilCls + '">' + state.lanternOil.toFixed(1) + ' gal (~' + oilDays + 'd)</span>');
+    html += si('Rope', state.rope + ' ft');
+    html += si('Pace', state.workPace);
+    html += si('Rations', state.rationLevel);
+    html += '</div>';
+
+    // Morale bar
+    html += '<div class="dash-morale"><span class="status-label">Morale:</span> ' +
+      '<span class="morale-bar"><span class="morale-fill ' + moraleCls + '" style="width:' + morale + '%"></span></span>' +
+      ' <span class="text-dim">' + morale + '%</span></div>';
+
+    // Guano contract progress (most prominent)
+    html += '<div class="guano-progress-wrap">';
+    html += '<div class="status-label">Guano: ' + state.guanoShipped.toFixed(1) + ' / ' + state.contractTarget + ' tons';
+    if (state.guanoStockpile > 0.01) html += ' <span class="text-dim">(+' + state.guanoStockpile.toFixed(2) + ' stockpiled)</span>';
+    html += '</div>';
+    html += UI.progressBar(state.guanoShipped, state.contractTarget);
+    html += '</div>';
+
+    // Chamber description (compact flavor)
     if (chamber && chamber.description) {
       html += '<div class="zone-desc">' + UI.escapeHtml(chamber.description) + '</div>';
     }
 
-    // Ambient text and animation
-    if (state.isUnderground) {
-      var ambient = getAmbient(state.currentChamber);
-      if (ambient) html += '<div class="ambient-text">' + UI.escapeHtml(ambient) + '</div>';
-
-      // Pick ambient animation based on zone
-      var animId = null;
-      if (chamber) {
-        var zone = chamber.zone || '';
-        if (state.currentChamber === 'bat_colony' || state.currentChamber === 'cathedral_floor') animId = 'bat_wings';
-        else if (zone === 'zone4' || zone === 'zone5') animId = 'stalactite_drip';
-        else if (state.currentChamber === 'cloud_room' || state.currentChamber === 'the_narrows') animId = 'cave_wind';
-        else animId = 'torch_flicker';
-      }
-      if (animId && window.AsciiArt) {
-        var anim = window.AsciiArt.getAnimation(animId);
-        if (anim) {
-          html += '<pre class="ambient-anim" id="status-anim">' + anim.frames[0] + '</pre>';
-        }
-      }
-    }
-
-    html += '<hr class="separator">';
-
-    // Crew health compact
-    html += '<div class="text-sm">';
-    html += '<span>' + UI.escapeHtml(state.foreman.name) + ' ' + healthLabel(state.foreman.health) + '</span>';
-    for (var i = 0; i < state.crew.length; i++) {
-      var m = state.crew[i];
-      if (m.alive) {
-        html += ' &bull; <span>' + UI.escapeHtml(m.name) + ' ' + healthLabel(m.health) + '</span>';
-      } else {
-        html += ' &bull; <span class="text-gray">' + UI.escapeHtml(m.name) + ' \u2020</span>';
-      }
-    }
-    html += '</div>';
-
-    html += '<hr class="separator">';
-
-    // Key stats in grid
-    html += '<div class="status-grid">';
-    html += si('Guano', state.guanoShipped.toFixed(1) + ' / ' + state.contractTarget + ' tons');
-    html += si('Stockpile', state.guanoStockpile.toFixed(2) + ' tons');
-    html += si('Cash', '$' + state.cash.toFixed(2));
-    html += si('Food', Math.round(state.food) + ' lbs');
-    html += si('Oil', state.lanternOil.toFixed(1) + ' gal');
-    html += si('Pace', state.workPace);
-    html += si('Rations', state.rationLevel);
-    html += si('Rope', state.rope + ' ft');
-    html += '</div>';
-
-    // Progress bar
-    html += '<div style="margin:4px 0">' + UI.progressBar(state.guanoShipped, state.contractTarget) + '</div>';
-
     UI.render(html);
-
-    // Start ambient animation if present
-    if (state.isUnderground) {
-      var animEl = document.getElementById('status-anim');
-      if (animEl && window.AsciiArt) {
-        var animId2 = null;
-        if (chamber) {
-          var zone2 = chamber.zone || '';
-          if (state.currentChamber === 'bat_colony' || state.currentChamber === 'cathedral_floor') animId2 = 'bat_wings';
-          else if (zone2 === 'zone4' || zone2 === 'zone5') animId2 = 'stalactite_drip';
-          else if (state.currentChamber === 'cloud_room' || state.currentChamber === 'the_narrows') animId2 = 'cave_wind';
-          else animId2 = 'torch_flicker';
-        }
-        if (animId2) {
-          var anim2 = window.AsciiArt.getAnimation(animId2);
-          if (anim2) UI.startAnimation(animEl, anim2.frames, anim2.interval);
-        }
-      }
-    }
 
     // === BUILD ACTION BAR ===
     var actions;
@@ -463,6 +442,18 @@
 
   function si(label, value) {
     return '<div class="status-row"><span class="status-label">' + label + ':</span><span class="status-value">' + value + '</span></div>';
+  }
+
+  function crewChip(name, health, alive, isForeman) {
+    if (!alive) return '<span class="crew-chip crew-chip-dead">' + UI.escapeHtml(name) + ' \u2020</span>';
+    var cls = 'crew-chip';
+    if (health <= 34) cls += ' crew-chip-good';
+    else if (health <= 69) cls += ' crew-chip-fair';
+    else if (health <= 104) cls += ' crew-chip-poor';
+    else cls += ' crew-chip-vpoor';
+    if (isForeman) cls += ' crew-chip-foreman';
+    var label = window.HealthSystem ? window.HealthSystem.getHealthLabel(health) : '';
+    return '<span class="' + cls + '">' + UI.escapeHtml(name) + ' <span class="chip-health">' + label + '</span></span>';
   }
 
   // =========================================
@@ -995,11 +986,15 @@
   function learnScreen() {
     UI.hideBars();
     var pages = [
-      { title: 'The Osage and the Devil\'s Den', text: 'The Osage people knew Marvel Cave as the "Devil\'s Den"\nand considered it sacred and dangerous. They marked the\nentrance with V-shaped carvings as warnings.\n\nWhite settlers discovered the cave in the 1840s.' },
-      { title: 'The Mining Company (1884)', text: 'The Marble Cave Mining and Manufacturing Company was\nfounded in 1884 to extract bat guano.\n\nAt $700 per ton, guano was worth the danger.\nMiners used carbide lanterns, hemp ropes, and dynamite.' },
-      { title: 'The Cave System', text: 'Marvel Cave features the Cathedral Room - the largest\ncave entrance room in America, over 200 feet tall.\n\nThe cave extends over 500 feet deep with underground\nrivers and lakes. Temperature stays 60\u00B0F year-round.' },
-      { title: 'The Bald Knobbers', text: 'The Bald Knobbers were vigilantes active in the 1880s.\nOriginally formed to combat lawlessness, some factions\nbecame violent. Disbanded after hangings in 1889.' },
-      { title: 'From Mine to Marvel', text: 'After the guano was exhausted, William Lynch bought\nthe cave in 1889 and began giving tours.\n\nIn 1950, the Herschend family built Silver Dollar City.\nToday Marvel Cave draws visitors from around the world.' }
+      { title: 'The Osage and the Devil\'s Den', text: 'The Osage people recognized this ominous sinkhole atop Roark Mountain by 1500, calling it "Devil\'s Den." The fluttering of thousands of bat wings and the echoes of subterranean waterfalls emanating from the abyss led them to believe it was a gateway to the underworld.\n\nLegend tells of a young Osage brave who fell while chasing a bear into the sinkhole. The Osage marked surrounding trees with a sideways "V" as warning to all who passed.' },
+      { title: 'The Spanish Expeditions (1541)', text: 'In 1541, Spanish conquistadors descended into the cave seeking gold and the mythical Fountain of Youth. They found neither, but left behind notched pine tree ladders deep in the Mammoth Room.\n\nThese "Spanish ladders" were discovered three centuries later in 1869, providing physical proof of the earliest European exploration of Marvel Cave.' },
+      { title: 'The Blow Expedition (1869)', text: 'Henry T. Blow, a St. Louis lead mining magnate, led six miners into Devil\'s Den in 1869. They lowered themselves 200 feet by rope into the Cathedral Room.\n\nFinding no lead, they reached a chamber with a flat, polished ceiling. Deceived by lamplight, they identified it as pure marble. The "Marble Cave" misnomer was born -- it was ordinary Mississippian limestone.' },
+      { title: 'The Marble Cave Mining Co. (1884)', text: 'In 1882, T. Hodges Jones and Truman S. Powell tested the marble claims -- the "marble" was just limestone. But they found something better: massive deposits of nitrogen-rich bat guano.\n\nIn 1884, Jones founded the Marble Cave Mining and Manufacturing Company. Guano sold at $700 per ton for fertilizer and gunpowder. Donkeys were lowered by rope to pull ore carts through the passages.' },
+      { title: 'Marmaros: The Mining Town', text: 'The mining boom birthed Marmaros ("Greek for marble") in 1884 -- a settlement of 28 souls with a hotel, general store, school, pottery shop, and furniture factory.\n\nBy 1889, after four and a half years, the guano was exhausted and the company collapsed. Marmaros was abandoned, and its remnants were burned by the Bald Knobbers, the violent Ozark vigilante group.' },
+      { title: 'The Cathedral Room', text: 'The Cathedral Room is the largest cave entrance room in the United States: 204 feet high, 225 feet wide, 411 feet long. It could hold the Statue of Liberty with room to spare.\n\nA 124-foot conical debris pile called the "Underground Mountain" rises from the floor. In 1963, Don Piccard set an underground altitude record by flying a hot air balloon inside this chamber.' },
+      { title: 'The Lynch Era (1889-1927)', text: 'William Henry Lynch bought the cave and surrounding land for $10,000 in 1889, sight unseen. He opened it to tourists in 1894 -- early tours lasted eight exhausting hours by candlelight.\n\nLynch personally built Missouri Highway 76 to connect the cave to Branson. After his death in 1927, his daughters Genevieve and Miriam renamed it "Marvel Cave," saying "Marble was untrue! Marvel was all truth."' },
+      { title: 'Silver Dollar City (1950-Present)', text: 'In 1950, Hugo Herschend and his family secured a 99-year lease. They replaced wooden ladders with concrete walkways and in 1957 built a cable-train funicular to carry visitors up from 505 feet below.\n\nThe Army Corps of Engineers said it was impossible. The Herschends built it anyway. To entertain visitors waiting above ground, they recreated Marmaros as an 1880s craft village -- which became Silver Dollar City.' },
+      { title: 'The Living Cave', text: 'Marvel Cave is a "wet" active cave -- formations are still growing. The constant temperature is 58\u00B0F year-round. Over 40,000 gray bats (federally endangered) roost in the Mammoth Room, consuming 24 million insects nightly.\n\nThe cave descends 505 feet to the Waterfall Room, where a 50-foot waterfall fed by the Lost River marks the deepest accessible point. Lake Genevieve and Lake Miriam, named for Lynch\'s daughters, hold waters 34 feet deep with passages mapped to 110 feet below the surface.' }
     ];
     show(0);
     function show(idx) {
