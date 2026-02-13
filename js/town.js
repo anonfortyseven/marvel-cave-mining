@@ -329,6 +329,8 @@
     // Build shop screen
     var art = getShopArt(shop.id);
     var html = '';
+    // Pixel art shop image
+    if (window.Images) html += Images.getShopImage(shop.id);
     if (art) {
       html += '<pre class="title-art">' + art + '</pre>\n';
     }
@@ -551,7 +553,13 @@
       playerMorale: state ? (state.morale || 50) : 50
     };
 
+    // Switch to mini-game music
+    if (window.Audio_Manager) Audio_Manager.play('minigame');
+
     gameObj.start(params, function (result) {
+      // Resume town music
+      if (window.Audio_Manager) Audio_Manager.play('town');
+
       if (result) {
         handleMiniGameResult(result);
 

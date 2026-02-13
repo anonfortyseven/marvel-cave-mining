@@ -216,17 +216,26 @@
     });
   }
 
-  // Show numbered menu choices and handle keyboard/click selection
+  // Show numbered menu choices with arrow navigation + OK button
   function promptChoice(options, callback) {
     clearKeyHandler();
-    var html = '<div class="menu-options">';
+    var selectedIdx = 0;
+
+    var html = '<div class="menu-options" id="menu-choices">';
     for (var i = 0; i < options.length; i++) {
       var opt = options[i];
       var key = opt.key || String(i + 1);
-      html += '<div class="menu-option" data-key="' + key + '">';
+      html += '<div class="menu-option' + (i === 0 ? ' selected' : '') + '" data-key="' + key + '" data-idx="' + i + '">';
       html += '  <span class="key">' + key + '</span>. ' + escapeHtml(opt.label);
       html += '</div>';
     }
+    html += '</div>';
+
+    // Arrow nav buttons + OK
+    html += '<div class="nav-buttons">';
+    html += '<button class="nav-btn" id="nav-up" aria-label="Previous"><span class="nav-arrow">&#9650;</span></button>';
+    html += '<button class="nav-btn nav-ok" id="nav-ok">OK</button>';
+    html += '<button class="nav-btn" id="nav-down" aria-label="Next"><span class="nav-arrow">&#9660;</span></button>';
     html += '</div>';
     append(html);
 
@@ -234,28 +243,88 @@
     el.scrollTop = el.scrollHeight;
 
     var keyMap = {};
+    var keyList = [];
     for (var j = 0; j < options.length; j++) {
       var k = options[j].key || String(j + 1);
       keyMap[k.toLowerCase()] = options[j].value !== undefined ? options[j].value : j;
+      keyList.push(k.toLowerCase());
     }
 
-    var menuOptions = el.querySelectorAll('.menu-option');
+    var menuOptions = el.querySelectorAll('#menu-choices .menu-option');
+
+    function updateHighlight() {
+      for (var m = 0; m < menuOptions.length; m++) {
+        menuOptions[m].classList.toggle('selected', m === selectedIdx);
+      }
+      // Scroll selected into view
+      if (menuOptions[selectedIdx]) {
+        menuOptions[selectedIdx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }
+
+    function confirmSelection() {
+      var chosenKey = keyList[selectedIdx];
+      if (keyMap.hasOwnProperty(chosenKey)) {
+        clearKeyHandler();
+        callback(keyMap[chosenKey]);
+      }
+    }
+
+    // Click/tap on options
     menuOptions.forEach(function (optEl) {
       optEl.addEventListener('click', function () {
-        var clickKey = this.getAttribute('data-key').toLowerCase();
-        if (keyMap.hasOwnProperty(clickKey)) {
-          clearKeyHandler();
-          callback(keyMap[clickKey]);
-        }
+        var clickIdx = parseInt(this.getAttribute('data-idx'), 10);
+        selectedIdx = clickIdx;
+        updateHighlight();
+        confirmSelection();
       });
     });
 
+    // Nav button handlers
+    var upBtn = document.getElementById('nav-up');
+    var downBtn = document.getElementById('nav-down');
+    var okBtn = document.getElementById('nav-ok');
+
+    if (upBtn) upBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      selectedIdx = (selectedIdx - 1 + options.length) % options.length;
+      updateHighlight();
+    });
+    if (downBtn) downBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      selectedIdx = (selectedIdx + 1) % options.length;
+      updateHighlight();
+    });
+    if (okBtn) okBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      confirmSelection();
+    });
+
     function handler(e) {
-      var pressed = e.key.toLowerCase();
-      if (keyMap.hasOwnProperty(pressed)) {
+      var pressed = e.key;
+      if (pressed === 'ArrowUp' || pressed === 'Up') {
+        e.preventDefault();
+        selectedIdx = (selectedIdx - 1 + options.length) % options.length;
+        updateHighlight();
+        return;
+      }
+      if (pressed === 'ArrowDown' || pressed === 'Down') {
+        e.preventDefault();
+        selectedIdx = (selectedIdx + 1) % options.length;
+        updateHighlight();
+        return;
+      }
+      if (pressed === 'Enter') {
+        e.preventDefault();
+        confirmSelection();
+        return;
+      }
+      // Direct key press still works
+      var lp = pressed.toLowerCase();
+      if (keyMap.hasOwnProperty(lp)) {
         e.preventDefault();
         clearKeyHandler();
-        callback(keyMap[pressed]);
+        callback(keyMap[lp]);
       }
     }
 
@@ -263,7 +332,7 @@
     document.addEventListener('keydown', handler);
   }
 
-  // Text input prompt
+  // Text input prompt with submit button
   function promptText(label, callback, opts) {
     clearKeyHandler();
     opts = opts || {};
@@ -273,6 +342,7 @@
     var html = '<div class="game-input-line">';
     html += '<span class="prompt-label">' + escapeHtml(label) + '</span>';
     html += '<input type="text" class="game-input" maxlength="' + maxLen + '" value="' + escapeHtml(defaultVal) + '" autofocus>';
+    html += '<button class="submit-btn" id="input-submit">GO</button>';
     html += '</div>';
     append(html);
 
@@ -284,15 +354,30 @@
     if (input) {
       setTimeout(function () { input.focus(); }, 50);
 
+      function doSubmit() {
+        var val = input.value.trim();
+        if (val.length > 0 || opts.allowEmpty) {
+          clearKeyHandler();
+          input.disabled = true;
+          var btn = input.parentNode.querySelector('.submit-btn');
+          if (btn) btn.disabled = true;
+          callback(val);
+        }
+      }
+
+      // Submit button click
+      var submitBtn = input.parentNode.querySelector('.submit-btn');
+      if (submitBtn) {
+        submitBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          doSubmit();
+        });
+      }
+
       function handler(e) {
         if (e.key === 'Enter') {
           e.preventDefault();
-          var val = input.value.trim();
-          if (val.length > 0 || opts.allowEmpty) {
-            clearKeyHandler();
-            input.disabled = true;
-            callback(val);
-          }
+          doSubmit();
         }
       }
 
@@ -301,7 +386,7 @@
     }
   }
 
-  // Number input prompt
+  // Number input prompt with submit button
   function promptNumber(label, callback, opts) {
     clearKeyHandler();
     opts = opts || {};
@@ -311,7 +396,8 @@
 
     var html = '<div class="game-input-line">';
     html += '<span class="prompt-label">' + escapeHtml(label) + '</span>';
-    html += '<input type="text" class="game-input" value="' + defaultVal + '" autofocus>';
+    html += '<input type="text" class="game-input" inputmode="numeric" value="' + defaultVal + '" autofocus>';
+    html += '<button class="submit-btn" id="input-submit">GO</button>';
     html += '</div>';
     append(html);
 
@@ -323,17 +409,32 @@
     if (input) {
       setTimeout(function () { input.focus(); }, 50);
 
+      function doSubmit() {
+        var val = parseInt(input.value, 10);
+        if (isNaN(val)) val = 0;
+        if (val < min) val = min;
+        if (val > max) val = max;
+        clearKeyHandler();
+        input.disabled = true;
+        input.value = val;
+        var btn = input.parentNode.querySelector('.submit-btn');
+        if (btn) btn.disabled = true;
+        callback(val);
+      }
+
+      // Submit button click
+      var submitBtn = input.parentNode.querySelector('.submit-btn');
+      if (submitBtn) {
+        submitBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          doSubmit();
+        });
+      }
+
       function handler(e) {
         if (e.key === 'Enter') {
           e.preventDefault();
-          var val = parseInt(input.value, 10);
-          if (isNaN(val)) val = 0;
-          if (val < min) val = min;
-          if (val > max) val = max;
-          clearKeyHandler();
-          input.disabled = true;
-          input.value = val;
-          callback(val);
+          doSubmit();
         }
       }
 
@@ -416,29 +517,31 @@
     }
   }
 
-  // "Press ENTER to continue" prompt (also responds to tap)
+  // "Press ENTER to continue" - prominent tappable button
   function pressEnter(callback) {
     clearKeyHandler();
-    append('<div class="text-dim" style="margin-top:12px;cursor:pointer" id="press-enter-prompt">Press ENTER to continue...</div>');
+    append('<div style="margin-top:14px;text-align:center">' +
+      '<button class="continue-btn" id="press-enter-prompt">CONTINUE</button>' +
+      '</div>');
 
     var el = getScreen();
     el.scrollTop = el.scrollHeight;
 
+    var fired = false;
     function fire() {
+      if (fired) return;
+      fired = true;
       clearKeyHandler();
-      var prompt = document.getElementById('press-enter-prompt');
-      if (prompt) prompt.removeEventListener('click', fire);
       callback();
     }
 
-    // Click/tap support
     setTimeout(function () {
       var prompt = document.getElementById('press-enter-prompt');
       if (prompt) prompt.addEventListener('click', fire);
     }, 50);
 
     function handler(e) {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         fire();
       }
@@ -447,15 +550,18 @@
     document.addEventListener('keydown', handler);
   }
 
-  // Wait for any key (also responds to tap)
+  // Wait for any key - prominent tappable button
   function pressAnyKey(callback) {
     clearKeyHandler();
-    append('<div class="text-dim" style="margin-top:8px;cursor:pointer" id="press-any-prompt">Press any key...</div>');
+    append('<div style="margin-top:10px;text-align:center">' +
+      '<button class="continue-btn continue-btn-sm" id="press-any-prompt">CONTINUE</button>' +
+      '</div>');
 
+    var fired = false;
     function fire() {
+      if (fired) return;
+      fired = true;
       clearKeyHandler();
-      var prompt = document.getElementById('press-any-prompt');
-      if (prompt) prompt.removeEventListener('click', fire);
       callback();
     }
 

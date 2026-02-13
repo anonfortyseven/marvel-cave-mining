@@ -719,6 +719,170 @@ body {
   font-size: var(--font-size-xs);
 }
 
+/* === Navigation Buttons (arrow up/down + OK) === */
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 10px 0 4px;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(92, 58, 30, 0.3);
+  border: 2px solid var(--color-brown);
+  color: var(--color-amber);
+  font-family: var(--font-main);
+  font-size: var(--font-size-md);
+  min-width: 52px;
+  min-height: 48px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  touch-action: manipulation;
+  border-radius: 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav-btn:hover,
+.nav-btn:active {
+  background: rgba(184, 115, 51, 0.25);
+  border-color: var(--color-copper);
+  color: var(--color-amber-bright);
+  text-shadow: var(--glow-amber);
+}
+
+.nav-btn:active {
+  transform: scale(0.92);
+}
+
+.nav-arrow {
+  font-size: var(--font-size-lg);
+  line-height: 1;
+}
+
+.nav-btn.nav-ok {
+  background: rgba(184, 115, 51, 0.2);
+  border-color: var(--color-copper);
+  color: var(--color-amber-bright);
+  font-size: var(--font-size-sm);
+  min-width: 64px;
+  text-shadow: var(--glow-amber);
+}
+
+.nav-btn.nav-ok:hover,
+.nav-btn.nav-ok:active {
+  background: rgba(184, 115, 51, 0.4);
+  border-color: var(--color-amber);
+}
+
+/* Selected menu option highlight */
+.menu-option.selected {
+  color: var(--color-amber-bright);
+  background: rgba(184, 115, 51, 0.15);
+  text-shadow: var(--glow-amber);
+  border-left: 3px solid var(--color-copper);
+  padding-left: 5px;
+}
+
+/* === Submit Button (GO) for text/number inputs === */
+.submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(184, 115, 51, 0.2);
+  border: 2px solid var(--color-copper);
+  color: var(--color-amber-bright);
+  font-family: var(--font-main);
+  font-size: var(--font-size-sm);
+  padding: 6px 14px;
+  min-height: 40px;
+  min-width: 52px;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  touch-action: manipulation;
+  border-radius: 3px;
+  text-shadow: var(--glow-amber);
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.submit-btn:hover,
+.submit-btn:active {
+  background: rgba(184, 115, 51, 0.4);
+  border-color: var(--color-amber);
+}
+
+.submit-btn:active {
+  transform: scale(0.93);
+}
+
+.submit-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* === Continue Button (replaces "Press ENTER" text) === */
+.continue-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(92, 58, 30, 0.3);
+  border: 2px solid var(--color-copper);
+  color: var(--color-amber-bright);
+  font-family: var(--font-main);
+  font-size: var(--font-size-sm);
+  padding: 12px 32px;
+  min-height: 48px;
+  cursor: pointer;
+  transition: all 0.15s;
+  touch-action: manipulation;
+  border-radius: 3px;
+  text-shadow: var(--glow-amber);
+  animation: continuePulse 2s ease-in-out infinite;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.continue-btn:hover,
+.continue-btn:active {
+  background: rgba(184, 115, 51, 0.3);
+  border-color: var(--color-amber);
+  animation: none;
+}
+
+.continue-btn:active {
+  transform: scale(0.95);
+}
+
+.continue-btn-sm {
+  padding: 8px 24px;
+  font-size: var(--font-size-xs);
+  min-height: 40px;
+}
+
+@keyframes continuePulse {
+  0%, 100% { border-color: var(--color-copper); }
+  50% { border-color: var(--color-amber-bright); box-shadow: var(--glow-amber); }
+}
+
+/* === Pixel Art Images === */
+.pixel-art-container {
+  text-align: center;
+  margin: 8px 0;
+}
+
+.pixel-art {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  border: 2px solid var(--color-brown);
+  border-radius: 4px;
+  box-shadow: 0 0 12px rgba(184, 115, 51, 0.2);
+}
+
 /* === Hidden Utility === */
 .hidden {
   display: none !important;
@@ -793,6 +957,26 @@ body {
 
   .action-btn {
     min-height: 52px;
+  }
+
+  .nav-btn {
+    min-width: 60px;
+    min-height: 52px;
+  }
+
+  .nav-btn.nav-ok {
+    min-width: 72px;
+  }
+
+  .submit-btn {
+    min-height: 44px;
+    min-width: 60px;
+    padding: 8px 18px;
+  }
+
+  .continue-btn {
+    min-height: 52px;
+    padding: 14px 40px;
   }
 }
 

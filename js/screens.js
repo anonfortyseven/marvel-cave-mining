@@ -97,8 +97,14 @@
   // =========================================
   function titleScreen() {
     UI.hideBars();
+    if (window.Audio_Manager) Audio_Manager.play('title');
+
+    var html = '';
+    // Pixel art image
+    if (window.Images) html += Images.getImageHtml('title', { maxWidth: 400, maxHeight: 220 });
+
     var art = (window.AsciiArt && window.AsciiArt.getTitleArt) ? window.AsciiArt.getTitleArt() : CAVE_ART;
-    var html = '<div class="title-art">' + art + '</div>\n';
+    html += '<div class="title-art">' + art + '</div>\n';
     html += '<div class="title-name text-glow-strong">The Marvel Cave Mining Company</div>\n';
     html += '<div class="subtitle">Stone County, Missouri &bull; 1884</div>\n';
     html += '<div style="margin-top:16px"></div>';
@@ -266,6 +272,9 @@
     var state = gs();
     if (!state) { titleScreen(); return; }
 
+    // Play context-appropriate music
+    if (window.Audio_Manager) Audio_Manager.playForContext(state);
+
     // Update status bar
     UI.renderStatusBar(state);
 
@@ -275,6 +284,15 @@
 
     // === BUILD MAIN CONTENT ===
     var html = '';
+
+    // Pixel art image for location
+    if (window.Images) {
+      if (state.isUnderground) {
+        html += Images.getCaveImage(state.currentChamber);
+      } else {
+        html += Images.getImageHtml('town', { maxWidth: 300, maxHeight: 160 });
+      }
+    }
 
     // Chamber art
     var art = getArt(state.currentChamber);
@@ -334,6 +352,7 @@
 
     // === BUILD ACTION BAR ===
     var actions;
+    var musicLabel = (window.Audio_Manager && Audio_Manager.isEnabled()) ? 'Music Off' : 'Music On';
     if (state.isUnderground) {
       actions = [
         { key: '1', label: 'Mine', value: 'mine', primary: true },
@@ -341,7 +360,8 @@
         { key: '3', label: 'Ascend', value: 'ascend' },
         { key: '4', label: 'Pace', value: 'pace' },
         { key: '5', label: 'Rations', value: 'rations' },
-        { key: '6', label: 'Rest', value: 'rest' }
+        { key: '6', label: 'Rest', value: 'rest' },
+        { key: 'm', label: musicLabel, value: 'music' }
       ];
     } else {
       actions = [
@@ -350,7 +370,8 @@
         { key: '3', label: 'Ship Guano', value: 'ship' },
         { key: '4', label: 'Rest', value: 'rest' },
         { key: '5', label: 'Supplies', value: 'supplies' },
-        { key: '6', label: 'Save', value: 'save' }
+        { key: '6', label: 'Save', value: 'save' },
+        { key: 'm', label: musicLabel, value: 'music' }
       ];
     }
 
@@ -379,6 +400,13 @@
       case 'ship': shipGuano(); break;
       case 'supplies': supplyScreen(); break;
       case 'save': saveGame(); break;
+      case 'music':
+        if (window.Audio_Manager) {
+          var on = Audio_Manager.toggle();
+          UI.showNotification(on ? 'Music On' : 'Music Off', 1000);
+        }
+        statusScreen();
+        break;
       default: statusScreen(); break;
     }
   }
@@ -721,6 +749,7 @@
   // =========================================
   function deathScreen(name, cause) {
     UI.hideBars();
+    if (window.Audio_Manager) Audio_Manager.play('gameover');
     var state = gs();
 
     // Try death art
@@ -736,6 +765,7 @@
       .replace('~~~DATE~~~', padCenter(formatDate(state), 11));
 
     var html = '';
+    if (window.Images) html += Images.getImageHtml('death', { maxWidth: 300, maxHeight: 180 });
     if (deathArt) html += '<pre class="chamber-art">' + deathArt + '</pre>';
     html += '<div class="gravestone">' + art + '</div>';
     html += '<div class="text-center text-dim" style="margin-top:10px">';
@@ -781,12 +811,14 @@
   // =========================================
   function endingScreen() {
     UI.hideBars();
+    if (window.Audio_Manager) Audio_Manager.play('title');
     var state = gs();
 
     var trophyArt = '';
     if (window.AsciiArt && window.AsciiArt.getScoringArt) trophyArt = window.AsciiArt.getScoringArt('trophy');
 
     var html = '';
+    if (window.Images) html += Images.getImageHtml('victory', { maxWidth: 320, maxHeight: 180 });
     if (trophyArt) html += '<pre class="title-art">' + trophyArt + '</pre>';
     html += '<div class="text-lg text-glow text-center" style="margin-top:10px">CONTRACT FULFILLED!</div><hr class="separator-double">';
     html += '<div class="text-bright text-center" style="margin:12px 0">You shipped ' + (state ? state.guanoShipped.toFixed(1) : '?') + ' tons of guano.</div>';
