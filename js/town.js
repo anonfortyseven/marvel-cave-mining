@@ -22,6 +22,245 @@
     '   ====================================='
   ].join('\n');
 
+  // ─── Tavern Micro-Scenes (family-friendly) ─────────────────────
+  // Random vignettes that can trigger on entering the Lantern Tavern.
+  // Small buffs/flags only; designed to keep the core loop intact.
+  var TAVERN_SCENES = [
+    {
+      id: 'red_rule',
+      who: 'Red Sullivan',
+      chance: 0.14,
+      cooldown: 2,
+      condition: function (state) { return !!state; },
+      text: [
+        'Red wipes a mug and nods toward your crew.',
+        '"You\'ve got good people. Don\'t grind \'em into dust. Steady wins this cave."'
+      ],
+      choices: [
+        {
+          key: '1',
+          label: '"You\'re right. We\'ll keep it steady."',
+          apply: function (state) {
+            state.workPace = 'steady';
+            state.morale = Math.min(100, (state.morale || 50) + 5);
+            return 'You promise to keep a steady pace.';
+          }
+        },
+        {
+          key: '2',
+          label: '"We\'ll be fine."',
+          apply: function (state) {
+            state.morale = Math.max(0, (state.morale || 50) - 2);
+            return 'The crew hears you. They don\'t look thrilled.';
+          }
+        },
+        {
+          key: '3',
+          label: '"Any advice for getting around down there?"',
+          apply: function (state) {
+            state.calmFocusDays = Math.max(state.calmFocusDays || 0, 2);
+            state.morale = Math.min(100, (state.morale || 50) + 3);
+            return 'Red points out a few landmarks. "Mark your turns. Don\'t rush."';
+          }
+        }
+      ]
+    },
+    {
+      id: 'red_stew',
+      who: 'Red Sullivan',
+      chance: 0.04,
+      cooldown: 5,
+      condition: function (state) {
+        var morale = state && state.morale !== undefined ? state.morale : 50;
+        return morale <= 35 || (state && state.food <= 15);
+      },
+      text: [
+        'Red slides a bowl of warm stew across the bar.',
+        '"No charge. Warm food makes better decisions."'
+      ],
+      choices: [
+        {
+          key: '1',
+          label: 'Accept (thank him)',
+          apply: function (state) {
+            state.morale = Math.min(100, (state.morale || 50) + 8);
+            if (state.foreman && state.foreman.alive) window.HealthSystem.applyHealing(state.foreman, 5);
+            return 'It\'s simple, hearty, and exactly what you needed.';
+          }
+        },
+        {
+          key: '2',
+          label: 'Share it with the crew',
+          apply: function (state) {
+            state.morale = Math.min(100, (state.morale || 50) + 10);
+            return 'You split the stew. Laughter returns to the table.';
+          }
+        },
+        {
+          key: '3',
+          label: 'Decline (save it for someone else)',
+          apply: function (state) {
+            state.morale = Math.min(100, (state.morale || 50) + 2);
+            return 'Red nods, respectful. "That\'s a kind choice."';
+          }
+        }
+      ]
+    },
+    {
+      id: 'penny_trivia',
+      who: 'Penny Mae',
+      chance: 0.12,
+      cooldown: 2,
+      condition: function (state) { return !!state; },
+      text: [
+        'Penny Mae pops up beside your table.',
+        '"Quiz time! Which is scarier: a dark tunnel… or a quiet one?"'
+      ],
+      choices: [
+        {
+          key: '1',
+          label: '"The quiet one."',
+          apply: function (state) {
+            state.taffy = (state.taffy || 0) + 1;
+            state.morale = Math.min(100, (state.morale || 50) + 6);
+            return '"Correct!" She hands you a little twist of taffy.';
+          }
+        },
+        {
+          key: '2',
+          label: '"The dark one."',
+          apply: function (state) {
+            state.morale = Math.min(100, (state.morale || 50) + 4);
+            return 'She giggles. "Fair! But quiet means you can\'t hear trouble coming."';
+          }
+        },
+        {
+          key: '3',
+          label: '"Both. That\'s why we stick together."',
+          apply: function (state) {
+            state.morale = Math.min(100, (state.morale || 50) + 6);
+            return 'She nods solemnly. "That\'s the best answer."';
+          }
+        }
+      ]
+    },
+    {
+      id: 'penny_sweet_deal',
+      who: 'Penny Mae',
+      chance: 0.08,
+      cooldown: 3,
+      condition: function (state) { return state && state.cash >= 1; },
+      text: [
+        'Penny Mae whispers like it\'s a secret.',
+        '"Two bits gets you a \"bravery bundle\". Three taffies. No arguing."'
+      ],
+      choices: [
+        {
+          key: '1',
+          label: 'Pay $0.50 for the bundle',
+          apply: function (state) {
+            state.cash = Math.round((state.cash - 0.5) * 100) / 100;
+            state.taffy = (state.taffy || 0) + 3;
+            state.morale = Math.min(100, (state.morale || 50) + 4);
+            return 'She ties the bag tight and beams. "Bravery\'s better when it\'s chewy."';
+          }
+        },
+        {
+          key: '2',
+          label: 'Tell her a funny story instead',
+          apply: function (state) {
+            state.morale = Math.min(100, (state.morale || 50) + 5);
+            return 'She laughs so hard she almost drops the taffy. The whole table smiles.';
+          }
+        },
+        {
+          key: '3',
+          label: 'Decline (save your money)',
+          apply: function (state) {
+            return '"Suit yourself," she says, not offended at all.';
+          }
+        }
+      ]
+    },
+    {
+      id: 'eli_napkin_map',
+      who: 'Eli Wren',
+      chance: 0.10,
+      cooldown: 3,
+      condition: function (state) { return state && state.cash >= 1; },
+      text: [
+        'A traveler with a pencil behind his ear sketches lines on a napkin.',
+        '"I don\'t draw treasure. I draw exits."'
+      ],
+      choices: [
+        {
+          key: '1',
+          label: 'Pay $1 for the napkin map',
+          apply: function (state) {
+            state.cash = Math.round((state.cash - 1) * 100) / 100;
+            if (!state.mappedChambers) state.mappedChambers = {};
+            state.mappedChambers[state.currentChamber] = 3;
+            state.morale = Math.min(100, (state.morale || 50) + 2);
+            return 'He hands it over. The lines are simple, but you feel steadier already.';
+          }
+        },
+        {
+          key: '2',
+          label: 'Ask him to teach you (no charge)',
+          apply: function (state) {
+            state.calmFocusDays = Math.max(state.calmFocusDays || 0, 1);
+            state.morale = Math.min(100, (state.morale || 50) + 3);
+            return '"Watch for the shapes," he says. "The cave repeats itself, but not exactly."';
+          }
+        },
+        {
+          key: '3',
+          label: 'Decline politely',
+          apply: function (state) {
+            return 'He tips his hat and folds the napkin away.';
+          }
+        }
+      ]
+    },
+    {
+      id: 'eli_air_pockets',
+      who: 'Eli Wren',
+      chance: 0.07,
+      cooldown: 4,
+      condition: function (state) { return !!state; },
+      text: [
+        'Eli taps the table twice, like a code.',
+        '"Sometimes the air turns sharp. If your light feels wrong… don\'t argue with it."'
+      ],
+      choices: [
+        {
+          key: '1',
+          label: 'Listen carefully',
+          apply: function (state) {
+            state.airAwareDays = Math.max(state.airAwareDays || 0, 2);
+            state.morale = Math.min(100, (state.morale || 50) + 2);
+            return 'You pack cloths where you can reach them fast.';
+          }
+        },
+        {
+          key: '2',
+          label: 'Ask what to do if it happens',
+          apply: function (state) {
+            state.airAwareDays = Math.max(state.airAwareDays || 0, 1);
+            return '"Stay together. Move slow. Get to a place you already know," he says.';
+          }
+        },
+        {
+          key: '3',
+          label: 'Nod and change the subject',
+          apply: function (state) {
+            return 'You don\'t press him. Some warnings are better left simple.';
+          }
+        }
+      ]
+    }
+  ];
+
   // ─── Shop Definitions (3 shops) ─────────────────────────────────
   var SHOPS = [
     {
@@ -168,6 +407,83 @@
     }
   }
 
+  // --- Tavern micro-scenes helpers ---
+  function ensureTavernState(state) {
+    if (!state.tavernSceneCooldowns) state.tavernSceneCooldowns = {};
+    if (!state.mappedChambers) state.mappedChambers = {};
+    if (!state.calmFocusDays) state.calmFocusDays = 0;
+    if (!state.airAwareDays) state.airAwareDays = 0;
+  }
+
+  function canRunTavernScene(scene, state) {
+    if (!scene || !state) return false;
+    ensureTavernState(state);
+    if (state.tavernSceneCooldowns[scene.id] && state.tavernSceneCooldowns[scene.id] > 0) return false;
+    if (scene.condition && !scene.condition(state)) return false;
+    return true;
+  }
+
+  function maybeRunTavernScene(shop) {
+    var state = gs();
+    if (!state || !shop || shop.id !== 'tavern') return false;
+    ensureTavernState(state);
+
+    // 60%: no scene (go straight to menu)
+    if (Math.random() < 0.60) return false;
+
+    // Filter eligible scenes
+    var eligible = [];
+    for (var i = 0; i < TAVERN_SCENES.length; i++) {
+      if (canRunTavernScene(TAVERN_SCENES[i], state)) eligible.push(TAVERN_SCENES[i]);
+    }
+    if (eligible.length === 0) return false;
+
+    // Weighted roll by chance
+    var total = 0;
+    for (var j = 0; j < eligible.length; j++) total += (eligible[j].chance || 0);
+    if (total <= 0) return false;
+
+    var r = Math.random() * total;
+    var pick = eligible[0];
+    for (var k = 0; k < eligible.length; k++) {
+      r -= (eligible[k].chance || 0);
+      if (r <= 0) { pick = eligible[k]; break; }
+    }
+
+    // Render scene
+    UI.hideBars();
+    var html = '<div class="text-lg text-glow">The Lantern Tavern</div><hr class="separator">';
+    html += '<div class="text-amber" style="margin:6px 0">' + UI.escapeHtml(pick.who) + '</div>';
+    for (var t = 0; t < pick.text.length; t++) {
+      html += '<div class="text-bright" style="margin:4px 0">' + UI.escapeHtml(pick.text[t]) + '</div>';
+    }
+    UI.render(html);
+
+    var opts = [];
+    for (var c = 0; c < pick.choices.length; c++) {
+      opts.push({ key: pick.choices[c].key, label: pick.choices[c].label, value: String(c) });
+    }
+    UI.promptChoice(opts, function (val) {
+      var idx = parseInt(val, 10);
+      var choice = pick.choices[idx];
+      var msg = '';
+      if (choice && choice.apply) {
+        msg = choice.apply(state) || '';
+      }
+
+      // Set cooldown
+      state.tavernSceneCooldowns[pick.id] = pick.cooldown || 2;
+      save();
+
+      // Show result, then return to the shop menu
+      var html2 = '<div class="text-bright" style="margin:10px 0">' + UI.escapeHtml(msg || 'Done.') + '</div>';
+      UI.render(html2);
+      UI.pressEnter(function () { showShop(shop); });
+    });
+
+    return true;
+  }
+
   // ─── Town Hub Screen ─────────────────────────────────────────────
   function showTownHub(callback) {
     townCallback = callback || townCallback;
@@ -236,6 +552,11 @@
     var state = gs();
     if (!state) { showTownHub(); return; }
     ensureEquipment(state);
+
+    // Random tavern micro-scene (family-friendly)
+    if (shop.id === 'tavern') {
+      if (maybeRunTavernScene(shop)) return;
+    }
 
     // Build shop screen
     var art = getShopArt(shop.id);

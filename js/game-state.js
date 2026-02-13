@@ -70,6 +70,12 @@ window.GameState = {
     },
     taffy: 0,
 
+    // Tavern micro-scenes (family-friendly)
+    tavernSceneCooldowns: {},
+    calmFocusDays: 0,
+    airAwareDays: 0,
+    mappedChambers: {},
+
     // Event tracking
     activeEvents: [],
     eventCooldowns: {},

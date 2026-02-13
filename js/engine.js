@@ -117,6 +117,9 @@ window.Engine = {
     // 8. Tick event cooldowns
     window.EventSystem.tickCooldowns(state);
 
+    // 8b. Tick temporary state flags (tavern scenes, etc.)
+    this.tickTemporaryFlags(state);
+
     // 9. Check contracts
     var contractResults = window.Economy.checkContracts(state);
     for (var c = 0; c < contractResults.length; c++) {
@@ -286,6 +289,32 @@ window.Engine = {
     var months = ['January', 'February', 'March', 'April', 'May', 'June',
                   'July', 'August', 'September', 'October', 'November', 'December'];
     return months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+  },
+
+  // Tick down short-lived state flags (used by town/tavern scenes)
+  tickTemporaryFlags: function(state) {
+    if (!state) return;
+
+    if (state.calmFocusDays && state.calmFocusDays > 0) state.calmFocusDays--;
+    if (state.airAwareDays && state.airAwareDays > 0) state.airAwareDays--;
+
+    // Per-chamber mapping timers
+    if (state.mappedChambers && typeof state.mappedChambers === 'object') {
+      for (var k in state.mappedChambers) {
+        if (!state.mappedChambers.hasOwnProperty(k)) continue;
+        state.mappedChambers[k]--;
+        if (state.mappedChambers[k] <= 0) delete state.mappedChambers[k];
+      }
+    }
+
+    // Tavern scene cooldowns
+    if (state.tavernSceneCooldowns && typeof state.tavernSceneCooldowns === 'object') {
+      for (var id in state.tavernSceneCooldowns) {
+        if (!state.tavernSceneCooldowns.hasOwnProperty(id)) continue;
+        state.tavernSceneCooldowns[id]--;
+        if (state.tavernSceneCooldowns[id] <= 0) delete state.tavernSceneCooldowns[id];
+      }
+    }
   },
 
   // Update morale for the day

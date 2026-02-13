@@ -73,13 +73,17 @@ window.EventSystem = {
       cooldown: 3,
       effect: function(state) {
         var results = { messages: [], deaths: [] };
-        results.messages.push('Thick ammonia from the nitrogen-rich guano deposits burns eyes and lungs!');
+        results.messages.push('Thick ammonia from the guano deposits makes the air hard to breathe.');
+        if (state.airAwareDays && state.airAwareDays > 0) {
+          results.messages.push('You cover your mouths with cloth and keep close.');
+        }
         var living = window.GameState.getLivingParty();
         for (var i = 0; i < living.length; i++) {
           var damage = 15 + Math.floor(Math.random() * 20);
+          if (state.airAwareDays && state.airAwareDays > 0) damage = Math.floor(damage * 0.7);
           var died = window.HealthSystem.applyDamage(living[i], damage);
           if (died) {
-            results.messages.push(living[i].name + ' succumbed to the bad air.');
+            results.messages.push(living[i].name + ' collapses and does not get back up.');
             results.deaths.push(living[i].name);
           }
         }
@@ -485,8 +489,20 @@ window.EventSystem = {
         continue;
       }
 
+      // Roll probability (with small dynamic modifiers)
+      var prob = event.probability;
+
+      // Tavern scene bonuses: make it less likely to get lost / bad air when prepared
+      if (eventId === 'lost') {
+        if (state.calmFocusDays && state.calmFocusDays > 0) prob *= 0.5;
+        if (state.mappedChambers && state.mappedChambers[state.currentChamber]) prob *= 0.4;
+      }
+      if (eventId === 'bad_air') {
+        if (state.airAwareDays && state.airAwareDays > 0) prob *= 0.7;
+      }
+
       // Roll probability
-      if (Math.random() < event.probability) {
+      if (Math.random() < prob) {
         // Event triggers!
         var result = event.effect(state);
         result.eventId = eventId;
