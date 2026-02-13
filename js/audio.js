@@ -9,8 +9,10 @@
   var currentTrack = null;
   var currentAudio = null;
   var musicEnabled = true;
-  var volume = 0.3;
+  var volume = 0.5;
   var fadeInterval = null;
+  var userHasInteracted = false;
+  var pendingTrack = null;
 
   // Track mappings
   var TRACKS = {
@@ -21,29 +23,55 @@
     gameover: 'audio/gameover.mp3'
   };
 
-  // Preloaded audio elements
   var audioCache = {};
 
-  // Preload all tracks
   function preload() {
     for (var key in TRACKS) {
       var audio = new Audio();
       audio.preload = 'auto';
-      audio.loop = (key !== 'gameover'); // gameover plays once
+      audio.loop = (key !== 'gameover');
       audio.volume = 0;
       audio.src = TRACKS[key];
       audioCache[key] = audio;
     }
   }
 
-  // Play a track with fade-in
+  // Global interaction listener - keeps trying until music plays
+  function onUserInteraction() {
+    userHasInteracted = true;
+    if (pendingTrack && musicEnabled) {
+      startTrack(pendingTrack);
+      pendingTrack = null;
+    }
+  }
+
+  function setupGlobalListeners() {
+    var events = ['click', 'keydown', 'touchstart', 'pointerdown'];
+    for (var i = 0; i < events.length; i++) {
+      document.addEventListener(events[i], onUserInteraction, { capture: true });
+    }
+  }
+
+  function removeGlobalListeners() {
+    var events = ['click', 'keydown', 'touchstart', 'pointerdown'];
+    for (var i = 0; i < events.length; i++) {
+      document.removeEventListener(events[i], onUserInteraction, { capture: true });
+    }
+  }
+
   function play(trackName) {
     if (!musicEnabled) return;
     if (!TRACKS[trackName]) return;
     if (currentTrack === trackName && currentAudio && !currentAudio.paused) return;
 
-    // Stop current track with fade
-    if (currentAudio) {
+    if (!userHasInteracted) {
+      // Can't play yet - save for when user interacts
+      pendingTrack = trackName;
+      currentTrack = trackName;
+      return;
+    }
+
+    if (currentAudio && !currentAudio.paused) {
       fadeOut(currentAudio, function () {
         startTrack(trackName);
       });
@@ -55,7 +83,6 @@
   function startTrack(trackName) {
     currentTrack = trackName;
 
-    // Use cached or create new
     var audio = audioCache[trackName];
     if (!audio) {
       audio = new Audio(TRACKS[trackName]);
@@ -70,35 +97,28 @@
     var playPromise = audio.play();
     if (playPromise !== undefined) {
       playPromise.then(function () {
+        // Success - music is playing
+        userHasInteracted = true;
+        pendingTrack = null;
+        removeGlobalListeners();
         fadeIn(audio);
       }).catch(function () {
-        // Autoplay blocked - will try again on user interaction
-        setupAutoplayResume(trackName);
+        // Still blocked - keep pending
+        pendingTrack = trackName;
+        userHasInteracted = false;
+        setupGlobalListeners();
       });
+    } else {
+      // Old browser, no promise - assume it worked
+      fadeIn(audio);
     }
-  }
-
-  // Set up listener to resume on first user interaction
-  function setupAutoplayResume(trackName) {
-    function resume() {
-      document.removeEventListener('click', resume);
-      document.removeEventListener('keydown', resume);
-      document.removeEventListener('touchstart', resume);
-      if (musicEnabled && currentTrack === trackName) {
-        startTrack(trackName);
-      }
-    }
-    document.addEventListener('click', resume, { once: true });
-    document.addEventListener('keydown', resume, { once: true });
-    document.addEventListener('touchstart', resume, { once: true });
   }
 
   function fadeIn(audio) {
     if (fadeInterval) clearInterval(fadeInterval);
     var target = volume;
-    audio.volume = 0;
     fadeInterval = setInterval(function () {
-      var v = audio.volume + 0.02;
+      var v = audio.volume + 0.03;
       if (v >= target) {
         audio.volume = target;
         clearInterval(fadeInterval);
@@ -106,13 +126,13 @@
       } else {
         audio.volume = v;
       }
-    }, 50);
+    }, 40);
   }
 
   function fadeOut(audio, callback) {
     if (fadeInterval) clearInterval(fadeInterval);
     fadeInterval = setInterval(function () {
-      var v = audio.volume - 0.03;
+      var v = audio.volume - 0.04;
       if (v <= 0) {
         audio.volume = 0;
         audio.pause();
@@ -122,27 +142,29 @@
       } else {
         audio.volume = v;
       }
-    }, 40);
+    }, 30);
   }
 
-  // Stop all music
   function stop() {
-    if (currentAudio) {
+    if (currentAudio && !currentAudio.paused) {
       fadeOut(currentAudio);
+    } else if (currentAudio) {
+      currentAudio.pause();
     }
     currentTrack = null;
+    pendingTrack = null;
   }
 
-  // Toggle music on/off
   function toggle() {
     musicEnabled = !musicEnabled;
     if (!musicEnabled) {
       stop();
+    } else if (currentTrack) {
+      play(currentTrack);
     }
     return musicEnabled;
   }
 
-  // Set volume (0-1)
   function setVolume(v) {
     volume = Math.max(0, Math.min(1, v));
     if (currentAudio && !currentAudio.paused) {
@@ -150,7 +172,6 @@
     }
   }
 
-  // Get state
   function isEnabled() {
     return musicEnabled;
   }
@@ -159,10 +180,8 @@
     return currentTrack;
   }
 
-  // Context-aware: play appropriate track for game state
   function playForContext(state) {
     if (!state) { play('title'); return; }
-
     if (state.isUnderground) {
       play('cave');
     } else {
@@ -170,11 +189,15 @@
     }
   }
 
-  // Preload on DOM ready
+  // Init
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', preload);
+    document.addEventListener('DOMContentLoaded', function () {
+      preload();
+      setupGlobalListeners();
+    });
   } else {
     preload();
+    setupGlobalListeners();
   }
 
   window.Audio_Manager = {

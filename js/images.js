@@ -60,20 +60,13 @@
     }
   }
 
-  // Get image HTML for a given key
-  function getImageHtml(key, opts) {
-    opts = opts || {};
+  // Get full-width 21:9 banner image HTML
+  function getImageHtml(key) {
     var path = IMAGE_MAP[key];
     if (!path) return '';
 
-    var maxW = opts.maxWidth || 320;
-    var maxH = opts.maxHeight || 200;
-    var cls = opts.className || 'pixel-art';
-
-    return '<div class="pixel-art-container" style="text-align:center;margin:8px 0">' +
-      '<img src="' + path + '" class="' + cls + '" ' +
-      'style="max-width:min(' + maxW + 'px,90vw);max-height:' + maxH + 'px;image-rendering:pixelated;image-rendering:crisp-edges" ' +
-      'alt="" loading="lazy">' +
+    return '<div class="pixel-banner">' +
+      '<img src="' + path + '" class="pixel-banner-img" alt="" loading="lazy">' +
       '</div>';
   }
 
@@ -91,19 +84,18 @@
       imgKey = 'mining';
     }
 
-    return getImageHtml(imgKey, { maxWidth: 280, maxHeight: 160 });
+    return getImageHtml(imgKey);
   }
 
   // Get shop image
   function getShopImage(shopId) {
     var key = shopId;
-    // Normalize shop IDs
     if (shopId === 'general') key = 'general_store';
     if (shopId === 'knife') key = 'knife_works';
     if (shopId === 'candy') key = 'candy_shop';
     if (shopId === 'wood') key = 'woodcraft';
 
-    return getImageHtml(key, { maxWidth: 260, maxHeight: 150 });
+    return getImageHtml(key);
   }
 
   // Start preloading when DOM ready

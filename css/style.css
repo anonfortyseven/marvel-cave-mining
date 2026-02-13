@@ -869,18 +869,27 @@ body {
   50% { border-color: var(--color-amber-bright); box-shadow: var(--glow-amber); }
 }
 
-/* === Pixel Art Images === */
-.pixel-art-container {
-  text-align: center;
-  margin: 8px 0;
+/* === Pixel Art Banner (21:9 full-width) === */
+.pixel-banner {
+  width: 100%;
+  aspect-ratio: 21 / 9;
+  overflow: hidden;
+  margin: 0 -20px 10px;
+  width: calc(100% + 40px);
+  border-bottom: 2px solid var(--color-brown);
+  border-top: 2px solid var(--color-brown);
+  position: relative;
+  background: var(--color-black);
 }
 
-.pixel-art {
+.pixel-banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  border: 2px solid var(--color-brown);
-  border-radius: 4px;
-  box-shadow: 0 0 12px rgba(184, 115, 51, 0.2);
+  display: block;
 }
 
 /* === Hidden Utility === */
@@ -909,6 +918,11 @@ body {
     padding: 20px 28px;
   }
 
+  .pixel-banner {
+    margin: 0 -28px 12px;
+    width: calc(100% + 56px);
+  }
+
   .status-grid {
     grid-template-columns: 1fr 1fr 1fr;
   }
@@ -935,6 +949,11 @@ body {
 
   #screen {
     padding: 10px 12px;
+  }
+
+  .pixel-banner {
+    margin: 0 -12px 8px;
+    width: calc(100% + 24px);
   }
 
   .status-grid {

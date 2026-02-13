@@ -101,7 +101,7 @@
 
     var html = '';
     // Pixel art image
-    if (window.Images) html += Images.getImageHtml('title', { maxWidth: 400, maxHeight: 220 });
+    if (window.Images) html += Images.getImageHtml('title');
 
     var art = (window.AsciiArt && window.AsciiArt.getTitleArt) ? window.AsciiArt.getTitleArt() : CAVE_ART;
     html += '<div class="title-art">' + art + '</div>\n';
@@ -290,7 +290,7 @@
       if (state.isUnderground) {
         html += Images.getCaveImage(state.currentChamber);
       } else {
-        html += Images.getImageHtml('town', { maxWidth: 300, maxHeight: 160 });
+        html += Images.getImageHtml('town');
       }
     }
 
@@ -765,7 +765,7 @@
       .replace('~~~DATE~~~', padCenter(formatDate(state), 11));
 
     var html = '';
-    if (window.Images) html += Images.getImageHtml('death', { maxWidth: 300, maxHeight: 180 });
+    if (window.Images) html += Images.getImageHtml('death');
     if (deathArt) html += '<pre class="chamber-art">' + deathArt + '</pre>';
     html += '<div class="gravestone">' + art + '</div>';
     html += '<div class="text-center text-dim" style="margin-top:10px">';
@@ -818,7 +818,7 @@
     if (window.AsciiArt && window.AsciiArt.getScoringArt) trophyArt = window.AsciiArt.getScoringArt('trophy');
 
     var html = '';
-    if (window.Images) html += Images.getImageHtml('victory', { maxWidth: 320, maxHeight: 180 });
+    if (window.Images) html += Images.getImageHtml('victory');
     if (trophyArt) html += '<pre class="title-art">' + trophyArt + '</pre>';
     html += '<div class="text-lg text-glow text-center" style="margin-top:10px">CONTRACT FULFILLED!</div><hr class="separator-double">';
     html += '<div class="text-bright text-center" style="margin:12px 0">You shipped ' + (state ? state.guanoShipped.toFixed(1) : '?') + ' tons of guano.</div>';
