@@ -92,6 +92,28 @@
     return '';
   }
 
+  function getCrewByRole(state, roleId) {
+    if (!state || !state.crew) return null;
+    for (var i = 0; i < state.crew.length; i++) {
+      if (state.crew[i].alive && state.crew[i].role === roleId) return state.crew[i];
+    }
+    return null;
+  }
+
+  function getRandomCrewCampQuote(state) {
+    var pool = [
+      { role: 'ropeman', lines: ['That rope held today. It\'ll hold tomorrow.', 'Tie it right tonight, and we live to laugh about this in town.'] },
+      { role: 'lampkeeper', lines: ['I\'ll trim the wicks before dawn. We won\'t lose the light.', 'Oil\'s low, but I can make every drop count.'] },
+      { role: 'blastman', lines: ['Stone\'s stubborn, but it always cracks in the end.', 'Tomorrow I\'ll place the charge cleaner. Less waste, more ore.'] },
+      { role: 'cartdriver', lines: ['Donkeys are fed and calm. We\'ll haul fast at first light.', 'Tracks are muddy, but I can keep the loads moving.'] }
+    ];
+    var pick = pool[Math.floor(Math.random() * pool.length)];
+    var crew = getCrewByRole(state, pick.role);
+    var speaker = crew ? crew.name : 'A crewman';
+    var line = pick.lines[Math.floor(Math.random() * pick.lines.length)];
+    return speaker + ' says, "' + line + '"';
+  }
+
   // =========================================
   // 1. TITLE SCREEN
   // =========================================
@@ -403,7 +425,7 @@
 
     // Guano contract progress (most prominent)
     html += '<div class="guano-progress-wrap">';
-    html += '<div class="status-label">Guano: ' + state.guanoShipped.toFixed(1) + ' / ' + state.contractTarget + ' tons';
+    html += '<div class="status-label">Contract: Guano ' + state.guanoShipped.toFixed(1) + ' / ' + state.contractTarget + ' tons';
     if (state.guanoStockpile > 0.01) html += ' <span class="text-dim">(+' + state.guanoStockpile.toFixed(2) + ' stockpiled)</span>';
     html += '</div>';
     html += UI.progressBar(state.guanoShipped, state.contractTarget);
@@ -412,6 +434,16 @@
     // Chamber description (compact flavor)
     if (chamber && chamber.description) {
       html += '<div class="zone-desc">' + UI.escapeHtml(chamber.description) + '</div>';
+    }
+
+    if (state.isUnderground) {
+      if (state.lastAmbientDay !== state.totalDays) {
+        state.lastAmbientDay = state.totalDays;
+        state.currentAmbientText = getAmbient(state.currentChamber);
+      }
+      if (state.currentAmbientText) {
+        html += '<div class="text-dim" style="margin-top:6px;font-style:italic">' + UI.escapeHtml(state.currentAmbientText) + '</div>';
+      }
     }
 
     UI.render(html);
@@ -427,7 +459,8 @@
         { key: '4', label: 'Pace', value: 'pace' },
         { key: '5', label: 'Rations', value: 'rations' },
         { key: '6', label: 'Rest', value: 'rest' },
-        { key: 'm', label: musicLabel, value: 'music' }
+        { key: '7', label: 'Map', value: 'map' },
+        { key: '8', label: musicLabel, value: 'music' }
       ];
     } else {
       actions = [
@@ -437,7 +470,7 @@
         { key: '4', label: 'Rest', value: 'rest' },
         { key: '5', label: 'Supplies', value: 'supplies' },
         { key: '6', label: 'Save', value: 'save' },
-        { key: 'm', label: musicLabel, value: 'music' }
+        { key: '7', label: musicLabel, value: 'music' }
       ];
     }
 
@@ -473,6 +506,7 @@
       case 'pace': changePace(); break;
       case 'rations': changeRations(); break;
       case 'rest': restDay(); break;
+      case 'map': showCaveMap(); break;
       case 'enter': enterCave(); break;
       case 'town': visitTown(); break;
       case 'ship': shipGuano(); break;
@@ -630,8 +664,10 @@
       state.isUnderground = false;
       state.currentChamber = 'marmaros';
       state.currentZone = 'surface';
+      if (window.Engine) window.Engine.advanceDay();
       UI.hideBars();
-      UI.render('<div class="text-bright">You emerge from the cave into daylight at Marmaros.</div>');
+      UI.render('<div class="text-bright">You emerge from the cave into daylight at Marmaros.</div>' +
+        '<div class="text-dim" style="margin-top:8px">Your crew spends a full day hauling ropes, tools, and guano sacks to the surface before camp can be struck.</div>');
       UI.pressEnter(function () { statusScreen(); });
       return;
     }
@@ -652,11 +688,15 @@
       state.isUnderground = false;
       state.currentChamber = 'marmaros';
       state.currentZone = 'surface';
+      if (window.Engine) window.Engine.advanceDay();
       UI.hideBars();
-      UI.render('<div class="text-bright">You emerge at Marmaros.</div>');
+      UI.render('<div class="text-bright">You emerge at Marmaros.</div>' +
+        '<div class="text-dim" style="margin-top:8px">Your crew hauls gear up the final rope ladder and squints into daylight. The climb has cost a full day and every shoulder aches.</div>');
     } else {
+      if (window.Engine) window.Engine.advanceDay();
       UI.hideBars();
-      UI.render('<div class="text-bright">You ascend to ' + (t ? t.name : 'the previous chamber') + '.</div>');
+      UI.render('<div class="text-bright">You ascend to ' + (t ? t.name : 'the previous chamber') + '.</div>' +
+        '<div class="text-dim" style="margin-top:8px">Your crew hauls equipment hand-over-hand up wet limestone and fraying rope. A full day is spent climbing and securing the line.</div>');
     }
     UI.pressEnter(function () { statusScreen(); });
   }
@@ -665,13 +705,34 @@
     UI.hideBars();
     var state = gs();
     if (!state) return;
+
+    if (state.isUnderground) {
+      var campfireFrame = '';
+      if (window.AsciiArt && window.AsciiArt.getAnimation) {
+        var campfire = window.AsciiArt.getAnimation('campfire');
+        if (campfire && campfire.frames && campfire.frames.length > 0) campfireFrame = campfire.frames[0];
+      }
+      var campHtml = '<div class="text-lg text-glow">Night in Camp</div><hr class="separator">';
+      if (campfireFrame) campHtml += '<pre class="title-art">' + UI.escapeHtml(campfireFrame) + '</pre>';
+      campHtml += '<div class="text-dim" style="font-style:italic">' + UI.escapeHtml(getRandomCrewCampQuote(state)) + '</div>';
+      UI.render(campHtml);
+      UI.pressEnter(function () { resolveRestDay(state); });
+      return;
+    }
+
+    resolveRestDay(state);
+  }
+
+  function resolveRestDay(state) {
     var orig = state.workPace;
     state.workPace = 'careful';
 
     if (window.Engine) {
       var r = window.Engine.advanceDay();
       state.workPace = orig;
-      var html = '<div class="text-bright">The crew rests for a full day.</div>';
+      var html = state.isUnderground
+        ? '<div class="text-bright">The crew rests underground for the day.</div>'
+        : '<div class="text-bright">Your crew rests for the day in Marmaros. Health recovers slightly.</div>';
       if (r && r.messages.length > 0) {
         html += '<div class="text-dim" style="margin-top:6px">';
         for (var i = 0; i < r.messages.length; i++) html += UI.escapeHtml(r.messages[i]) + '<br>';
@@ -680,8 +741,56 @@
       UI.render(html);
     } else {
       state.workPace = orig;
-      UI.render('<div class="text-bright">The crew rests. Health improves.</div>');
+      UI.render('<div class="text-bright">Your crew rests for the day. Health improves.</div>');
     }
+    UI.pressEnter(function () { statusScreen(); });
+  }
+
+  function showCaveMap() {
+    UI.hideBars();
+    var state = gs();
+    if (!state || !window.CaveData || !window.CaveData.CHAMBERS) {
+      UI.render('<div class="text-dim">Map data unavailable.</div>');
+      UI.pressEnter(function () { statusScreen(); });
+      return;
+    }
+
+    var zoneLabels = {
+      zone1: 'Zone 1 - Cathedral Room',
+      zone2: 'Zone 2 - Upper Passages',
+      zone3: 'Zone 3 - Middle Depths',
+      zone4: 'Zone 4 - Deep Chambers',
+      zone5: 'Zone 5 - The Abyss'
+    };
+    var zoneOrder = ['zone1', 'zone2', 'zone3', 'zone4', 'zone5'];
+    var lines = [];
+    lines.push('CAVE MAP (Discovered chambers shown)');
+    lines.push('');
+
+    for (var z = 0; z < zoneOrder.length; z++) {
+      var zoneId = zoneOrder[z];
+      var zoneChambers = [];
+      for (var id in window.CaveData.CHAMBERS) {
+        if (!window.CaveData.CHAMBERS.hasOwnProperty(id)) continue;
+        var ch = window.CaveData.CHAMBERS[id];
+        if (ch.zone === zoneId) zoneChambers.push(ch);
+      }
+      zoneChambers.sort(function (a, b) { return a.depth - b.depth; });
+      if (zoneChambers.length === 0) continue;
+      lines.push(zoneLabels[zoneId] || zoneId);
+      for (var i = 0; i < zoneChambers.length; i++) {
+        var c = zoneChambers[i];
+        var discovered = state.discoveredChambers && state.discoveredChambers.indexOf(c.id) !== -1;
+        var name = discovered ? c.name : '???';
+        if (state.currentChamber === c.id) name = '[' + name + ']';
+        lines.push('  ' + c.depth + 'ft - ' + name);
+      }
+      lines.push('');
+    }
+
+    UI.render('<div class="text-lg text-glow">Surveyor\'s Cave Map</div><hr class="separator">' +
+      '<pre class="title-art" style="font-size:13px;line-height:1.25">' + UI.escapeHtml(lines.join('\\n')) + '</pre>' +
+      '<div class="text-dim">[brackets] mark your current chamber.</div>');
     UI.pressEnter(function () { statusScreen(); });
   }
 

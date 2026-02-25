@@ -5,6 +5,67 @@ window.EventSystem = {
   // Cooldown period (in days) before same event can repeat
   DEFAULT_COOLDOWN: 3,
 
+  crewQuips: {
+    ropeman: [
+      "That rope's fraying — I can feel it!",
+      'Keep your knots tight and your feet tighter.',
+      'One bad handhold and we all pay for it.',
+      'Rope first, bravado second.'
+    ],
+    lampkeeper: [
+      'Hold still — I need this flame to stay true.',
+      'If the light dies, we die with it.',
+      'Bad air makes the lantern dance. I do not like it.',
+      'Stay in the glow and keep moving.'
+    ],
+    blastman: [
+      'Loose rock means loose graves. Mind your heads.',
+      'I can break stone. I cannot mend a crushed skull.',
+      'Flood water and powder do not mix — move!',
+      'Hear that rumble? The cave is warning us.'
+    ],
+    cartdriver: [
+      'Keep the line moving — donkeys spook easy down here.',
+      'The track is slick as grease; watch your footing.',
+      'If we drop this load, we lose half a day.',
+      'I can haul through this, but not at a dead run.'
+    ]
+  },
+
+  getCrewQuipForEvent: function(state, eventId) {
+    if (!state || !state.crew) return null;
+    var roleForEvent = {
+      cave_in: 'blastman',
+      flooding: 'cartdriver',
+      bad_air: 'lampkeeper',
+      bat_swarm: 'lampkeeper',
+      rockfall: 'blastman',
+      equipment_break: 'ropeman',
+      snakebite: 'ropeman',
+      bat_fever: 'lampkeeper',
+      lost: 'cartdriver',
+      exhaustion: 'cartdriver',
+      hypothermia: 'lampkeeper',
+      lung_sickness: 'lampkeeper',
+      broken_bone: 'ropeman'
+    };
+
+    var role = roleForEvent[eventId];
+    if (!role || !this.crewQuips[role]) return null;
+
+    var speaker = null;
+    for (var i = 0; i < state.crew.length; i++) {
+      if (state.crew[i].alive && state.crew[i].role === role) {
+        speaker = state.crew[i];
+        break;
+      }
+    }
+
+    var line = this.crewQuips[role][Math.floor(Math.random() * this.crewQuips[role].length)];
+    if (!line) return null;
+    return (speaker ? speaker.name : 'A crewman') + ': "' + line + '"';
+  },
+
   // --- CAVE EVENT DEFINITIONS ---
   caveEvents: {
     'cave_in': {
@@ -508,6 +569,8 @@ window.EventSystem = {
         result.eventId = eventId;
         result.eventName = event.name;
         result.eventDescription = event.description;
+        var quip = this.getCrewQuipForEvent(state, eventId);
+        if (quip) result.messages.push(quip);
         triggered.push(result);
 
         // Set cooldown

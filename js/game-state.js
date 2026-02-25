@@ -105,6 +105,7 @@ window.GameState = {
     }
     this.state.date = new Date(1884, startMonth, 1);
     this.state.startDate = new Date(1884, startMonth, 1);
+    this.state.discoveredChambers = ['marmaros'];
 
     if (options) {
       if (options.foremanName) this.state.foreman.name = options.foremanName;
@@ -234,6 +235,8 @@ window.GameState = {
       if (saveData.whiskey !== undefined) delete saveData.whiskey;
       if (saveData.candles !== undefined) delete saveData.candles;
       if (saveData.clothing !== undefined) delete saveData.clothing;
+      if (!Array.isArray(saveData.discoveredChambers)) saveData.discoveredChambers = [];
+      if (saveData.discoveredChambers.indexOf('marmaros') === -1) saveData.discoveredChambers.unshift('marmaros');
 
       this.state = saveData;
       return true;

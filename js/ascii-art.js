@@ -828,14 +828,18 @@
             'The temperature drops sharply as you enter...',
             'Birds nest in the crevices near the entrance...',
             'The cave exhales a breath of cold, stale air...',
-            'You can still see daylight behind you...'
+            'You can still see daylight behind you...',
+            'Strange V-shaped cuts on nearby stone look too deliberate to be natural...',
+            'Old warning marks near the entrance make your skin crawl...'
         ],
         cathedral_floor: [
             'The ceiling vanishes into darkness 200 feet above...',
             'Bats swirl in vast spirals overhead...',
             'Your voice echoes back a dozen times...',
             'A stalagmite towers above you like a pillar...',
-            'Water has carved this room over millennia...'
+            'Water has carved this room over millennia...',
+            'You notice strange markings scratched into the wall...',
+            'A few old tool cuts here look far older than the mining company...'
         ],
         sentinel_chamber: [
             'The tall stalagmite stands like a silent guard...',
@@ -930,7 +934,24 @@
             'The waterfall plunges from a crack high above...',
             'This is the deepest point: 700 feet below...',
             'The water pools before draining into cracks...',
-            'You have reached the heart of Marvel Cave...'
+            'You have reached the heart of Marvel Cave...',
+            'A rusted tin tucked in a niche looks like it has been here for years...',
+            'Someone once camped here; the marks are too neat to be natural...'
+        ],
+        the_dungeon: [
+            'Iron-stained walls glisten like dried blood in your lantern glow...',
+            'The passage narrows and every sound feels close and heavy...',
+            'A loose stone in the wall looks like it has been pried out before...'
+        ],
+        spring_room: [
+            'Hidden water trickles behind calcite curtains, loud as rainfall...',
+            'You find old initials carved beside the spring, half-faded with time...',
+            'The orange walls shimmer as if someone polished them by hand...'
+        ],
+        lake_genevieve: [
+            'Your lantern reveals pale ripples beneath the glassy surface...',
+            'Tiny shapes move in the dark water where no sunlight has ever reached...',
+            'The still lake suddenly stirs with nearly invisible life...'
         ]
     };
 

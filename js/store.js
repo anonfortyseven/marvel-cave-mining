@@ -241,7 +241,7 @@
       var qty = cart[cat.key] || 0;
       state[cat.stateKey] = (state[cat.stateKey] || 0) + qty;
     }
-    state.cash = getRemainingCash();
+    state.cash = getRemainingCash() + 5; // petty cash after outfitting
     state.totalExpenses = (state.totalExpenses || 0) + getCartTotal();
 
     if (window.GameState.save) {
