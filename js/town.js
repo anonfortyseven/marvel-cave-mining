@@ -33,34 +33,34 @@
       cooldown: 2,
       condition: function (state) { return !!state; },
       text: [
-        'Red wipes a mug and nods toward your crew.',
-        '"You\'ve got good people. Don\'t grind \'em into dust. Steady wins this cave."'
+        'Red polishes a glass that will never be clean and studies your crew with eyes that have seen too many mining parties come through this door.',
+        '"I been pouring drinks in Marmaros since \'82. You know how many crews I\'ve outfitted? Fourteen. You know how many came back whole? Three. Steady wins this cave. The greedy ones are buried in it."'
       ],
       choices: [
         {
           key: '1',
-          label: '"You\'re right. We\'ll keep it steady."',
+          label: '"We\'ll keep it steady. Your word on it."',
           apply: function (state) {
             state.workPace = 'steady';
             state.morale = Math.min(100, (state.morale || 50) + 5);
-            return 'You promise to keep a steady pace.';
+            return 'Red nods slowly. "That\'s what the smart ones say. Now let\'s see if you mean it."';
           }
         },
         {
           key: '2',
-          label: '"We\'ll be fine."',
+          label: '"We\'ll be fine, Red."',
           apply: function (state) {
             state.morale = Math.max(0, (state.morale || 50) - 2);
-            return 'The crew hears you. They don\'t look thrilled.';
+            return 'Red says nothing. He has heard those exact words before, from men who are not here to say them again.';
           }
         },
         {
           key: '3',
-          label: '"Any advice for getting around down there?"',
+          label: '"What have you heard about the deeper chambers?"',
           apply: function (state) {
             state.calmFocusDays = Math.max(state.calmFocusDays || 0, 2);
             state.morale = Math.min(100, (state.morale || 50) + 3);
-            return 'Red points out a few landmarks. "Mark your turns. Don\'t rush."';
+            return 'Red lowers his voice. "Past the Serpentine, mark every turn. The cave repeats itself but not exactly. And if you hear water changing pitch -- don\'t think. Run."';
           }
         }
       ]
@@ -75,8 +75,8 @@
         return morale <= 35 || (state && state.food <= 15);
       },
       text: [
-        'Red slides a bowl of warm stew across the bar.',
-        '"No charge. Warm food makes better decisions."'
+        'Red slides a bowl of venison stew across the bar without being asked. It steams in the lamplight.',
+        '"On the house. I had a cousin in the lead mines at Granby. He said the hardest part wasn\'t the digging. It was remembering you was human. Eat."'
       ],
       choices: [
         {
@@ -85,7 +85,7 @@
           apply: function (state) {
             state.morale = Math.min(100, (state.morale || 50) + 8);
             if (state.foreman && state.foreman.alive) window.HealthSystem.applyHealing(state.foreman, 5);
-            return 'It\'s simple, hearty, and exactly what you needed.';
+            return 'The stew tastes like the surface. Like daylight and woodsmoke and a world where things grow upward.';
           }
         },
         {
@@ -93,15 +93,15 @@
           label: 'Share it with the crew',
           apply: function (state) {
             state.morale = Math.min(100, (state.morale || 50) + 10);
-            return 'You split the stew. Laughter returns to the table.';
+            return 'You split the bowl five ways. It is not enough for anyone and exactly enough for everyone. Someone laughs. It has been a while since anyone laughed.';
           }
         },
         {
           key: '3',
-          label: 'Decline (save it for someone else)',
+          label: 'Decline (save it for someone worse off)',
           apply: function (state) {
             state.morale = Math.min(100, (state.morale || 50) + 2);
-            return 'Red nods, respectful. "That\'s a kind choice."';
+            return 'Red nods. "That is the first kind thing I have seen a miner do all week. I will remember it."';
           }
         }
       ]
@@ -113,33 +113,33 @@
       cooldown: 2,
       condition: function (state) { return !!state; },
       text: [
-        'Penny Mae pops up beside your table.',
-        '"Quiz time! Which is scarier: a dark tunnel… or a quiet one?"'
+        'Penny Mae appears beside your table like a small, determined ghost. Her taffy cart rattles behind her.',
+        '"My grandma used to sing a song about this cave. Wanna hear a piece? She said: \'The Devil built a house of stone, and filled it full of wings. He hid his treasure in the deep, where the blind fish sings.\' What do you reckon the treasure is?"'
       ],
       choices: [
         {
           key: '1',
-          label: '"The quiet one."',
+          label: '"Gold. It\'s always gold."',
           apply: function (state) {
             state.taffy = (state.taffy || 0) + 1;
             state.morale = Math.min(100, (state.morale || 50) + 6);
-            return '"Correct!" She hands you a little twist of taffy.';
+            return 'She wrinkles her nose. "That\'s what the Spaniards thought too. Here, have a taffy for trying." She presses a warm twist of molasses candy into your hand.';
           }
         },
         {
           key: '2',
-          label: '"The dark one."',
+          label: '"The cave itself is the treasure."',
           apply: function (state) {
             state.morale = Math.min(100, (state.morale || 50) + 4);
-            return 'She giggles. "Fair! But quiet means you can\'t hear trouble coming."';
+            return 'Her eyes go wide. "That\'s what Grandma said! She said the people who lived here first knew that. The Osage. They didn\'t dig. They just... listened."';
           }
         },
         {
           key: '3',
-          label: '"Both. That\'s why we stick together."',
+          label: '"I don\'t know, but I aim to find out."',
           apply: function (state) {
             state.morale = Math.min(100, (state.morale || 50) + 6);
-            return 'She nods solemnly. "That\'s the best answer."';
+            return 'She grins like someone who knows a secret. "The blind fish sings," she whispers. "In the lake at the bottom. If you ever get that deep, listen for it." She leaves a taffy on the table and vanishes back to her cart.';
           }
         }
       ]
@@ -151,8 +151,8 @@
       cooldown: 3,
       condition: function (state) { return state && state.cash >= 1; },
       text: [
-        'Penny Mae whispers like it\'s a secret.',
-        '"Two bits gets you a \"bravery bundle\". Three taffies. No arguing."'
+        'Penny Mae leans in conspiratorially, smelling of molasses and woodsmoke.',
+        '"I got a bravery bundle. Three taffies and a lucky penny I found by the sinkhole. Fifty cents. The penny is not negotiable."'
       ],
       choices: [
         {
@@ -162,22 +162,22 @@
             state.cash = Math.round((state.cash - 0.5) * 100) / 100;
             state.taffy = (state.taffy || 0) + 3;
             state.morale = Math.min(100, (state.morale || 50) + 4);
-            return 'She ties the bag tight and beams. "Bravery\'s better when it\'s chewy."';
+            return 'She ties the bag tight with twine and drops in a penny worn smooth as a river stone. "The penny came from the cave. Grandma said things that come from the cave want to go back. So you take it down there and it\'ll show you the way home."';
           }
         },
         {
           key: '2',
-          label: 'Tell her a funny story instead',
+          label: 'Tell her a story from the cave instead',
           apply: function (state) {
             state.morale = Math.min(100, (state.morale || 50) + 5);
-            return 'She laughs so hard she almost drops the taffy. The whole table smiles.';
+            return 'You tell her about the Cathedral Room. How big it is. How the bats spiral at dusk. She listens with her mouth open and her eyes wide and for a moment you remember that wonder is possible even in a place that wants to kill you.';
           }
         },
         {
           key: '3',
           label: 'Decline (save your money)',
           apply: function (state) {
-            return '"Suit yourself," she says, not offended at all.';
+            return '"Your loss," she says cheerfully. "The penny was real lucky. I only tripped twice carrying it."';
           }
         }
       ]
@@ -189,8 +189,8 @@
       cooldown: 3,
       condition: function (state) { return state && state.cash >= 1; },
       text: [
-        'A traveler with a pencil behind his ear sketches lines on a napkin.',
-        '"I don\'t draw treasure. I draw exits."'
+        'An old man sits alone in the corner, sketching lines on a napkin with a carpenter\'s pencil. His hands are scarred. His eyes are the pale blue of a man who has spent too long in the dark.',
+        '"I don\'t draw treasure," he says without looking up. "I draw exits. A man who knows his exits don\'t need treasure."'
       ],
       choices: [
         {
@@ -201,23 +201,23 @@
             if (!state.mappedChambers) state.mappedChambers = {};
             state.mappedChambers[state.currentChamber] = 3;
             state.morale = Math.min(100, (state.morale || 50) + 2);
-            return 'He hands it over. The lines are simple, but you feel steadier already.';
+            return 'He slides the napkin across the table. The lines are crude but precise. You recognize the Serpentine Passage. A side passage is marked with an X and the words: "DO NOT." He offers no further explanation.';
           }
         },
         {
           key: '2',
-          label: 'Ask him to teach you (no charge)',
+          label: 'Ask how he knows the cave so well',
           apply: function (state) {
             state.calmFocusDays = Math.max(state.calmFocusDays || 0, 1);
             state.morale = Math.min(100, (state.morale || 50) + 3);
-            return '"Watch for the shapes," he says. "The cave repeats itself, but not exactly."';
+            return '"I worked the Blow expedition in \'69. Thirty years ago. We found the Spanish ladders in the Mammoth Room. Three hundred year old pine and they was still standing." He pauses. "We found other things too. Things that wasn\'t Spanish and wasn\'t Osage and wasn\'t anything I got a word for. The cave repeats itself, friend. But not exactly."';
           }
         },
         {
           key: '3',
           label: 'Decline politely',
           apply: function (state) {
-            return 'He tips his hat and folds the napkin away.';
+            return 'He folds the napkin carefully into his vest pocket. "Suit yourself. But if you make it to the Waterfall Room, look behind the falls. There\'s markings. Old ones. Older than the Spaniards." He says nothing more.';
           }
         }
       ]
@@ -229,32 +229,32 @@
       cooldown: 4,
       condition: function (state) { return !!state; },
       text: [
-        'Eli taps the table twice, like a code.',
-        '"Sometimes the air turns sharp. If your light feels wrong… don\'t argue with it."'
+        'Eli Wren catches your arm as you pass his table. His grip is stronger than an old man\'s grip should be.',
+        '"The air down there has moods. When your candle flame turns blue, the cave is breathing something you should not be. When the flame shrinks, there ain\'t enough air for both of you and the fire. When the flame goes out..." He trails off. "Don\'t let the flame go out."'
       ],
       choices: [
         {
           key: '1',
-          label: 'Listen carefully',
+          label: 'Listen carefully to every word',
           apply: function (state) {
             state.airAwareDays = Math.max(state.airAwareDays || 0, 2);
             state.morale = Math.min(100, (state.morale || 50) + 2);
-            return 'You pack cloths where you can reach them fast.';
+            return 'He nods, satisfied. "Carry a wet cloth. When the ammonia hits, press it to your face and breathe through it. The men who died of lung sickness -- they breathed it raw. Don\'t be them." You pack cloths where you can reach them fast.';
           }
         },
         {
           key: '2',
-          label: 'Ask what to do if it happens',
+          label: 'Ask what he saw down there in 1869',
           apply: function (state) {
             state.airAwareDays = Math.max(state.airAwareDays || 0, 1);
-            return '"Stay together. Move slow. Get to a place you already know," he says.';
+            return 'His pale eyes go distant. "We found the Spanish ladders. Three hundred years underground and the pine was still solid. But there was other wood down there too. Older. Hardwood that don\'t grow in Missouri. I never could figure how it got five hundred feet underground." He finishes his drink. "Stay together. Move slow. Get to a place you already know. That\'s all the wisdom I got."';
           }
         },
         {
           key: '3',
           label: 'Nod and change the subject',
           apply: function (state) {
-            return 'You don\'t press him. Some warnings are better left simple.';
+            return 'You pull your arm free gently. Eli watches you go with those pale cave-blind eyes. "The water remembers," he says to your back. You do not ask him what he means.';
           }
         }
       ]
@@ -269,10 +269,10 @@
       keeper: 'Herschel Barnes',
       useExistingStore: true,
       greetings: [
-        '"Stock up well, friend. The cave don\'t forgive the unprepared."',
-        '"Mornin\'! Got fresh rope in yesterday. Good hemp, strong as iron."',
-        '"Back again? Must mean you\'re still alive. That\'s good for business."',
-        '"I keep a tally of who buys what. The smart ones buy oil first."'
+        '"Herschel Barnes. I stock what you need to go underground and most of what you need to come back up. I don\'t extend credit."',
+        '"Fresh hemp rope in yesterday. Good and strong. You will want it. The cave eats rope like a mule eats oats."',
+        '"Back again? That means you\'re still alive. I consider that a personal recommendation for my merchandise."',
+        '"The smart ones buy oil first. The dead ones bought dynamite first. Draw your own conclusions."'
       ]
     },
     {
@@ -282,10 +282,10 @@
       miniGame: 'SharpenGame',
       miniGamePrompt: 'Care to test your arm at the grindstone?',
       greetings: [
-        '"Need somethin\' fixed? Or maybe you wanna try the grindstone?"',
-        '"Iron don\'t lie, friend. Good steel keeps a man alive down there."',
-        '"I forged every pickaxe that ever went into that cave. Ain\'t lost one yet."',
-        '"Step in, warm yourself by the forge. What can old Jeb do for ya?"'
+        '"Jebediah Colt. I shoe mules and I sharpen steel. If you want conversation, go to Red\'s. If you want to live, come to me."',
+        '"Iron don\'t lie. Good steel keeps a man alive. Bad steel keeps a widow fed. Which do you want?"',
+        '"I forged every pickaxe that ever went into that cave. Most of them came back. Most of the men did too."',
+        '"Step in. Don\'t touch nothing hot. What do you need?"'
       ],
       items: [
         {
@@ -320,10 +320,10 @@
       secondMiniGame: 'TaffyGame',
       secondMiniGamePrompt: 'Penny Mae\'s taffy cart is here! Pull some taffy?',
       greetings: [
-        '"Pull up a stool! What\'s your poison?"',
-        '"Welcome to the Lantern! Stew\'s hot and Penny Mae\'s got fresh taffy."',
-        '"Ain\'t seen you in a while, friend. Figured the cave got ya!"',
-        '"Step on in! Leave your worries at the door -- they\'ll keep."'
+        '"The Lantern Tavern. Pull up a stool. You look like a man who has been underground. I can always tell by the eyes."',
+        '"Stew is hot. Penny Mae has fresh taffy. And old Eli is in his corner, drawing maps on napkins nobody asked for. Welcome."',
+        '"Ain\'t seen you in a while. I figured the cave got you. Glad to be wrong. Drink?"',
+        '"Come in. Leave your worries at the door. The Bald Knobbers leave theirs at the trail. We are all pretending here."'
       ],
       items: [
         {

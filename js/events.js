@@ -7,28 +7,44 @@ window.EventSystem = {
 
   crewQuips: {
     ropeman: [
-      "That rope's fraying — I can feel it!",
-      'Keep your knots tight and your feet tighter.',
-      'One bad handhold and we all pay for it.',
-      'Rope first, bravado second.'
+      "That rope's fraying. I can feel it in my hands and I do not like what my hands are telling me.",
+      'Keep your knots tight and your feet tighter. The cave tests both.',
+      'One bad handhold and we all pay for it. I have buried men who trusted bad rope.',
+      'Rope first. Bravado second. Survival always.',
+      "I have been doing this for fourteen years. The scared ones live longer. Remember that.",
+      "Check the anchor. Check it again. The third check is the one that saves your life.",
+      "I tied a bowline on my mother's clothesline when I was six. Haven't stopped tying knots since.",
+      "Slow is smooth and smooth is alive. Rush the rope and the rope will rush you into the ground."
     ],
     lampkeeper: [
-      'Hold still — I need this flame to stay true.',
-      'If the light dies, we die with it.',
-      'Bad air makes the lantern dance. I do not like it.',
-      'Stay in the glow and keep moving.'
+      'Hold still. I need this flame to stay true. Our lives are exactly as long as this wick.',
+      'If the light dies, we die with it. That is not poetry. That is arithmetic.',
+      'Bad air makes the lantern dance. When the flame dances, I do not dance with it. I leave.',
+      'Stay in the glow. The dark out there is not empty. It is patient.',
+      "Oil's low. I can stretch it but I cannot create it. We need to think about going up.",
+      'That blue tinge on the flame? Methane. The cave is breathing something we should not be.',
+      "I have seen a man walk ten feet past his lantern's reach and never come back. Ten feet.",
+      "The flame tells you things if you watch it. Right now it is saying we should not be here."
     ],
     blastman: [
-      'Loose rock means loose graves. Mind your heads.',
-      'I can break stone. I cannot mend a crushed skull.',
-      'Flood water and powder do not mix — move!',
-      'Hear that rumble? The cave is warning us.'
+      'Loose rock means loose graves. Mind your heads and mind your prayers.',
+      'I can break stone. I cannot mend a crushed skull. The order of operations matters.',
+      'Flood water and powder do not mix. If the water comes, leave the powder. Leave everything.',
+      'Hear that rumble? The cave is clearing its throat. When it speaks, we listen.',
+      "I have cracked open mountains. This cave is different. It pushes back.",
+      "That crack in the ceiling was not there yesterday. The limestone remembers every charge we set.",
+      "Dynamite is simple. Light the fuse, walk away. It is the walking away part men get wrong.",
+      "The rock here is Mississippian limestone. Three hundred million years old. It has opinions about being disturbed."
     ],
     cartdriver: [
-      'Keep the line moving — donkeys spook easy down here.',
-      'The track is slick as grease; watch your footing.',
-      'If we drop this load, we lose half a day.',
-      'I can haul through this, but not at a dead run.'
+      'Keep the line moving. These donkeys spook easy and a spooked donkey in a cave is a disaster with hooves.',
+      'Track is slick as sin. Watch your footing or watch the donkey step on you.',
+      'We drop this load, we lose half a day. I do not have half a day to lose.',
+      'I can haul through this, but not at a dead run. The cart was not built for heroics.',
+      "The donkeys know something we don't. Look at their ears. They hear things in the rock.",
+      "I have driven carts through worse. Not much worse. But worse.",
+      "Fifty pounds a sack. Four sacks a load. Eight loads a day. The arithmetic of bat dung.",
+      "The mules on the surface have it easy. These poor donkeys got lowered down here by rope and they have not forgiven us."
     ]
   },
 
@@ -70,7 +86,7 @@ window.EventSystem = {
   caveEvents: {
     'cave_in': {
       name: 'Cave-In',
-      description: 'The Mississippian limestone fractures and collapses from the ceiling!',
+      description: 'A sound like God clearing His throat. The Mississippian limestone fractures and the ceiling comes down.',
       zones: ['zone1', 'zone2', 'zone3', 'zone4', 'zone5'],
       probability: 0.04,
       cooldown: 5,
@@ -81,19 +97,19 @@ window.EventSystem = {
         if (living.length === 0) return results;
         var victim = living[Math.floor(Math.random() * living.length)];
         var damage = 30 + Math.floor(Math.random() * 40); // 30-70 damage
-        results.messages.push(victim.name + ' is struck by falling rocks!');
+        results.messages.push(victim.name + ' disappears under a wall of falling stone.');
         var died = window.HealthSystem.applyDamage(victim, damage);
         if (died) {
-          results.messages.push(victim.name + ' was killed in the cave-in.');
+          results.messages.push(victim.name + ' was buried. The cave keeps what it takes.');
           results.deaths.push(victim.name);
         } else {
-          results.messages.push(victim.name + '\'s health: ' + window.HealthSystem.getHealthLabel(victim.health));
+          results.messages.push(victim.name + ' crawls free, bloodied but breathing. Health: ' + window.HealthSystem.getHealthLabel(victim.health));
         }
         // May lose timber
         if (state.timber > 0) {
           var lost = Math.min(state.timber, Math.floor(Math.random() * 5) + 1);
           state.timber -= lost;
-          results.messages.push(lost + ' timber lost in the collapse.');
+          results.messages.push(lost + ' timber splintered like matchsticks in the collapse.');
         }
         return results;
       }
@@ -101,20 +117,20 @@ window.EventSystem = {
 
     'flooding': {
       name: 'Flooding',
-      description: 'The Lost River swells with rainwater from the surface!',
+      description: 'A sound like distant thunder that gets less distant very fast. The Lost River swells with surface rain.',
       zones: ['zone3', 'zone4', 'zone5'],
       probability: 0.05,
       cooldown: 4,
       effect: function(state) {
         var results = { messages: [], deaths: [] };
-        results.messages.push('The Lost River surges! Flash flooding fills the passage in minutes!');
+        results.messages.push('Brown water fills the passage in minutes. There is nowhere to go but up.');
         // Everyone takes minor damage, supplies may be lost
         var living = window.GameState.getLivingParty();
         for (var i = 0; i < living.length; i++) {
           var damage = 10 + Math.floor(Math.random() * 15);
           window.HealthSystem.applyDamage(living[i], damage);
         }
-        results.messages.push('The entire party is soaked and chilled.');
+        results.messages.push('The entire party is soaked to the bone. The fifty-eight-degree air begins its patient work.');
         // Lose some food and candles
         var foodLost = Math.min(state.food, Math.floor(Math.random() * 10) + 5);
         state.food -= foodLost;
@@ -128,13 +144,13 @@ window.EventSystem = {
 
     'bad_air': {
       name: 'Bad Air',
-      description: 'Ammonia from centuries of bat guano chokes the chamber.',
+      description: 'The candle flame shrinks to a blue whisper. Ammonia from centuries of bat guano chokes the chamber.',
       zones: ['zone3', 'zone4', 'zone5'],
       probability: 0.06,
       cooldown: 3,
       effect: function(state) {
         var results = { messages: [], deaths: [] };
-        results.messages.push('Thick ammonia from the guano deposits makes the air hard to breathe.');
+        results.messages.push('The ammonia hits your throat like a fist. Thick, invisible, centuries old.');
         if (state.airAwareDays && state.airAwareDays > 0) {
           results.messages.push('You cover your mouths with cloth and keep close.');
         }
@@ -144,12 +160,12 @@ window.EventSystem = {
           if (state.airAwareDays && state.airAwareDays > 0) damage = Math.floor(damage * 0.7);
           var died = window.HealthSystem.applyDamage(living[i], damage);
           if (died) {
-            results.messages.push(living[i].name + ' collapses and does not get back up.');
+            results.messages.push(living[i].name + ' collapses. The coughing stops. That is worse than the coughing.');
             results.deaths.push(living[i].name);
           }
         }
         if (results.deaths.length === 0) {
-          results.messages.push('Everyone is dizzy and retching from the fumes.');
+          results.messages.push('Everyone is retching. Eyes streaming. The cave does not apologize.');
         }
         return results;
       }
@@ -157,19 +173,19 @@ window.EventSystem = {
 
     'bat_swarm': {
       name: 'Bat Swarm',
-      description: 'The gray bat colony erupts in a spiraling vortex toward the surface!',
+      description: 'The ceiling comes alive. Forty thousand gray bats erupt in a shrieking, spiraling vortex.',
       zones: ['zone1', 'zone2', 'zone3', 'zone4'],
       probability: 0.07,
       cooldown: 2,
       effect: function(state) {
         var results = { messages: [], deaths: [] };
-        results.messages.push('Tens of thousands of gray bats spiral past in a roaring vortex!');
+        results.messages.push('A river of bats pours through the passage. You cannot see. You cannot hear. You can only endure.');
         var living = window.GameState.getLivingParty();
         for (var i = 0; i < living.length; i++) {
           var damage = 5 + Math.floor(Math.random() * 10);
           window.HealthSystem.applyDamage(living[i], damage);
         }
-        results.messages.push('Scratches and bites from the swarm. The bats consume 24 million insects a night — they don\'t appreciate the intrusion.');
+        results.messages.push('Scratches and bites from the swarm. Forty thousand bats that eat twenty-four million insects a night do not appreciate the intrusion.');
         // Oil consumption spikes from panicked movement
         state.lanternOil = Math.max(0, state.lanternOil - 0.25);
         results.messages.push('Lantern oil spilled in the commotion.');
@@ -179,7 +195,7 @@ window.EventSystem = {
 
     'rockfall': {
       name: 'Rockfall',
-      description: 'Dissolved limestone crumbles from the passage walls!',
+      description: 'A shelf of limestone sheers off with a sound like a rifle shot.',
       zones: ['zone2', 'zone3', 'zone4', 'zone5'],
       probability: 0.05,
       cooldown: 3,
@@ -189,10 +205,10 @@ window.EventSystem = {
         if (living.length === 0) return results;
         var victim = living[Math.floor(Math.random() * living.length)];
         var damage = 15 + Math.floor(Math.random() * 25);
-        results.messages.push('Weathered limestone breaks free and tumbles onto ' + victim.name + '!');
+        results.messages.push('A boulder the size of a whiskey barrel breaks free and tumbles onto ' + victim.name + '.');
         var died = window.HealthSystem.applyDamage(victim, damage);
         if (died) {
-          results.messages.push(victim.name + ' was crushed by falling rocks.');
+          results.messages.push(victim.name + ' did not get up. The mountain shrugged and a man died.');
           results.deaths.push(victim.name);
         }
         return results;
@@ -201,7 +217,7 @@ window.EventSystem = {
 
     'equipment_break': {
       name: 'Equipment Break',
-      description: 'The cave\'s constant moisture corrodes the equipment!',
+      description: 'The cave\'s constant moisture and mineral-laden air have been working on your equipment.',
       zones: ['zone1', 'zone2', 'zone3', 'zone4', 'zone5'],
       probability: 0.06,
       cooldown: 4,
@@ -240,7 +256,7 @@ window.EventSystem = {
 
     'snakebite': {
       name: 'Snakebite',
-      description: 'An Ozark copperhead strikes from the rocks near the entrance!',
+      description: 'Four feet of Ozark malice coiled in the rocks. A timber rattlesnake strikes before you see it.',
       zones: ['zone1', 'zone2'],
       probability: 0.04,
       cooldown: 5,
@@ -250,13 +266,13 @@ window.EventSystem = {
         if (living.length === 0) return results;
         var victim = living[Math.floor(Math.random() * living.length)];
         var damage = 20 + Math.floor(Math.random() * 30);
-        results.messages.push(victim.name + ' was bitten by a copperhead lurking in the upper passages!');
+        results.messages.push(victim.name + ' was bitten by a timber rattler coiled in the rocks. It struck before anyone saw it.');
         var died = window.HealthSystem.applyDamage(victim, damage);
         if (died) {
-          results.messages.push(victim.name + ' died from the venom.');
+          results.messages.push(victim.name + ' died of the venom. The nearest doctor was in Forsyth. Two days away.');
           results.deaths.push(victim.name);
         } else {
-          results.messages.push(victim.name + ' needs rest to recover.');
+          results.messages.push(victim.name + '\'s arm swells black as a bruise. Rest is the only medicine that matters.');
         }
         return results;
       }
@@ -264,7 +280,7 @@ window.EventSystem = {
 
     'bat_fever': {
       name: 'Bat Fever',
-      description: 'Histoplasmosis from inhaling fungal spores in the bat guano.',
+      description: 'It starts as a cough. It always starts as a cough. Histoplasmosis from the guano fungus.',
       zones: ['zone1', 'zone2', 'zone3', 'zone4'],
       probability: 0.03,
       cooldown: 7,
@@ -274,27 +290,27 @@ window.EventSystem = {
         if (living.length === 0) return results;
         var victim = living[Math.floor(Math.random() * living.length)];
         var damage = 25 + Math.floor(Math.random() * 20);
-        results.messages.push(victim.name + ' has come down with cave fever — the guano harbors a lung fungus!');
+        results.messages.push(victim.name + ' has come down with cave fever. The guano dust harbors a fungus that colonizes the lungs.');
         window.HealthSystem.applyDamage(victim, damage);
-        results.messages.push(victim.name + ' shivers with fever and cannot draw a full breath.');
+        results.messages.push(victim.name + ' shivers with fever and cannot draw a full breath. Science won\'t name this disease for sixty years.');
         return results;
       }
     },
 
     'lost': {
       name: 'Lost',
-      description: 'The scalloped passages twist and branch into darkness.',
+      description: 'Every passage looks the same. Every shadow is a fork you do not remember.',
       zones: ['zone3', 'zone4', 'zone5'],
       probability: 0.04,
       cooldown: 4,
       effect: function(state) {
         var results = { messages: [], deaths: [] };
-        results.messages.push('Every passage looks the same — water-carved scallops and branching tunnels. The party is lost!');
+        results.messages.push('Every passage looks the same. Water-carved scallops and branching tunnels. Your landmarks have vanished.');
         // Extra resource consumption (wandering uses oil and food)
         state.lanternOil = Math.max(0, state.lanternOil - 0.5);
         var foodLost = Math.floor(Math.random() * 5) + 3;
         state.food = Math.max(0, state.food - foodLost);
-        results.messages.push('Lost half a day finding the way back. Extra rations consumed.');
+        results.messages.push('Lost half a day wandering before the passage came familiar again. Extra rations consumed in the dark.');
         // Minor health hit from stress
         var living = window.GameState.getLivingParty();
         for (var i = 0; i < living.length; i++) {
@@ -306,7 +322,7 @@ window.EventSystem = {
 
     'exhaustion': {
       name: 'Exhaustion',
-      description: 'The crew is pushed beyond their limits.',
+      description: 'The body has limits. You have found them.',
       zones: ['zone1', 'zone2', 'zone3', 'zone4', 'zone5'],
       probability: 0.05,
       cooldown: 3,
@@ -314,39 +330,39 @@ window.EventSystem = {
       condition: function(state) { return state.workPace === 'grueling'; },
       effect: function(state) {
         var results = { messages: [], deaths: [] };
-        results.messages.push('The grueling pace takes its toll!');
+        results.messages.push('The grueling pace takes its toll. The body has limits and you have found them.');
         var living = window.GameState.getLivingParty();
         for (var i = 0; i < living.length; i++) {
           var damage = 10 + Math.floor(Math.random() * 15);
           window.HealthSystem.applyDamage(living[i], damage);
         }
-        results.messages.push('Everyone is bone-tired. Work output suffers.');
+        results.messages.push('Every man is bone-tired. They move like men underwater. Work output suffers accordingly.');
         return results;
       }
     },
 
     'hypothermia': {
       name: 'Hypothermia',
-      description: 'The constant 58-degree air and dripping water drain body heat.',
+      description: 'Fifty-eight degrees does not sound cold until everything you own is soaked through.',
       zones: ['zone4', 'zone5'],
       probability: 0.04,
       cooldown: 4,
       effect: function(state) {
         var results = { messages: [], deaths: [] };
-        results.messages.push('At 505 feet deep, the constant 58-degree air and dripping water are deadly!');
+        results.messages.push('Five hundred feet deep. Wet clothes. Fifty-eight degrees. The cold does not rush. It is patient.');
         var living = window.GameState.getLivingParty();
         for (var i = 0; i < living.length; i++) {
           var damage = 12 + Math.floor(Math.random() * 15);
           window.HealthSystem.applyDamage(living[i], damage);
         }
-        results.messages.push('Wet clothes and the cave\'s relentless chill sap everyone\'s strength.');
+        results.messages.push('The shivering is constant now. When it stops, that is when it gets dangerous.');
         return results;
       }
     },
 
     'lung_sickness': {
       name: 'Lung Sickness',
-      description: 'Nitrogen-rich guano dust inflames the lungs.',
+      description: 'The guano dust has done its patient work. A racking cough that will not stop.',
       zones: ['zone1', 'zone2', 'zone3', 'zone4'],
       probability: 0.03,
       cooldown: 7,
@@ -356,13 +372,13 @@ window.EventSystem = {
         if (living.length === 0) return results;
         var victim = living[Math.floor(Math.random() * living.length)];
         var damage = 20 + Math.floor(Math.random() * 25);
-        results.messages.push(victim.name + ' develops a racking cough from the ammonia-laden guano dust!');
+        results.messages.push(victim.name + ' doubles over with a racking cough that echoes off the walls like a death rattle.');
         var died = window.HealthSystem.applyDamage(victim, damage);
         if (died) {
-          results.messages.push(victim.name + ' choked to death on cave dust.');
+          results.messages.push(victim.name + '\'s cough went silent. That was not a good sign. It was the last sign.');
           results.deaths.push(victim.name);
         } else {
-          results.messages.push(victim.name + ' will have trouble breathing for days.');
+          results.messages.push(victim.name + ' will be breathing through a wet cloth for days. If breathing at all.');
         }
         return results;
       }
@@ -370,7 +386,7 @@ window.EventSystem = {
 
     'broken_bone': {
       name: 'Broken Bone',
-      description: 'The wet limestone is treacherous underfoot.',
+      description: 'Wet flowstone. One wrong step. Gravity does the rest.',
       zones: ['zone1', 'zone2', 'zone3', 'zone4', 'zone5'],
       probability: 0.03,
       cooldown: 6,
@@ -401,7 +417,7 @@ window.EventSystem = {
       cooldown: 7,
       effect: function(state) {
         var results = { messages: [], deaths: [] };
-        results.messages.push('Bald Knobbers ride into Marmaros under cover of night!');
+        results.messages.push('Flour-sack masks with cane-stalk horns. Hickory switches and revolvers. The Bald Knobbers have come calling.');
         // Steal cash and supplies
         var cashStolen = Math.min(state.cash, Math.floor(Math.random() * 50) + 20);
         if (state.equipment && state.equipment.huntingKnife) {
@@ -409,7 +425,7 @@ window.EventSystem = {
           results.messages.push('Your hunting knife deters the worst of the theft.');
         }
         state.cash -= cashStolen;
-        results.messages.push('They steal $' + cashStolen.toFixed(2) + ' from the strongbox.');
+        results.messages.push('They take $' + cashStolen.toFixed(2) + ' from the strongbox. "A toll," the leader says. "For using our roads."');
         // May steal food
         if (Math.random() < 0.5) {
           var foodStolen = Math.min(state.food, Math.floor(Math.random() * 20) + 10);
@@ -422,7 +438,7 @@ window.EventSystem = {
           if (living.length > 0) {
             var victim = living[Math.floor(Math.random() * living.length)];
             window.HealthSystem.applyDamage(victim, 20);
-            results.messages.push(victim.name + ' was roughed up by the raiders.');
+            results.messages.push(victim.name + ' caught a hickory switch across the jaw for looking at a Knobber wrong.');
           }
         }
         state.baldKnobberThreat = Math.min(10, state.baldKnobberThreat + 2);
@@ -432,12 +448,12 @@ window.EventSystem = {
 
     'stagecoach_delay': {
       name: 'Stagecoach Delay',
-      description: 'The roads up Roark Mountain are impassable.',
+      description: 'The Roark Mountain road has surrendered to mud and gravity.',
       probability: 0.05,
       cooldown: 5,
       effect: function(state) {
         var results = { messages: [], deaths: [] };
-        results.messages.push('The supply wagon can\'t make it up the Roark Mountain road!');
+        results.messages.push('The supply wagon is mired axle-deep on the Roark Mountain road. Nothing is getting through.');
         // Delay all pending payments by an extra 3 days
         for (var i = 0; i < state.pendingPayments.length; i++) {
           state.pendingPayments[i].dueDate = new Date(
@@ -478,11 +494,14 @@ window.EventSystem = {
       effect: function(state) {
         var results = { messages: [], deaths: [] };
         var tips = [
-          'A traveler warns of Bald Knobber activity on Roark Mountain.',
-          'A traveler mentions the deepest guano deposits lie past the Mammoth Room, 450 feet down.',
-          'A traveler shares news from Springfield — bat guano fetches $700 a ton for fertilizer.',
-          'An old Osage hunter says the cave is Devil\'s Den. His people have avoided it for generations.',
-          'A traveler says the Marble Cave Mining Company in Barton County is watching your operation closely.'
+          'A traveler warns of Bald Knobber activity on Roark Mountain. "Travel by day," he says. "Or don\'t travel."',
+          'A prospector passing through says the richest guano lies past the Mammoth Room, four hundred fifty feet down. His eyes say he has been there. His hands say he did not enjoy it.',
+          'News from Springfield: bat guano is fetching seven hundred dollars a ton for fertilizer and gunpowder components. The number hangs in the air like a promise.',
+          'An old Osage man passes through without stopping. He leaves tobacco at the cave entrance and speaks to no one. The cave entrance is quieter for a day afterward.',
+          'A drummer from Kansas City mentions the Marble Cave Mining Company in Barton County is watching your operation. Competition or curiosity, he cannot say.',
+          'A circuit preacher warns that the cave is ungodly. He has never been inside it. The men who have been inside say nothing.',
+          'A stagecoach driver swears he saw lights moving inside the cave at midnight. No one was underground. No one will explain it.',
+          'An old-timer says the Spaniards left more than ladders down there. He taps his nose and orders another whiskey.'
         ];
         var tip = tips[Math.floor(Math.random() * tips.length)];
         results.messages.push(tip);

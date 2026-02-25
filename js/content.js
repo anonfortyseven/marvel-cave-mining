@@ -12,377 +12,418 @@
   // Oregon Trail style "You have reached..." text for each chamber
   var LANDMARK_TEXT = {
     marmaros: [
-      'You have arrived at Marmaros, a dusty mining settlement',
-      'perched on the wooded ridgetop above Marvel Cave.',
+      'You have arrived at Marmaros.',
       '',
-      'A handful of rough-hewn buildings line the single road:',
-      'a general store, a boardinghouse, and a shed that serves',
-      'as both post office and assay station. Mule teams wait',
-      'by the cave entrance, ready to haul guano to the rail',
-      'depot at Branson.',
+      'Twenty-eight souls cling to this ridgetop like moss',
+      'on a headstone. A hotel that is mostly roof. A general',
+      'store that smells of lye and ambition. A shed where a',
+      'man will weigh your guano and lie about the scales.',
       '',
-      'William Henry Lynch established this outpost in 1869',
-      'after purchasing mining rights to the cave from the',
-      'Osage Nation. The guano trade has drawn men from across',
-      'the Ozarks seeking their fortune underground.'
+      'Mule teams stamp in the mud by the cave mouth, waiting',
+      'to drag another load of bat dung down to Branson. The',
+      'Greek word for marble -- that is what they named this',
+      'place, after the Blow expedition mistook limestone for',
+      'something worth having.',
+      '',
+      'The Bald Knobbers ride these hills after dark. Keep',
+      'your lantern lit and your business to yourself.'
     ],
     cathedral_entrance: [
-      'You stand at the mouth of Marvel Cave.',
+      'You stand at the mouth of the Devil\'s Den.',
       '',
-      'A natural sinkhole forty feet across yawns open in the',
-      'forest floor. Wooden ladders and rope rigging descend',
-      'into the darkness below. The air rising from the pit',
-      'is cool and carries a faint mineral smell.',
+      'Forty feet across, the sinkhole yawns in the forest',
+      'floor like a wound that will not close. The Osage',
+      'carved warnings into the trees -- a sideways V that',
+      'meant: do not enter. They said a young brave fell',
+      'here chasing a bear and the earth swallowed him whole.',
       '',
-      'The Osage people called this place the "Devil\'s Den"',
-      'and avoided it. White settlers discovered it in the',
-      '1840s, but systematic exploration did not begin until',
-      'after the Civil War.',
+      'Rope ladders and crude timber rigging descend into',
+      'a darkness so complete it seems to drink your lantern',
+      'light. The air rising from below is fifty-eight degrees',
+      'and smells of centuries.',
       '',
-      'The entrance drops 200 feet into the largest cave',
-      'entrance room in America.'
+      'The drop is two hundred feet. The largest cave',
+      'entrance room in America waits at the bottom.',
+      'In 1541, Spanish conquistadors lowered themselves',
+      'on notched pine logs. Some came back up. Some did not.'
     ],
     the_sentinel: [
       'Before you stands The Sentinel.',
       '',
-      'A massive stalagmite nearly thirty feet tall rises from',
-      'the cavern floor like a silent guardian. Mineral deposits',
-      'have built this formation over tens of thousands of years,',
-      'one slow drip at a time.',
+      'Thirty feet of calcite risen from the cavern floor,',
+      'built one patient drip at a time over millennia. It',
+      'stands where stalactite met stalagmite and fused into',
+      'a column that looks, in the lantern-flicker, almost',
+      'like something keeping watch.',
       '',
-      'Miners have come to regard The Sentinel with a',
-      'superstitious reverence. Some tip their hats as they pass.',
-      'Others leave small offerings of tobacco at its base,',
-      'a habit borrowed from the Osage.',
+      'The guides tell tourists it is the only thing holding',
+      'up the Cathedral Room ceiling. The tourists believe',
+      'them. Your crew tips their hats as they pass, a habit',
+      'no one remembers starting.',
       '',
-      'The formation is composed of calcite deposited by',
-      'mineral-rich water seeping through the limestone above.'
+      'Old tobacco offerings sit at its base. Osage, some',
+      'say. Others say the miners leave them. No one claims',
+      'to have seen who.'
     ],
     cathedral_floor: [
-      'You have descended to the floor of the Cathedral Room.',
+      'You stand on the floor of the Cathedral Room.',
       '',
-      'This is the largest cave entrance room in the Americas,',
-      'spanning over two acres. The ceiling soars seventy feet',
-      'overhead, lost in shadow. Your lantern illuminates only',
-      'a small circle of the vast space.',
+      'Two acres of darkness. The ceiling is two hundred',
+      'feet overhead and lost to shadow -- you could stand',
+      'the Statue of Liberty in here and she would not',
+      'scrape her torch. Your lantern is a candle in a',
+      'cathedral built by water and time.',
       '',
-      'Thick deposits of bat guano cover the floor in places,',
-      'some several feet deep. The smell is powerful. This is',
-      'what you came for -- bat guano, rich in nitrogen and',
-      'phosphorus, valued as fertilizer across the South.',
+      'The guano lies thick in places. Centuries of it,',
+      'deposited by the gray bat colonies that spiral',
+      'from the sinkhole at dusk in a living tornado',
+      'that takes twenty minutes to pass. The smell hits',
+      'your throat like a fist.',
       '',
-      'The Cathedral Room alone contains enough guano to fill',
-      'hundreds of wagons.'
+      'Atop the 124-foot debris pile called the Underground',
+      'Mountain, the bones of animals that fell through the',
+      'sinkhole over millennia lie mixed with the dung of',
+      'eighty thousand bats. This is what you came for.',
+      'God help you.'
     ],
     serpentine_passage: [
       'You enter the Serpentine Passage.',
       '',
-      'The grand scale of the Cathedral Room gives way to a',
-      'twisting, turning tunnel barely six feet high. The walls',
-      'press close, slick with moisture. Your lantern throws',
-      'wild shadows as you navigate the curves.',
+      'The Cathedral Room releases you into a gut of stone',
+      'barely six feet high, twisting like something alive.',
+      'The walls are scalloped smooth by ancient pressurized',
+      'water that bored through this bedrock a million years',
+      'before you were born.',
       '',
-      'This passage was carved by an ancient underground river',
-      'that has long since found another path. The smooth,',
-      'water-worn walls bear the marks of millennia.',
+      'Every sack of guano you harvest must come back',
+      'through here on a man\'s shoulders. One sack at a',
+      'time. Fifty pounds each. The passage does not care',
+      'about your schedule.',
       '',
-      'Miners must haul all their guano back through this',
-      'passage by hand. It is slow, exhausting work.'
+      'The walls are scarred with pick marks from miners',
+      'who tried to widen it. The limestone won.'
     ],
     egyptian_room: [
       'You have entered the Egyptian Room.',
       '',
-      'Strange mineral formations line the walls, creating',
-      'patterns that early explorers thought resembled Egyptian',
-      'hieroglyphs and temple columns. The resemblance is',
-      'uncanny in flickering lantern light.',
+      'The ceiling here is flat and polished like the sole',
+      'of a giant\'s boot. In 1869, the Blow expedition held',
+      'up their lanterns and declared it pure marble. It was',
+      'ordinary Mississippian limestone. But the mistake gave',
+      'this cave its name and its fortune.',
       '',
-      'These formations are actually flowstone deposits --',
-      'sheets of calcite laid down by water flowing over the',
-      'cave walls. The "hieroglyphs" are natural patterns',
-      'created by varying mineral content in the water.',
+      'Miriam and Genevieve Lynch, daughters of the man who',
+      'bought the cave, named the formations: King Tut\'s',
+      'Sarcophagus. Cleopatra\'s Sandal. The Sphinx\'s Nose.',
+      'They were girls playing make-believe three hundred',
+      'feet underground. The names stuck.',
       '',
-      'William Henry Lynch once charged tourists 50 cents',
-      'to view this room before he turned to mining.'
+      'Lynch charged tourists fifty cents to see this room.',
+      'Then the guano trade paid better, and the tourists',
+      'stopped coming. Now you are here with a shovel instead',
+      'of a lantern tour.'
     ],
     gulf_of_doom: [
       'You stand at the edge of the Gulf of Doom.',
       '',
-      'A vast chasm opens before you, its bottom invisible',
-      'in the absolute darkness below. When you drop a stone,',
-      'you count to four before hearing it strike bottom.',
+      'A hundred-foot vertical shaft drops beneath the heel',
+      'of the Egyptian Room into nothing. Drop a stone and',
+      'listen. You will not hear it land. The bottom is a',
+      'deep slurry of cavern clay and nitrogen-rich guano',
+      'that swallows everything without sound.',
       '',
-      'Rich guano deposits crust the ledges around the rim,',
-      'deposited by bats who roost in the upper walls of the',
-      'void. This is some of the richest guano in the cave,',
-      'but reaching it means working on narrow ledges above',
-      'a fatal drop.',
+      'The richest deposits in the cave crust the ledges',
+      'around the rim. Three miners have fallen here. Their',
+      'lanterns were found. The men were not.',
       '',
-      'At least three miners have fallen to their deaths here.',
-      'Their bodies were never recovered.'
+      'Early explorers called this pit bottomless, and they',
+      'were not entirely wrong. Some depths are not meant',
+      'to be measured.'
     ],
     fat_mans_misery: [
       'You have reached Fat Man\'s Misery.',
       '',
-      'The passage narrows dramatically to barely eighteen',
-      'inches wide. You must turn sideways, exhale fully, and',
-      'shuffle through inch by inch. Equipment must be passed',
-      'ahead by hand.',
+      'Four feet seven inches of headroom. Seven feet of',
+      'passage. You must turn sideways, empty your lungs,',
+      'and shuffle through an inch at a time while the',
+      'Ozarks press against your chest and spine.',
       '',
-      'This infamous squeeze point has stopped many an explorer.',
-      'One tale tells of a 300-pound man who became wedged so',
-      'tightly that his companions greased him with lard and',
-      'pulled him free with ropes.',
+      'They say a three-hundred-pound man got wedged here',
+      'so tight his crew greased him with lard and hauled',
+      'him out with rope. They say he never went underground',
+      'again. They say a lot of things in Marmaros.',
       '',
-      'Beyond this point, there is no easy escape from the',
-      'cave. Consider your supplies carefully before proceeding.'
+      'Beyond this point, the cave does not let go easily.',
+      'Check your oil. Check your rope. Check your nerve.'
     ],
     the_dungeon: [
       'You have entered The Dungeon.',
       '',
-      'The ceiling drops to barely four feet. You must crouch',
-      'or crawl. The air is thick, stale, and carries a sharp',
-      'ammonia tang that burns your eyes and throat.',
+      'The ceiling drops to four feet. Iron oxide leaches',
+      'through the limestone in thick rust-colored streaks',
+      'that look, in your lantern light, exactly like dried',
+      'blood running down the walls.',
       '',
-      'Candles burn dim here, a warning of poor air quality.',
-      'Experienced miners know that a guttering flame means',
-      'dangerous levels of carbon dioxide or methane. If your',
-      'candle goes out, you leave immediately.',
+      'Cave guides told tourists this was a Spanish torture',
+      'chamber. It was not. It is just stone bleeding iron,',
+      'the way stone does when water has ten thousand years',
+      'to work. But the ammonia is real, and the air burns',
+      'your eyes and throat.',
       '',
-      'The ammonia comes from decomposing bat guano, which',
-      'releases nitrogen compounds as it breaks down. Prolonged',
-      'exposure causes "bat fever" -- a persistent lung illness.'
+      'A guttering candle flame means bad air. If it goes',
+      'out, you leave. There is no negotiating with carbon',
+      'dioxide. It pools in low places and waits.'
     ],
     spring_room: [
       'You have found the Spring Room.',
       '',
-      'A natural spring bubbles from a crack in the limestone',
-      'wall, collecting in a clear pool before disappearing',
-      'into a crevice in the floor. The air here is noticeably',
-      'fresher than the surrounding passages.',
+      'Hidden behind The Sentinel through a crevice most men',
+      'walk past without seeing, the walls here blaze with',
+      'orange calcite so vivid it looks painted. Concealed',
+      'waterfalls cascade over terraced stone, filling the',
+      'chamber with a sound like heavy rain.',
       '',
-      'This is the only reliable water source in the deep cave.',
-      'Miners rest here to fill their canteens, wash their',
-      'faces, and catch their breath. Some have carved their',
-      'initials into the soft limestone walls.',
+      'Sixteenth-century Spaniards heard this water and saw',
+      'these glowing walls and believed they had found the',
+      'Fountain of Youth. They had not. But you can see how',
+      'a man might think so.',
       '',
-      'The water temperature is a constant 56 degrees',
-      'Fahrenheit, year round. It tastes faintly of minerals',
-      'but is clean and safe to drink.'
+      'The water is fifty-six degrees, clear as glass, and',
+      'safe to drink. Miners have carved their names here.',
+      'Some of the names are very old. Some are in languages',
+      'you do not recognize.'
     ],
     blondies_throne: [
       'You have reached Blondie\'s Throne.',
       '',
       'A massive flowstone formation rises from the chamber',
-      'floor, shaped roughly like a high-backed chair. Thick',
-      'guano deposits surround it on all sides.',
+      'floor in undulating tiers, shaped like a high-backed',
+      'chair designed by a patient god. Thick guano deposits',
+      'surround it on all sides.',
       '',
-      'This chamber is named after "Blondie" Putnam, a miner',
-      'who claimed it as his personal territory in 1872. He',
-      'sat atop the flowstone during lunch breaks, presiding',
-      'over the darkness like a king on his throne.',
+      'They named it for young Charles "Blondie" Smallwood,',
+      'who got separated from his tour group and was found',
+      'hours later fast asleep in the flowstone\'s embrace,',
+      'blonde hair dusty with calcite, dreaming whatever',
+      'children dream three hundred feet underground.',
       '',
-      'Blondie mined this chamber alone for three years before',
-      'a lung ailment forced him to the surface for good. He',
-      'never returned underground.'
+      'The guano here is rich. The bats thick. The air foul.',
+      'But there is something about this room that makes men',
+      'speak in whispers, as if someone is still sleeping.'
     ],
     cloud_room: [
       'You have entered the Cloud Room.',
       '',
-      'A thick, acrid haze hangs in the air -- ammonia vapor',
-      'rising from the deepest guano deposits in the upper',
-      'cave. Your eyes water and your lungs burn. Without',
-      'a respirator, you can endure perhaps thirty minutes.',
+      'The ceiling changes here. The smooth limestone gives',
+      'way to porous dolomite, pocked and undulating like a',
+      'bank of storm clouds frozen in stone. Below this false',
+      'sky, the richest guano deposits in the upper cave',
+      'lie several feet deep.',
       '',
-      'This was the primary mining chamber, where the largest',
-      'crews worked the richest deposits. The guano here is',
-      'several feet deep in places, accumulated over centuries.',
+      'The ammonia is a living thing in this room. It fills',
+      'your skull and burns your lungs. Without a cloth over',
+      'your face you can endure maybe thirty minutes before',
+      'the coughing starts. A year from now, some of these',
+      'men will have a cough that never leaves.',
       '',
-      'Many miners who worked the Cloud Room developed chronic',
-      'lung ailments. The connection between bat guano dust',
-      'and the fungal disease histoplasmosis would not be',
-      'understood for another sixty years.'
+      'They will call it bat fever. The disease is really',
+      'histoplasmosis -- a fungus that lives in the guano',
+      'dust. No one will identify it for another sixty years.'
     ],
     mammoth_room: [
       'You have entered the Mammoth Room.',
       '',
-      'The noise hits you first -- a deafening, high-pitched',
-      'shrieking that fills the enormous chamber. Your lantern',
-      'reveals a ceiling alive with movement: eighty thousand',
-      'gray bats, packed shoulder to shoulder overhead.',
+      'The shrieking hits you first. Forty thousand gray bats',
+      'packed shoulder to shoulder on the ceiling, every one',
+      'of them screaming. The sound is not of this world. It',
+      'fills the enormous unlit chamber with a vibration you',
+      'feel in your teeth.',
       '',
-      'The gray bat (Myotis grisescens) is the dominant species',
-      'here. They roost in vast colonies during the summer,',
-      'emerging at dusk in a living river that can take twenty',
-      'minutes to pass. Their droppings are the source of the',
-      'guano that drives the mining economy.',
+      'This room is deliberately left dark. No permanent',
+      'lights. The bats are federally endangered and this is',
+      'their hibernaculum. At dusk they pour from the sinkhole',
+      'in a spiraling vortex that devours twenty-four million',
+      'insects a night.',
       '',
-      'Working beneath a colony this size requires nerve and',
-      'a strong stomach. The bats are not aggressive, but a',
-      'startled swarm can disorient and injure a miner badly.'
+      'It was here, in 1869, that the Blow expedition found',
+      'the Spanish ladders -- notched pine logs left by',
+      'conquistadors three centuries earlier. Still standing.',
+      'Still holding. The wood remembers what the men forgot.'
     ],
     lost_river: [
       'You have discovered the Lost River.',
       '',
-      'An underground river emerges from a crack in the rock',
-      'wall, flows for perhaps fifty feet through the chamber,',
-      'and vanishes into another fissure on the far side.',
+      'It surfaces from a crack in the rock like a secret',
+      'told under duress, flows fifty feet through open air,',
+      'and plunges back into the stone without explanation.',
+      'No one knows where it comes from. No one knows where',
+      'it goes. Dye tests have failed.',
       '',
-      'No one knows where this river comes from or where it',
-      'goes. Dye tests have been inconclusive. The water level',
-      'rises unpredictably, sometimes flooding the passage in',
-      'minutes with no warning.',
+      'The water level rises without warning. A change in',
+      'the sound -- deeper, more resonant -- means a surge',
+      'is coming from upstream. When the surface rains, the',
+      'water percolates through the karst and this river',
+      'becomes a fury that fills passages to the ceiling.',
       '',
-      'Miners have learned to watch for a subtle change in the',
-      'sound of the water. A deeper, more resonant tone means',
-      'a flood surge is coming from upstream.'
+      'Respect the river. It was here before the cave had',
+      'a name, and it will be here after the name is forgotten.'
     ],
     lake_genevieve: [
       'You have reached Lake Genevieve.',
       '',
-      'A perfectly still underground lake stretches before you,',
-      'its surface reflecting your lantern like a dark mirror.',
-      'The water is so clear and so still that it is difficult',
-      'to tell where air ends and water begins.',
+      'A perfectly still underground lake, thirty-four feet',
+      'deep, reflects your lantern like a black mirror. The',
+      'water is so clear and so motionless that you cannot',
+      'tell where air ends and water begins until your boot',
+      'breaks the surface.',
       '',
-      'William Henry Lynch named this lake after his daughter.',
-      'It is roughly 100 feet across, and its true depth has',
-      'never been measured. The water maintains a constant',
-      '56 degrees year-round.',
+      'William Henry Lynch named it for his daughter. Sub-',
+      'aquatic surveys have mapped passages plunging to a',
+      'hundred and ten feet below the surface. Most remain',
+      'unexplored. The silt-outs are too dangerous.',
       '',
-      'Coins and small artifacts dropped by early visitors',
-      'still glint on the visible ledges below the surface,',
-      'undisturbed by current or tide.'
+      'Coins dropped by early tourists still glint on the',
+      'ledges below. Sometimes, in the stillness, something',
+      'pale and eyeless moves beneath the surface. It is',
+      'only the cavefish. Probably.'
     ],
     lake_miriam: [
       'You have discovered Lake Miriam.',
       '',
-      'A second underground lake, deeper and more remote than',
-      'Lake Genevieve. The passage to reach it requires wading',
-      'through chest-deep water for thirty yards.',
+      'The passage to reach it requires wading chest-deep',
+      'through fifty-six-degree water for thirty yards in',
+      'absolute darkness. Most men turn back. The ones who',
+      'do not find a chamber so silent that their own pulse',
+      'sounds like drumming.',
       '',
-      'The chamber is utterly silent except for the slow,',
-      'rhythmic drip of water from the ceiling. The darkness',
-      'beyond your lantern is absolute and total.',
+      'Lynch named this one for his other daughter. Miriam',
+      'never saw it. Neither did Genevieve. The names were',
+      'given from the surface, by a father who loved his',
+      'children more than he understood the dark.',
       '',
-      'Few miners ventured this far into the cave system.',
-      'Those who did reported an eerie sense of peace, as',
-      'though the weight of the earth above had squeezed',
-      'all urgency from the world.'
+      'Few miners come this far. Those who do sit for a',
+      'while in the silence and then leave without speaking.',
+      'Some say the weight of the earth above squeezes all',
+      'urgency from the world. Others say the cave is',
+      'listening, and they do not want to be heard.'
     ],
     waterfall_room: [
       'You have reached the Waterfall Room.',
       '',
-      'A waterfall plunges over 400 feet into a mist-shrouded',
-      'abyss below you. The roar of falling water is constant',
-      'and disorienting, filling the chamber with a deep',
-      'vibration you feel in your chest.',
+      'Five hundred and five feet below the surface. The',
+      'deepest accessible point. A fifty-foot waterfall fed',
+      'by the Lost River plunges into a mist-shrouded pool',
+      'with a roar that fills your chest like a second heart.',
       '',
-      'This is the deepest accessible point in Marvel Cave,',
-      'and the guano deposits here are the richest of all.',
-      'But everything is slick with mist, every surface',
-      'treacherous, every foothold uncertain.',
+      'Everything is slick. Every surface treacherous. The',
+      'mist soaks through your clothes in minutes and the',
+      'fifty-eight-degree air begins its patient work on',
+      'your body heat.',
       '',
-      'Only the bravest or most desperate miners worked the',
-      'Waterfall Room. The guano hauled from this depth was',
-      'worth a premium, but the cost in broken bones and',
-      'ruined health was immense.'
+      'The guano here is the richest in the cave and the',
+      'most dangerous to reach. Only the bravest or most',
+      'desperate miners worked this room. The premium they',
+      'earned was paid in broken bones and ruined lungs.',
+      '',
+      'Somewhere behind the falls, the rock is marked with',
+      'symbols that do not match any known alphabet. They',
+      'are very old. They may be older than the cave itself.'
     ]
   };
 
   // ─── Random Event Messages ───────────────────────────────────────
   var EVENT_MESSAGES = {
     cave_in: [
-      'A deep rumble shakes the passage. Rocks crash down from the ceiling!',
-      'The timber supports groan and snap. The roof is coming down!',
-      'A section of ceiling collapses without warning. Dust and debris fill the air.',
-      'The ground shudders and a wall of rock blocks the passage behind you.',
-      'Cracks spider across the ceiling. You barely dive clear as tons of rock come down.'
+      'A sound like God clearing His throat. The ceiling comes down.',
+      'The timber supports groan, then scream, then snap. Run.',
+      'No warning. Just weight. Tons of Ozark limestone where air used to be.',
+      'The ground shudders and a wall of rubble seals the passage behind you like a tomb.',
+      'Cracks race across the ceiling like lightning frozen in stone. You dive. Not everyone does.'
     ],
     bat_swarm: [
-      'A shrieking cloud of bats erupts from the darkness overhead!',
-      'Thousands of bats take flight at once. The air is thick with leathery wings.',
-      'Your lantern startles a roosting colony. Bats swarm around you in a frenzy.',
-      'A river of bats pours through the passage, battering you with their wings.',
-      'The bats descend in a screeching, chaotic mass. You can barely see your hand.'
+      'The ceiling comes alive. Forty thousand wings and forty thousand screams.',
+      'A river of bats pours through the passage. You cannot see. You cannot hear. You can only endure.',
+      'Your lantern startles the colony and they erupt -- a shrieking, churning cloud of leather and teeth.',
+      'The swarm hits you like weather. Like a storm made of bones and rage.',
+      'They pour past you for twenty minutes. You count the seconds because counting is all you can do.'
     ],
     bad_air: [
-      'The candle flame gutters and dims. The air here is dangerously foul.',
-      'A wave of dizziness hits you. The ammonia fumes are overwhelming.',
-      'Your eyes burn and your lungs ache. The air quality is deteriorating fast.',
-      'The flame on your lantern turns blue. Methane. You need to move. Now.',
-      'A sickly-sweet smell fills the passage. Carbonic gas is pooling in this low spot.'
+      'The candle flame shrinks to a blue whisper. Get out.',
+      'Ammonia so thick you can taste it. Your eyes stream. Your lungs rebel.',
+      'A sweetness in the air that should not be there. Carbonic gas pooling in the low spots. Move.',
+      'The lantern flame turns blue. Methane. The cave is telling you something and you should listen.',
+      'Dizziness hits like a fist. The guano fumes have been working on you and you did not notice until now.'
     ],
     flooding: [
-      'A distant roar grows louder. Water is rising fast!',
-      'The river surges without warning. Cold water rushes through the passage.',
-      'Rainwater from the surface pours down through cracks in the ceiling.',
-      'The underground stream has overflowed its banks. The path is submerged.',
-      'Flash flood! Brown water churns through the chamber at alarming speed.'
+      'A sound like distant thunder that gets less distant very fast.',
+      'The Lost River surges. Brown water fills the passage in minutes. There is nowhere to go but up.',
+      'Surface rain finds its way down through a thousand cracks. The cave is drowning and you are in it.',
+      'The stream overflows its banks without apology. Cold water. Fast water. Rising water.',
+      'Flash flood. The water does not care about your schedule or your supplies or your life.'
     ],
     fall: [
-      'The ground gives way beneath your feet!',
-      'A loose rock slides and you tumble down a steep slope.',
-      'Your foot finds empty air where solid ground should be.',
-      'The ledge crumbles and you scramble for a handhold.',
-      'You slip on wet flowstone and slide toward the edge.'
+      'The ground gives way and so does your stomach.',
+      'A loose rock. A wet boot. A long moment of understanding.',
+      'Your foot finds empty air where the floor promised to be.',
+      'The ledge crumbles like a broken promise. You grab for stone. Stone does not grab back.',
+      'Wet flowstone. One wrong step. Gravity does the rest.'
     ],
     rockfall: [
-      'A boulder breaks free from the ceiling and crashes down nearby.',
-      'Loose rocks tumble from the wall, striking your equipment.',
-      'A shelf of limestone sheers off and shatters on the floor.',
-      'Pebbles rain from above -- a warning of larger rocks to follow.',
-      'A rockfall blocks half the passage. You\'ll need to clear a path.'
+      'A boulder the size of a whiskey barrel breaks free overhead.',
+      'Rocks tumble from the wall like the mountain shrugging.',
+      'A shelf of limestone sheers off with a sound like a rifle shot.',
+      'Pebbles first. Then stones. The mountain gives its warnings in ascending order.',
+      'A rockfall blocks half the passage. The other half looks at you with indifference.'
     ],
     stuck: [
-      'The passage narrows. One of your crew gets wedged tight.',
-      'The squeeze point is tighter than expected. Someone is stuck.',
-      'A crew member\'s pack catches on a rock outcrop. They cannot move.',
-      'The passage is too narrow for your equipment. Time is wasted finding a way through.'
+      'The passage narrows and someone gets wedged like a cork in a bottle.',
+      'The squeeze point is tighter than your map suggested. Someone is not going anywhere.',
+      'A crew member\'s pack catches on a rock tooth. They cannot move forward or back.',
+      'The passage laughs at your equipment and refuses to let it through.'
     ],
     disease: [
-      'A crew member develops a racking cough. Bat fever.',
-      'One of your miners collapses with chills and fever. The cave sickness has taken hold.',
-      'The dust from the guano has done its work. A miner cannot stop coughing.',
-      'Histoplasmosis. The fungus in the guano has infected one of your crew.'
+      'It starts as a cough. It always starts as a cough.',
+      'Chills. Fever. The guano fungus has found a new home in a miner\'s lungs.',
+      'The dust has done its patient work. A man who was fine yesterday cannot stand today.',
+      'Histoplasmosis. The word will not exist for sixty years. The disease does not wait.'
     ],
     hypothermia: [
-      'The cold water has sapped the warmth from your bones.',
-      'A crew member is shivering uncontrollably. They need warmth.',
-      'After wading through the flooded passage, the cold sets in dangerously.',
-      'Wet clothing and cave temperatures are a deadly combination.'
+      'Fifty-eight degrees does not sound cold until everything you own is soaked through.',
+      'The shivering stops. That is when it gets dangerous.',
+      'Wet clothes and cave air. The combination is older than medicine and more reliable.',
+      'The cold does not rush. It is patient. It has all the time in the world.'
     ],
     lost: [
-      'The passage branches in ways your map doesn\'t show. Which way?',
-      'Your landmarks have vanished. Nothing looks familiar.',
-      'A wrong turn leads to a dead end. You must backtrack.',
-      'The darkness is total. Without a working lantern, you are blind and lost.'
+      'Every passage looks the same. Every shadow is a fork you do not remember.',
+      'Your landmarks have vanished. The cave has rearranged itself when you were not looking.',
+      'A wrong turn leads to a dead end that looks exactly like the right turn.',
+      'Without a working lantern you are blind and lost and the cave is very, very large.'
     ],
 
     // === Positive / Neutral Events ===
     good_find: [
-      'You discover a rich pocket of undisturbed guano. Excellent yield today.',
-      'A side alcove holds guano deposits several feet deep. A lucky find.',
-      'Your geologist spots an unusually rich formation. Mining goes well.',
-      'The guano in this section is dry and easy to sack. Good working conditions.'
+      'A side alcove thick with undisturbed guano. Your men grin like they struck gold.',
+      'The deposits here are deep and dry. A lucky find on a day you needed one.',
+      'Your geologist spots a formation and says a word that means money. The shovels come out.',
+      'Rich guano. Easy access. Good air. Days like this keep men coming back underground.'
     ],
     rest_event: [
-      'The crew rests by the underground spring. Spirits improve.',
-      'A brief rest and a drink of cool spring water restore some strength.',
-      'The crew takes a meal break. Salt pork and hardtack never tasted so good.',
-      'An hour\'s rest in the Spring Room does wonders for morale.'
+      'The crew rests by the spring. Clean water and silence. The cave is generous today.',
+      'Cool water. A pause in the work. The men remember they are alive.',
+      'Salt pork and hardtack by lantern light. No one complains. No one has the energy.',
+      'An hour in the Spring Room. The orange walls glow. Something about this place gives a man back to himself.'
     ],
     equipment_break: [
-      'A pickaxe handle snaps. You\'ll need to use a spare.',
-      'Your best shovel bends against a rock. It\'s still usable, but barely.',
-      'A rope frays and must be replaced from your supplies.',
-      'The lantern glass cracks. You patch it, but it throws less light.'
+      'A pickaxe handle snaps mid-swing. The limestone does not even notice.',
+      'Your best shovel bends against rock that has been waiting since the Carboniferous.',
+      'A rope frays where you cannot see it until you can. Replace it. Now.',
+      'The lantern glass cracks. You patch it with what you have. It throws half the light.'
     ],
     crew_morale: [
-      'The crew sings a hymn as they work. The cave rings with harmony.',
-      'Someone tells a joke. Laughter echoes through the passages.',
-      'A crew member finds a beautiful crystal formation. Spirits lift.',
-      'The foreman shares a flask of whiskey. Morale improves considerably.'
+      'Someone starts a hymn. One by one the others join. The cave has never heard harmony before.',
+      'A joke so bad it is good. Laughter bouncing off limestone. The darkness retreats an inch.',
+      'A crew member finds a crystal formation like frozen starlight. Nobody touches it. Everyone stares.',
+      'The foreman passes a flask. One sip each. Morale improves more than the whiskey warrants.'
     ]
   };
 
@@ -393,12 +434,17 @@
       message: [
         'You have died of bat fever.',
         '',
-        'The fungal spores in the guano dust have destroyed',
-        'your lungs. What began as a persistent cough became',
-        'a wasting illness no frontier medicine could cure.',
+        'It started as a cough you ignored. Then a cough',
+        'you couldn\'t ignore. Then a silence where your',
+        'breathing used to be.',
         '',
-        'Histoplasmosis would not be identified as a disease',
-        'until 1906. You never knew what killed you.'
+        'The fungus in the guano dust colonized your lungs',
+        'like the Spaniards colonized this cave. Thoroughly',
+        'and without asking permission.',
+        '',
+        'Histoplasmosis won\'t have a name for sixty years.',
+        'You never knew what killed you. Neither will the',
+        'next man who works this room.'
       ]
     },
     cave_in: {
@@ -406,11 +452,15 @@
       message: [
         'You have been killed in a cave-in.',
         '',
-        'Tons of Ozark limestone came down without warning,',
-        'burying you and your crew beneath the rubble.',
+        'The mountain decided it was done holding itself',
+        'up. The sound was brief. So were you.',
         '',
-        'Your body was never recovered. The passage was',
-        'sealed permanently by the collapse.'
+        'Tons of Ozark limestone. A space where a man',
+        'used to be. The passage sealed itself like a',
+        'wound closing, and the cave moved on without you.',
+        '',
+        'They did not recover the body. The cave keeps',
+        'what it takes, and it does not negotiate.'
       ]
     },
     fall: {
@@ -418,9 +468,13 @@
       message: [
         'You have fallen to your death.',
         '',
-        'A misstep on a slick ledge sent you tumbling',
-        'into the darkness below. The fall was mercifully',
-        'short, but the landing was not.',
+        'One wet boot on slick flowstone. A moment of',
+        'perfect clarity as gravity explained itself.',
+        'The fall was not long. The landing was thorough.',
+        '',
+        'Your lantern hit the floor before you did and',
+        'went out. The darkness arrived a moment early,',
+        'like a host preparing for a guest.',
         '',
         'The cave keeps what it takes.'
       ]
@@ -430,13 +484,16 @@
       message: [
         'You have fallen into the Gulf of Doom.',
         '',
-        'The narrow ledge gave way and you plunged into',
-        'the bottomless void. Your lantern flickered as',
-        'you fell, growing smaller and smaller until the',
-        'darkness swallowed it entirely.',
+        'The ledge crumbled and you went into the shaft',
+        'feet-first with your lantern still lit. Your crew',
+        'watched the light fall. It got smaller. Then it',
+        'got very small. Then it was gone.',
         '',
-        'Your body was never found, like the three miners',
-        'who came before you.'
+        'They never heard you land. The clay-and-guano',
+        'slurry at the bottom absorbs everything. Sound.',
+        'Light. Men.',
+        '',
+        'You are the fourth. You will not be the last.'
       ]
     },
     drowning: {
@@ -444,12 +501,15 @@
       message: [
         'You have drowned in the cave.',
         '',
-        'The underground river rose faster than you could',
-        'retreat. Cold, dark water filled the passage and',
-        'there was nowhere to go.',
+        'The Lost River rose faster than you could think',
+        'the word "retreat." Cold water. Dark water. Water',
+        'that filled every passage and left no air for a',
+        'man who needed some.',
         '',
         'They found your lantern wedged between two rocks,',
-        'still faintly warm.'
+        'still faintly warm. They did not find you.',
+        '',
+        'The river does not know your name.'
       ]
     },
     lost_in_darkness: {
@@ -457,13 +517,17 @@
       message: [
         'You have been lost in the darkness.',
         '',
-        'When the last lantern failed, absolute darkness',
-        'closed in. You wandered the passages by touch,',
-        'growing weaker, until you could walk no more.',
+        'The last lantern sputtered and died and the dark',
+        'came in like a flood. You walked by touch. You',
+        'walked by memory. You walked until you couldn\'t.',
         '',
-        'Your remains were found years later by a survey',
-        'team, seated against a wall, hand still clutching',
-        'an empty lantern.'
+        'A survey team found your remains years later,',
+        'seated against a wall with an empty lantern in',
+        'your hand and your face turned toward a passage',
+        'that would have led to the surface.',
+        '',
+        'Two hundred yards. You were two hundred yards',
+        'from daylight.'
       ]
     },
     lung_sickness: {
@@ -471,13 +535,15 @@
       message: [
         'You have died of lung sickness.',
         '',
-        'Months of breathing ammonia fumes and guano dust',
-        'have filled your lungs with fluid. The coughing',
-        'that started as an annoyance became agony, then',
-        'silence.',
+        'Months of ammonia and guano dust. Your lungs',
+        'filled with what they could not expel. The',
+        'coughing became a language you spoke fluently',
+        'and then the language went silent.',
         '',
         'You are buried in the small cemetery above the',
-        'cave. The headstone reads simply: "A Miner."'
+        'cave. The headstone reads: "A Miner." No name.',
+        'The stonemason charged by the letter and your',
+        'crew was short on funds.'
       ]
     },
     snakebite: {
@@ -485,11 +551,15 @@
       message: [
         'You have died of snakebite.',
         '',
-        'A timber rattlesnake, disturbed from its den near',
-        'the cave entrance, struck without warning. The',
-        'nearest doctor was two days\' ride away.',
+        'A timber rattlesnake. Four feet of Missouri',
+        'malice coiled in the rocks near the entrance.',
+        'It struck before you saw it and the venom',
+        'worked faster than the nearest doctor could ride.',
         '',
-        'The venom worked quickly. By nightfall, it was over.'
+        'The nearest doctor was in Forsyth. Two days away.',
+        'The snake did not extend that courtesy.',
+        '',
+        'By nightfall it was done.'
       ]
     },
     starvation: {
@@ -497,11 +567,17 @@
       message: [
         'You have starved to death.',
         '',
-        'Deep in the cave with no supplies and no way to',
-        'forage, hunger became your constant companion,',
-        'then your executioner.',
+        'Deep in the cave with empty packs and no way',
+        'to forage. Hunger kept you company for a while.',
+        'Then it stopped being company and started being',
+        'a landlord.',
         '',
-        'You should have turned back when the rations ran low.'
+        'The cave is full of things. Limestone. Water.',
+        'Bats. Guano. None of it is food.',
+        '',
+        'You should have turned back when the hardtack',
+        'ran out. But you didn\'t, and now you know why',
+        'they call this place the Devil\'s Den.'
       ]
     },
     hypothermia: {
@@ -509,13 +585,17 @@
       message: [
         'You have died of exposure.',
         '',
-        'Soaked by the underground river and unable to',
-        'build a fire in the depths, the cold crept in',
-        'slowly. First the shivering stopped. Then the',
-        'confusion began. Then sleep came, and did not leave.',
+        'Fifty-eight degrees. It does not sound cold.',
+        'It does not need to sound cold. Wet clothes and',
+        'no fire will kill a man at fifty-eight degrees',
+        'with the same patience the cave applies to',
+        'everything.',
         '',
-        'The cave is always 60 degrees. It does not sound',
-        'cold until your clothes are wet and your fire is out.'
+        'First the shivering stopped. You thought that',
+        'was good. It was not good. Then sleep came,',
+        'warm and heavy as a quilt, and you let it.',
+        '',
+        'The cave does not hurry.'
       ]
     },
     bad_air: {
@@ -523,12 +603,16 @@
       message: [
         'You have suffocated.',
         '',
-        'The oxygen ran out in the sealed passage. There',
-        'was no warning -- the candle simply dimmed and went',
-        'out, and a terrible drowsiness overcame you.',
+        'Carbonic gas. Heavier than air. Pooling in the',
+        'low spots like invisible water. The candle dimmed',
+        'and you thought it was the oil. It was not the oil.',
         '',
-        'Carbonic gas is heavier than air. It pools in low',
-        'places. By the time you noticed, it was too late.'
+        'A terrible drowsiness. A thought half-formed.',
+        'A breath that did not come.',
+        '',
+        'The gas was already there when you arrived.',
+        'It was patient. It did not need to be anything',
+        'else.'
       ]
     }
   };
@@ -554,44 +638,49 @@
       ' /                     \\'
     ],
     epitaphs: [
-      'Gone to glory.',
-      'Taken by the mountain.',
+      'Gone to glory, if glory will have him.',
+      'The mountain took what was owed.',
       'The cave keeps its own.',
-      'Rest now, weary miner.',
+      'Rest now. The digging is done.',
       'Deeper than any man should go.',
-      'The darkness was patient.',
-      'He dug too deep.',
-      'Remembered by none, mourned by few.',
-      'Another soul the cave has claimed.',
-      'The Ozarks giveth and the Ozarks taketh away.'
+      'The darkness was patient. He was not.',
+      'He dug too deep and found the bottom.',
+      'Mourned by few. Owed by many.',
+      'Another name the limestone learned.',
+      'The Ozarks giveth and the Ozarks taketh away.',
+      'He came for guano. The guano came for him.',
+      'Last words: "Hold the rope."'
     ]
   };
 
   // ─── Bald Knobber Encounter Dialogue ─────────────────────────────
   var BALD_KNOBBER_DIALOGUE = {
     intro: [
-      'The trail ahead is blocked by four men on horseback.',
-      'They wear crude masks made from flour sacks, with',
-      'horns fashioned from cane stalks. Each carries a',
-      'hickory switch and a revolver.',
+      'Four riders block the trail. Flour-sack masks with',
+      'cane-stalk horns. Hickory switches. Revolvers that',
+      'have seen recent use.',
       '',
-      '"Hold up there, miner," says the leader. "We\'re the',
-      'law in these hills. You\'re carrying an awful lot of',
-      'guano through Bald Knobber territory."'
+      'The leader spits tobacco juice and studies your load.',
+      '"Well now," he says, in the tone of a man who has',
+      'done this before. "That is an awful lot of bat shit',
+      'for one crew to be hauling through our territory.',
+      'I believe there is a toll for that."'
     ],
     options: [
       {
         id: 'pay_toll',
         text: 'Pay their toll (lose 20% of your guano)',
         response: [
-          '"Smart man," the leader says, taking his share.',
-          '"You can pass. And remember -- we\'re watching',
-          'these roads. You\'ll pay every time."',
+          '"Smart man," the leader says, weighing your',
+          'offering in his hand. "You can pass. But we ride',
+          'these roads regular, and our memory is long."',
           '',
-          'The Bald Knobbers were a vigilante group active in',
-          'Taney and Christian counties from 1883 to 1889.',
-          'While they began as a law-and-order movement, many',
-          'devolved into extortion and intimidation.'
+          'The Bald Knobbers began as vigilantes fighting',
+          'lawlessness in Taney County. Captain Nat Kinney',
+          'organized over a thousand men. By 1884, some',
+          'factions had devolved into the very thing they',
+          'claimed to oppose. The horned masks were meant',
+          'to terrify. They succeeded.'
         ],
         outcome: { guanoLoss: 0.20, healthLoss: 0, timeLoss: 0, reputationChange: -5 }
       },
@@ -599,15 +688,16 @@
         id: 'negotiate',
         text: 'Try to negotiate a smaller toll',
         response: [
-          'You stand your ground and bargain hard. The leader',
-          'studies you for a long moment.',
+          'You hold the leader\'s gaze. You have been',
+          'underground for days. You are not afraid of',
+          'men who hide behind flour sacks.',
           '',
-          '"Ten percent. And you carry a message to Lynch for us.',
-          'Tell him the Knobbers want a word about water rights."',
+          '"Ten percent," he says finally. "And you carry',
+          'a message to Lynch. Tell him the Knobbers want',
+          'a word about those water rights."',
           '',
-          'The Bald Knobbers\' disputes with local landowners',
-          'often centered on resource access -- water, timber,',
-          'and mineral rights in the Ozark hills.'
+          'You nod. You will deliver the message.',
+          'You will not mention how your hands shook.'
         ],
         outcome: { guanoLoss: 0.10, healthLoss: 0, timeLoss: 1, reputationChange: 0 }
       },
@@ -615,16 +705,16 @@
         id: 'fight',
         text: 'Refuse and prepare to fight',
         response: [
-          'You draw your knife. Your crew grabs their pickaxes.',
+          'You draw your knife. Your crew grabs pickaxes.',
+          'Men who swing steel underground all day do not',
+          'flinch from men on horseback.',
           '',
-          'The fight is brief and ugly. Two of the Knobbers',
-          'flee. The other two put up a struggle before',
-          'retreating into the woods, bruised and cursing.',
+          'The fight is brief and ugly. Two Knobbers flee.',
+          'The other two learn what a pickaxe can do to',
+          'a man who is not limestone.',
           '',
-          'You\'ve made enemies today. The Bald Knobbers have',
-          'long memories and a talent for midnight visits.',
-          '',
-          'Several crew members are hurt in the scuffle.'
+          'You have made enemies with long memories and',
+          'a talent for midnight visits. Sleep light.'
         ],
         outcome: { guanoLoss: 0, healthLoss: 15, timeLoss: 0, reputationChange: 10 }
       },
@@ -632,15 +722,16 @@
         id: 'sneak',
         text: 'Try to sneak past using a back trail',
         response: [
-          'You know these hills. There\'s an old deer trail',
-          'that winds around the ridge. It adds hours to the',
-          'journey and the footing is treacherous, but you',
-          'might avoid the confrontation entirely.',
+          'You know these hills. An old deer trail winds',
+          'around the ridge through brush so thick a horse',
+          'cannot follow. It adds half a day and the',
+          'footing is treacherous.',
           '',
-          'After a tense detour through heavy brush, you',
-          'emerge on the road beyond the Knobbers\' position.',
+          'You emerge on the road beyond the Knobbers,',
+          'scratched and exhausted but whole.',
           '',
-          'You lose time, but keep your guano and your hide.'
+          'You keep your guano. You keep your hide. You',
+          'lose time you cannot afford to lose.'
         ],
         outcome: { guanoLoss: 0, healthLoss: 5, timeLoss: 2, reputationChange: 0 }
       }
@@ -651,9 +742,10 @@
   // ─── Bat Swarm Decision Text ─────────────────────────────────────
   var BAT_SWARM_DECISIONS = {
     intro: [
-      'A massive colony of bats erupts from the ceiling!',
-      'Thousands of shrieking, leathery-winged creatures',
-      'fill the passage. You can barely hear yourself think.',
+      'The ceiling erupts. Forty thousand gray bats launch',
+      'themselves into the passage in a shrieking, spiraling',
+      'tornado of leather wings and needle teeth. The air',
+      'is more bat than air.',
       '',
       'What do you do?'
     ],
@@ -661,7 +753,7 @@
       {
         id: 'hold_ground',
         text: 'Hold your ground and cover your head',
-        response: 'You crouch low and shield your face. The swarm batters you with their wings but passes in a few terrifying minutes. Minor scratches and bruises.',
+        response: 'You crouch and cover your face with your arms. The swarm batters you for three minutes that feel like thirty. When it passes you are scratched and shaking and alive.',
         healthCost: 5,
         timeCost: 0,
         lanternRisk: 0.1
@@ -669,7 +761,7 @@
       {
         id: 'retreat',
         text: 'Retreat to the previous chamber',
-        response: 'You back out quickly. The swarm pours past you in the passage. Safe, but you\'ve lost time and will need to wait for them to settle before proceeding.',
+        response: 'You back out fast. The swarm pours past like a river of bad dreams. You are safe but you have lost time. They will settle eventually. Bats always do.',
         healthCost: 0,
         timeCost: 2,
         lanternRisk: 0.05
@@ -677,7 +769,7 @@
       {
         id: 'push_through',
         text: 'Push through the swarm',
-        response: 'You lower your head and charge forward. Bats slam into you from every direction. Your lantern nearly goes out. You emerge on the other side, battered but through.',
+        response: 'You lower your head and charge. Wings slam your face. Claws rake your neck. Your lantern nearly dies. You come out the other side looking like you lost a fight with a threshing machine. But you are through.',
         healthCost: 12,
         timeCost: 0,
         lanternRisk: 0.30
@@ -685,7 +777,7 @@
       {
         id: 'use_fire',
         text: 'Wave your lantern to drive them away',
-        response: 'The fire scatters some bats but enrages others. The swarm intensifies around you before finally dispersing. You\'ve used extra oil.',
+        response: 'The fire scatters some and enrages the rest. The swarm doubles back and you are in the center of it. When it finally disperses your oil reserve is noticeably lighter.',
         healthCost: 8,
         timeCost: 1,
         lanternRisk: 0.15,
@@ -697,50 +789,52 @@
   // ─── Store / Shopkeeper Dialogue ─────────────────────────────────
   var SHOPKEEPER_DIALOGUE = {
     greeting: [
-      '"Welcome to Marmaros General Supply. I\'m Herschel Barnes.',
-      'You\'ll be needin\' provisions if you\'re headed below.',
-      'I stock everything a miner needs, and I don\'t extend credit."'
+      '"Marmaros Outfitters. Herschel Barnes, proprietor.',
+      'I stock everything a man needs to go underground',
+      'and most of what he needs to come back up. I don\'t',
+      'extend credit and I don\'t accept excuses."'
     ],
     browse: [
-      '"Take your time. Look around. But remember -- the',
-      'cave don\'t care what you forgot to buy. Better to',
-      'spend a dollar now than wish you had one later."'
+      '"Look around. Take your time. But the cave is open',
+      'right now and it don\'t care what you forgot. Better',
+      'to spend a dollar today than wish you had tomorrow',
+      'from inside a limestone coffin."'
     ],
     low_funds: [
-      '"Hmm. You\'re a bit light in the purse, friend.',
-      'I\'d recommend at least oil, food, and rope.',
-      'Everything else is a luxury you might not need.',
-      'Then again, you might."'
+      '"Light purse. That\'s a hard way to start. Get oil',
+      'first. Then food. Then rope. Everything else is a',
+      'luxury, and luxuries don\'t survive the first day',
+      'underground."'
     ],
     farewell: [
-      '"Good luck down there. And I mean that sincerely.',
-      'I\'ve buried too many customers already this year."'
+      '"Watch yourself down there. I mean that. I\'ve sold',
+      'provisions to men who didn\'t come back to buy more.',
+      'Don\'t be one of those men."'
     ],
     buy_response: [
-      '"Good choice. You\'ll be glad you have that."',
-      '"Smart purchase. That\'ll serve you well below."',
-      '"I\'ll have the mules load that up for you."',
-      '"Solid gear. Take care of it and it\'ll take care of you."'
+      '"Good choice. That\'ll earn its keep below."',
+      '"Smart purchase. The cave respects preparation."',
+      '"I\'ll have that loaded. Take care of it and it\'ll take care of you."',
+      '"Solid. You\'ll be glad you bought that when the dark starts pressing in."'
     ],
     haggle_response: [
-      '"My prices are fair and final. This ain\'t a bazaar."',
-      '"You\'re welcome to shop elsewhere. Oh wait -- there',
-      'ain\'t an elsewhere. Price stands."',
-      '"I\'ve got mouths to feed too, miner. Price is firm."'
+      '"My prices are fair and final. There ain\'t another store in Marmaros."',
+      '"You\'re welcome to shop at the competition. There ain\'t any."',
+      '"I got two daughters to feed and a mule that eats like a horse. Price stands."'
     ],
     item_descriptions: {
-      lantern_oil: '"Whale oil, best quality. Your lantern is your life down there."',
-      candles: '"Tallow candles. Good for backup light. Also tells you if the air\'s gone bad -- when the flame shrinks, you leave."',
-      rope: '"Hemp rope, fifty-foot coils. You\'ll want at least two."',
-      timber: '"Shoring timber. Heavy as sin, but it\'s the difference between a mine and a grave."',
-      food: '"Salt pork, hardtack, dried beans, and coffee. Enough to keep a man working for a week."',
-      water: '"Clean water from Roark Creek. The spring down below helps, but don\'t count on it alone."',
-      blasting_powder: '"Black powder. Handle it like your life depends on it, because it does."',
-      pickaxes: '"Good steel heads. They\'ll dull on that limestone, so bring spares."',
-      shovels: '"For scooping guano. Not glamorous work, but it pays."',
-      guano_sacks: '"Waxed burlap. Holds fifty pounds of guano each. Bring plenty."',
-      medicine: '"Laudanum, quinine, bandages, and a bone saw. I hope you won\'t need the saw."',
-      respirator: '"Cloth mask for the fumes. Better than nothing, but not by much."'
+      lantern_oil: '"Whale oil. Your lantern is your life down there. When the oil goes, you go with it."',
+      candles: '"Tallow candles. Backup light. But more important: a candle that shrinks means the air has gone bad. When it dims, you leave. Don\'t think. Leave."',
+      rope: '"Hemp rope. Fifty-foot coils. You\'ll want at least two unless you plan to fly."',
+      timber: '"Shoring timber. Heavy as a guilty conscience but it\'s the difference between a mine and a mass grave."',
+      food: '"Salt pork, hardtack, dried beans, coffee. Enough to keep a man swinging a pick for a week. It ain\'t fancy. Neither is starvation."',
+      water: '"Clean water from Roark Creek. The spring below helps, but the spring is at the spring and you ain\'t always at the spring."',
+      blasting_powder: '"Black powder. You treat this like it\'s what it is, which is the difference between you and a hole in the ground."',
+      pickaxes: '"Good steel heads. The limestone eats them alive so bring spares."',
+      shovels: '"For scooping bat dung. The most glamorous job in Stone County."',
+      guano_sacks: '"Waxed burlap. Fifty pounds each. Bring twice as many as you think you need."',
+      medicine: '"Laudanum, quinine, bandages, and a bone saw. I hope you don\'t need the saw. I hope that a lot."',
+      respirator: '"Cloth mask for the ammonia. It\'s the difference between coughing and dying of coughing."'
     }
   };
 
@@ -749,52 +843,56 @@
     spring: {
       title: 'Spring',
       description: [
-        'Spring has come to the Ozarks. Dogwood blossoms line',
-        'the ridges and the creeks run high with snowmelt.',
+        'Dogwood blossoms on the ridges. Creeks running high',
+        'with snowmelt. The Ozarks waking up angry.',
         '',
-        'Rain is frequent. The underground rivers are swollen',
-        'and flooding risk is at its peak. But the bats are',
-        'returning from their winter roosts, and fresh guano',
-        'deposits await below.'
+        'The bats are returning from winter roosts. Fresh',
+        'guano awaits below. But the underground rivers are',
+        'swollen and the Lost River does not suffer fools.',
+        'Flash flooding will kill you faster than anything',
+        'else in this cave.'
       ],
       warning: 'Flooding risk is HIGH this season.'
     },
     summer: {
       title: 'Summer',
       description: [
-        'Summer settles over the Ozarks like a wool blanket.',
-        'The heat drives men underground, where the cave holds',
-        'a constant 60 degrees.',
+        'Summer settles over the Ozarks like a wool blanket',
+        'soaked in sweat. Men flee underground where the cave',
+        'holds a steady fifty-eight degrees.',
         '',
-        'The bat colonies are at peak population. The guano',
-        'deposits are the thickest of the year, but so are',
-        'the ammonia fumes. Work crews must rotate frequently.'
+        'The bat colonies are at peak population. Eighty',
+        'thousand wings. The guano is thick. So is the',
+        'ammonia. So is the risk of bat fever. Work crews',
+        'rotate or they die. It is that simple.'
       ],
       warning: 'Bat activity is HIGH. Bad air risk is elevated.'
     },
     fall: {
       title: 'Fall',
       description: [
-        'The oaks and hickories blaze red and gold across the',
-        'ridges. The air is crisp and dry.',
+        'The oaks and hickories blaze red and gold across',
+        'the ridges like the hills are on fire. The air is',
+        'sharp and dry and carries the smell of wood smoke.',
         '',
-        'The bats are leaving for their winter hibernation sites.',
-        'Mining conditions improve as the colonies thin. The dry',
-        'weather reduces flooding risk. This is the best season',
-        'for deep operations.'
+        'The bats are leaving for their winter hibernation.',
+        'The ammonia thins. The flooding risk drops. This is',
+        'peak season. The cave is as safe as it ever gets,',
+        'which is not very safe at all.'
       ],
       warning: 'Conditions are FAVORABLE. This is peak mining season.'
     },
     winter: {
       title: 'Winter',
       description: [
-        'Ice glazes the cave entrance and snow blankets the',
-        'hills. The road to Branson is often impassable.',
+        'Ice glazes the sinkhole entrance. Snow buries the',
+        'road to Branson. The Ozarks become a place that',
+        'does not want you here.',
         '',
-        'Deep inside, the cave temperature holds steady, but',
-        'the entrance passages are frigid. Most bats have',
-        'departed. Mining is difficult but not impossible.',
-        'Getting guano to market is the real challenge.'
+        'Deep inside, the cave holds steady. The bats have',
+        'gone. The silence is absolute. Mining is possible',
+        'but getting guano to market is another matter.',
+        'The road does not forgive.'
       ],
       warning: 'Transport difficulties. Hypothermia risk near the entrance.'
     }
@@ -805,63 +903,66 @@
     investor: {
       title: 'Investor',
       description: [
-        'You are a man of means from Springfield, looking to',
-        'turn a profit on the booming guano trade. You have',
-        'capital to invest but no mining experience.',
+        'A man of means from Springfield with clean hands',
+        'and a ledger full of numbers. You have capital,',
+        'ambition, and no idea what waits below.',
         '',
-        'You start with the most money ($1,600) and can hire',
-        'well, but your lack of experience means a lower score',
-        'multiplier (x1). This is business, not adventure.'
+        'Most money ($1,600). Least experience. Score x1.',
+        'The cave does not care about your bank account.'
       ],
-      starting_text: 'You arrive at Marmaros with a full purse and high expectations. Time to make money.'
+      starting_text: 'You arrive at Marmaros in a rented carriage. The locals stare. You stare back. This will be an education.'
     },
     miner: {
       title: 'Miner',
       description: [
-        'You are an experienced miner with years of work',
-        'in lead and zinc mines across the Ozarks. You know',
-        'how to read the rock and keep men alive underground.',
+        'Twenty years in the Ozark lead and zinc mines.',
+        'You can read rock the way a preacher reads scripture.',
+        'You know what a bad timber sounds like. You know',
+        'what bad air smells like.',
         '',
-        'You start with moderate funds ($800) and a solid crew.',
-        'Your experience earns a fair score multiplier (x2).',
-        'This is what you were born to do.'
+        'Moderate funds ($800). Solid experience. Score x2.',
+        'The cave is just another hole in the ground.',
+        'A deeper one.'
       ],
-      starting_text: 'You arrive at Marmaros with steady hands and a miner\'s eye. The cave awaits.'
+      starting_text: 'You arrive at Marmaros with steady hands and a miner\'s eye. You have done this before. Not here, but the dark is the same everywhere.'
     },
     farmer: {
       title: 'Farmer Turned Miner',
       description: [
-        'The drought wiped out your crops. Mining bat guano',
-        'isn\'t what you imagined for your life, but a man',
-        'has to feed his family.',
+        'The drought took your corn. The bank took your',
+        'plow. You heard bat dung sells for seven hundred',
+        'dollars a ton and you did not ask questions.',
         '',
-        'You start with little money ($400) and no mining',
-        'experience, but your grit earns the highest score',
-        'multiplier (x3). Fortune favors the desperate.'
+        'Little money ($400). No mining experience. Score x3.',
+        'Fortune favors the desperate, or so you tell',
+        'yourself on the road to Marmaros.'
       ],
-      starting_text: 'You arrive at Marmaros with callused hands and an empty wallet. It\'s this or lose the farm.'
+      starting_text: 'You arrive at Marmaros with callused hands, an empty wallet, and the kind of determination that comes from having nothing to go back to.'
     }
   };
 
   // ─── Final Decision Text (3 Endings) ─────────────────────────────
   var FINAL_DECISIONS = {
     intro: [
-      'Your mining season is coming to an end. You\'ve hauled',
+      'Your mining season draws to a close. You have hauled',
       '{guano_amount} pounds of guano to the surface and your',
       'crew is {crew_status}.',
       '',
-      'You face a final decision.'
+      'The cave waits below. The road waits above.',
+      'You face a final choice.'
     ],
     options: [
       {
         id: 'sell_and_leave',
         title: 'Sell Your Guano and Leave',
         description: [
-          'You can sell your guano at market price and head home.',
-          'The money is modest but certain. You\'ll live to see',
-          'another season.',
+          'Take your earnings. Tip your hat to Marmaros.',
+          'Ride the stagecoach back to a world with daylight',
+          'and horizons. The money is modest but certain.',
           '',
-          'This is the safe choice.'
+          'You survived the Devil\'s Den. That is not nothing.',
+          'Some men in that cemetery above the cave would',
+          'have taken this deal.'
         ],
         scoreMultiplier: 1.0
       },
@@ -870,11 +971,15 @@
         title: 'One More Run Into the Deep',
         description: [
           'The Waterfall Room still holds the richest deposits.',
-          'One more trip could double your haul. But your crew',
-          'is tired, your supplies are thin, and the cave has',
-          'been waiting patiently for you to make a mistake.',
+          'Five hundred feet down. One more trip could double',
+          'your haul. Your crew is tired, your supplies thin,',
+          'your rope frayed.',
           '',
-          'High risk. High reward.'
+          'The cave has been patient with you. Patient does',
+          'not mean kind. But the guano is there, and a man',
+          'who has come this far does not stop at the edge.',
+          '',
+          'High risk. High reward. The cave\'s oldest bargain.'
         ],
         scoreMultiplier: 1.5
       },
@@ -882,18 +987,18 @@
         id: 'invest_in_cave',
         title: 'Invest in the Cave\'s Future',
         description: [
-          'You\'ve seen what this cave could become. Not just a',
-          'mine, but a wonder. You can invest your profits in',
-          'improving the cave infrastructure -- better ladders,',
-          'walkways, lighting -- turning Marvel Cave into a',
-          'tourist attraction.',
+          'You have seen what this cave could become. Not a',
+          'mine. A wonder. Better ladders. Walkways. Lighting.',
+          'Charge the tourists a dollar a head and let them',
+          'see what you have seen.',
           '',
-          'This is what the Lynches eventually did. By 1894,',
-          'Marvel Cave was drawing visitors from across the',
-          'country. Today it sits at the heart of Silver Dollar',
-          'City, one of Missouri\'s most popular attractions.',
+          'In 1889, William Lynch will begin giving tours.',
+          'In 1950, the Herschends will build Silver Dollar',
+          'City around this very hole in the ground. You are',
+          'fifty years ahead of your time.',
           '',
-          'Less immediate profit, but the highest score.'
+          'The cave is the treasure. The guano was just the',
+          'introduction.'
         ],
         scoreMultiplier: 2.0
       }
@@ -902,26 +1007,26 @@
 
   // ─── Traveler News / Historical Flavor Text ──────────────────────
   var TRAVELER_NEWS = [
-    'A traveler reports that General Custer has been defeated at Little Bighorn. The frontier is in turmoil.',
-    'Word from St. Louis: the price of guano fertilizer has risen sharply. Good news for miners.',
-    'A circuit preacher passed through Marmaros. He says the railroad will reach Branson within five years.',
-    'Travelers report a cholera outbreak in Springfield. Best to avoid the city.',
-    'A mule skinner says the road to Branson is washed out. Guano shipments will be delayed.',
-    'News from the territorial capital: Missouri is debating new mining safety regulations.',
-    'A drummer selling patent medicine claims his tonic cures bat fever. No one believes him.',
-    'Word is that Nat Kinney and his Bald Knobbers are causing trouble again in Taney County.',
-    'A geologist from the University says Marvel Cave may be the deepest in the Ozarks.',
-    'Travelers report a bear was seen near the cave entrance. The mules are nervous.',
-    'A newspaper from Kansas City reports that bat guano is being tested as a component in explosives.',
-    'An old Osage man passed through. He warned against disturbing the spirits below the mountain.',
-    'Silver has been discovered in a cave near Joplin. Half the miners in the county have gone to stake claims.',
-    'A photographer from back East wants to take pictures inside the cave. He\'s offering to pay for a guide.',
-    'The temperance movement has closed three saloons in Forsyth. Miners are not pleased.',
-    'Word from Washington: President Hayes is sending surveyors to map the Ozark caves.',
-    'A traveling show passed through with a trained bear and a woman who reads fortunes. She predicted rain.',
-    'Two miners from the Granby lead mines arrived today. They say conditions here are worse.',
-    'A letter from your family reports that crops are doing well this year. Good news from home.',
-    'The stagecoach driver says he saw lights in the cave at night. The miners call him a fool.'
+    'A drummer from St. Louis says guano fertilizer prices have jumped. Farmers out East can\'t get enough of it.',
+    'Word from Springfield: cholera in the water supply. Best stay in the hills.',
+    'A circuit preacher passed through. He says the railroad will reach Branson within five years. Nobody believes him.',
+    'Travelers say Nat Kinney and his Bald Knobbers hung a man near Forsyth last week. No trial. Just rope.',
+    'A mule skinner reports the Branson road is washed out. Guano shipments delayed.',
+    'News from Jefferson City: the legislature is debating mining safety laws. The miners laugh bitterly.',
+    'A patent medicine man claims his tonic cures bat fever. He does not look healthy himself.',
+    'An old Osage man passed through Marmaros. He left tobacco at the cave entrance and said nothing to anyone.',
+    'A geologist from the state university measured the Cathedral Room. Says it could hold the Statue of Liberty.',
+    'A bear was spotted near the sinkhole entrance. The donkeys are restless and so is your crew.',
+    'A Kansas City newspaper says bat guano is being tested for explosives. The military is interested.',
+    'Silver discovered near Joplin. Half the miners in Stone County have gone to stake claims. Your competition just got thinner.',
+    'A photographer from New York wants to take pictures inside the cave. He has never been underground. This should be interesting.',
+    'The temperance league has closed three saloons in Forsyth. The miners\' morale has taken a corresponding hit.',
+    'Two miners from the Granby lead operation arrived today. They say working conditions here are worse. That takes some doing.',
+    'A letter from home reports crops are good this year. The news tastes like clean water.',
+    'The stagecoach driver swears he saw lights moving inside the cave at midnight. Nobody was underground. Nobody will admit to it.',
+    'A traveling fortune-teller read the cards for your foreman. She went pale and asked for her money back.',
+    'Word is that William Henry Lynch himself is coming to inspect the operation. The crew cleans up. The cave does not.',
+    'An old-timer in the tavern says the Spaniards left more than ladders in this cave. He won\'t say what. He won\'t stop drinking, either.'
   ];
 
   // ─── Easter Egg Text ─────────────────────────────────────────────
@@ -930,18 +1035,20 @@
       trigger: 'cathedral_entrance',
       chance: 0.15,
       text: [
-        'You notice strange V-shaped marks carved into the',
-        'limestone near the cave entrance. They are old --',
-        'very old. The edges have been softened by centuries',
-        'of mineral deposits.',
+        'Near the cave mouth, half-hidden by mineral deposits,',
+        'you find V-shaped marks carved deep into the limestone.',
+        'They are old. Older than the mining company. Older than',
+        'Lynch. Older than the Republic.',
         '',
-        'These are Osage trail markers, carved long before',
-        'European settlers arrived. The V-marks indicated',
-        'a significant landmark or spiritual site.',
+        'Osage trail markers. The sideways V meant warning --',
+        'a place of power, a threshold between worlds. The',
+        'Osage did not enter the deepest chambers. They said',
+        'the cave was a door, and some doors should not be',
+        'opened.',
         '',
-        'The Osage considered this cave sacred -- a doorway',
-        'to the underworld. They left offerings but did not',
-        'enter the deepest chambers.',
+        'You run your finger along the carved stone. The edges',
+        'have been softened by centuries of mineral seepage,',
+        'but the intent is sharp as the day they were cut.',
         '',
         'You have discovered the Osage V-marks. (+50 discovery points)'
       ],
@@ -951,16 +1058,18 @@
       trigger: 'gulf_of_doom',
       chance: 0.10,
       text: [
-        'Wedged in a crevice near the Gulf of Doom, you find',
-        'a tarnished Spanish coin -- a silver real, dated 1743.',
+        'Wedged in a crevice at the rim of the Gulf of Doom,',
+        'your lantern catches a dull gleam. A tarnished silver',
+        'coin. A Spanish real, dated 1743.',
         '',
-        'Local legend says that Spanish conquistadors explored',
-        'these caves in the 1700s, searching for gold and',
-        'silver. They found neither, but the tales persisted.',
+        'On the reverse: a cross. On the obverse: a word you',
+        'cannot read, worn smooth by two hundred years of cave',
+        'air. The conquistadors came here looking for gold and',
+        'the Fountain of Youth. They found bat dung and darkness.',
         '',
-        'William Henry Lynch himself spent years searching',
-        'for "Spanish treasure" in the cave before turning',
-        'to the more reliable guano trade.',
+        'But they left their ladders in the Mammoth Room and',
+        'their coin at the Gulf of Doom. What else did they',
+        'leave? And what were they really looking for?',
         '',
         'You have discovered the Spanish coin. (+75 discovery points)'
       ],
@@ -970,17 +1079,18 @@
       trigger: 'spring_room',
       chance: 0.12,
       text: [
-        'Carved into the wall near the spring, you find a',
-        'name and date: "H.B. Wright, 1903."',
+        'Carved into the orange calcite near the spring, in',
+        'careful letters: "H.B. WRIGHT - 1903."',
         '',
-        'Harold Bell Wright was a preacher and novelist who',
-        'lived in the Ozarks and explored Marvel Cave. His',
-        'bestselling novel "The Shepherd of the Hills" (1907)',
-        'was inspired by the landscape and people of this',
-        'region.',
+        'Harold Bell Wright. A preacher who came to the Ozarks',
+        'for his health and stayed for the stories. He explored',
+        'this cave and walked these hills and wrote a novel',
+        'called "The Shepherd of the Hills" that made the',
+        'Ozarks famous.',
         '',
-        'The book would make the Ozarks famous and eventually',
-        'draw tourists to Marvel Cave by the thousands.',
+        'Beneath his name, in smaller letters, he carved:',
+        '"THE WATER REMEMBERS." You do not know what he meant.',
+        'The spring continues its patient work behind you.',
         '',
         'You have discovered Harold Bell Wright\'s signature. (+60 discovery points)'
       ],
@@ -990,18 +1100,23 @@
       trigger: 'waterfall_room',
       chance: 0.08,
       text: [
-        'Near the base of the waterfall, you find a rusted',
-        'tin box hidden in a rock niche. Inside is a leather',
-        'journal, badly water-damaged but still partly legible.',
+        'Behind the falls, in a rock niche shielded from the',
+        'spray, you find a rusted tin box. Inside: a leather',
+        'journal, water-damaged but partly legible.',
         '',
-        'The journal belongs to one "Charlie Sullivan," a miner',
+        '"Charlie Sullivan" is written on the cover. A miner',
         'who worked the Waterfall Room alone in the winter of',
-        '1878. His entries describe the isolation, the constant',
-        'roar of water, and a growing conviction that something',
-        'lived in the deepest pools.',
+        '1878. His entries describe the isolation. The constant',
+        'roar of water. A growing conviction that the cave was',
+        'not empty.',
         '',
-        'The last entry reads: "I have seen it. God forgive me,',
-        'I have seen it in the water."',
+        '"Something moves behind the falls," he wrote on',
+        'January 14th. "Not bats. Not water. Something that',
+        'watches." The entries grow shorter after that.',
+        '',
+        'The last page reads: "I have seen it. God forgive',
+        'me, I have seen it in the water. It has the face',
+        'of a man who has been underground too long."',
         '',
         'Charlie Sullivan was never heard from again.',
         '',
@@ -1013,19 +1128,20 @@
       trigger: 'the_dungeon',
       chance: 0.10,
       text: [
-        'Behind a loose stone in The Dungeon, you discover',
-        'a cache of Civil War-era supplies: Confederate',
-        'cartridge boxes, a canteen stamped "C.S.A.," and',
-        'a faded letter from a soldier to his wife.',
+        'Behind a loose stone in The Dungeon -- a stone that',
+        'has been pried out and replaced before, you can see',
+        'the tool marks -- you find a cache.',
         '',
-        'During the Civil War, both Union and Confederate',
-        'forces used Ozark caves as hideouts and supply',
-        'depots. Taney County saw bitter guerrilla warfare',
-        'between 1861 and 1865.',
+        'Confederate cartridge boxes. A canteen stamped C.S.A.',
+        'And a letter, folded tight, from a soldier named',
+        'Thomas Harwell to his wife Sarah in Forsyth.',
         '',
-        'The letter is dated September 1863 and expresses',
-        'hope that the war will end soon. It never reached',
-        'its destination.',
+        '"The cave is safe," he wrote, September 1863. "The',
+        'Yankees will not find us here. I am coming home when',
+        'this is over. Keep the lantern lit."',
+        '',
+        'He never sent the letter. The cave kept it for him.',
+        'Twenty-one years and counting.',
         '',
         'You have discovered a Civil War cache. (+65 discovery points)'
       ],
@@ -1035,18 +1151,20 @@
       trigger: 'lake_genevieve',
       chance: 0.20,
       text: [
-        'In the clear water of Lake Genevieve, your lantern',
-        'reveals small, pale fish drifting slowly near the',
-        'bottom. They are completely white and eyeless.',
+        'Your lantern finds them in the clear water of Lake',
+        'Genevieve. Small. Pale as cave worms. Completely',
+        'eyeless. Drifting through the dark water like ghosts',
+        'of fish that used to live in the light.',
         '',
-        'These are Ozark cavefish (Amblyopsis rosae), one of',
-        'the rarest fish in North America. They evolved in',
-        'total darkness, losing their eyes and pigmentation',
-        'over thousands of generations.',
+        'Ozark cavefish. Amblyopsis rosae. They have lived in',
+        'this darkness for so many generations that evolution',
+        'took back their eyes and their color. They navigate',
+        'by sensing vibrations in the water.',
         '',
-        'They navigate by sensing vibrations in the water.',
-        'The species would not be formally described by',
-        'science until 1898.',
+        'Science won\'t formally describe them until 1898.',
+        'For now they are just pale shapes moving in a place',
+        'where nothing should be alive, doing fine without',
+        'the sun, thank you very much.',
         '',
         'You have discovered the blind cavefish. (+55 discovery points)'
       ],
@@ -1057,32 +1175,32 @@
   // ─── Status Screen Text ──────────────────────────────────────────
   var STATUS_TEXT = {
     health: {
-      excellent: 'Your crew is in fine health.',
-      good: 'Your crew is in fair condition.',
-      fair: 'Some of your crew are ailing.',
-      poor: 'Several crew members are seriously ill.',
-      critical: 'Your crew is barely able to work. Many are sick or injured.',
-      dying: 'Your crew is in desperate condition. Without rest or medicine, men will die.'
+      excellent: 'Your crew is fit and working hard.',
+      good: 'Your crew is holding up. Some aches and bruises.',
+      fair: 'Several men are coughing. The cave is wearing on them.',
+      poor: 'Your crew is in rough shape. Injuries and illness taking hold.',
+      critical: 'The crew can barely stand. Without rest or medicine, you will start burying men.',
+      dying: 'Your crew is dying. This is not a metaphor.'
     },
     morale: {
-      high: 'Morale is high. The crew works with purpose.',
-      good: 'Morale is steady. No complaints.',
-      fair: 'Morale is slipping. The men grumble.',
-      low: 'Morale is low. The crew is restless and sullen.',
-      critical: 'Morale has collapsed. Some talk of abandoning the operation.'
+      high: 'Morale is high. The crew works like men who believe in something.',
+      good: 'Morale is steady. No complaints that matter.',
+      fair: 'Morale is slipping. The grumbling has started.',
+      low: 'Morale is bad. Men work in silence. That is worse than complaining.',
+      critical: 'Morale has collapsed. Some men are talking about walking out. Others are past talking.'
     },
     supplies: {
-      well_stocked: 'Your supplies are plentiful.',
-      adequate: 'You have adequate supplies for now.',
-      low: 'Supplies are running low. You should resupply soon.',
-      critical: 'Supplies are critically low. You must resupply immediately.',
-      empty: 'You are out of essential supplies.'
+      well_stocked: 'Supplies are plentiful. You are prepared.',
+      adequate: 'Adequate supplies for now. Keep an eye on them.',
+      low: 'Supplies running low. The cave eats through provisions faster than you think.',
+      critical: 'Critically low. You need to resupply or start making hard choices.',
+      empty: 'You are out of essential supplies. The cave is about to teach you something.'
     },
     pace: {
-      careful: 'You are moving carefully, checking every handhold.',
-      steady: 'You maintain a steady working pace.',
-      aggressive: 'You are pushing the crew hard. Speed over safety.',
-      reckless: 'You are mining recklessly. The crew is uneasy.'
+      careful: 'Moving careful. Checking every handhold twice.',
+      steady: 'Steady pace. Good work without unnecessary risk.',
+      aggressive: 'Pushing hard. Speed over safety. The crew knows it.',
+      reckless: 'Reckless. The crew is scared and they should be.'
     }
   };
 
@@ -1092,21 +1210,21 @@
       'THE MARVEL CAVE MINING COMPANY',
       '==============================',
       '',
-      'The year is 1884. You are a guano miner in the',
-      'Ozark Mountains of southwest Missouri.',
+      'The year is 1884. You are a guano miner in Stone',
+      'County, Missouri, in the Ozark Mountains.',
       '',
-      'Marvel Cave -- one of the largest caves in the',
-      'region -- is rich with bat guano, a valuable',
-      'fertilizer. Your job is to descend into the cave,',
-      'mine guano, and haul it to the surface for sale.',
+      'Marvel Cave -- the Devil\'s Den -- drops five hundred',
+      'feet into the earth. It is full of bat guano worth',
+      '$700 a ton as fertilizer and gunpowder. Your job is',
+      'to go down, dig it up, and come back alive.',
       '',
-      'But the cave is dangerous. Cave-ins, flooding,',
-      'bad air, bat swarms, and the ever-present risk of',
-      'getting lost in the darkness will test your skill',
-      'and your nerve.',
+      'The cave has opinions about this plan. Cave-ins.',
+      'Flooding. Bad air. Bat swarms. The Gulf of Doom.',
+      'The Bald Knobbers on the roads above. A fungus',
+      'in the dust that will eat your lungs.',
       '',
-      'Manage your crew, supplies, and health carefully.',
-      'The cave does not forgive mistakes.'
+      'Manage your crew, your supplies, and your nerve.',
+      'The cave does not forgive and it does not forget.'
     ],
     controls: [
       'CONTROLS',
@@ -1125,23 +1243,25 @@
     tips: [
       'MINING TIPS',
       '-----------',
-      '- Always carry extra lantern oil. Darkness kills.',
-      '- Watch your candle flame. If it dims, the air is bad.',
-      '- The Spring Room is the only safe rest point underground.',
-      '- Shoring timber prevents cave-ins. Don\'t skip it.',
-      '- Respirators reduce lung damage in the Cloud Room.',
-      '- The Gulf of Doom has the richest guano but is deadly.',
-      '- Listen for changes in water sounds. Floods come fast.',
-      '- Fall is the best mining season. Spring is the worst.',
-      '- A good crew is worth more than good equipment.'
+      '- Oil is life. When the lantern dies, you die.',
+      '- Watch your candle. A dim flame means bad air.',
+      '- The Spring Room is the only safe rest underground.',
+      '- Timber prevents cave-ins. Skipping it is gambling.',
+      '- Respirators in the Cloud Room. Your lungs will thank you.',
+      '- The Gulf of Doom pays best and kills fastest.',
+      '- Water sounds change before floods. Listen.',
+      '- Fall is peak season. Spring will drown you.',
+      '- A good crew is worth more than good equipment.',
+      '- The cave has secrets. Pay attention to what does',
+      '  not belong.'
     ]
   };
 
   // ─── Title Screen Text ───────────────────────────────────────────
   var TITLE_TEXT = {
     title: 'THE MARVEL CAVE MINING COMPANY',
-    subtitle: 'An Ozark Adventure',
-    year: '~ Missouri, 1884 ~',
+    subtitle: 'A Descent into the Ozarks',
+    year: '~ Stone County, Missouri, 1884 ~',
     prompt: 'Press any key to begin',
     credits: [
       'Inspired by The Oregon Trail',
@@ -1153,40 +1273,40 @@
   // ─── Mining Result Text ──────────────────────────────────────────
   var MINING_TEXT = {
     success: [
-      'Your crew works steadily, filling sack after sack with rich guano.',
-      'The deposits here are thick and easy to harvest. A productive session.',
-      'Hard work, foul air, but the guano sacks are heavy. A good haul.',
-      'Your miners find a rich vein of guano. Sacks fill quickly.'
+      'Sack after sack. The guano comes up dry and rich. A good day in the dark.',
+      'The deposits are thick here. Your crew works in rhythm -- shovel, sack, haul, repeat.',
+      'Foul air. Foul work. Full sacks. The arithmetic of guano mining.',
+      'A rich vein. The shovels bite deep and the burlap fills heavy. This is what seven hundred dollars a ton looks like.'
     ],
     poor: [
-      'The deposits here are thin and scattered. Slim pickings.',
-      'More rock than guano in this section. Disappointing.',
-      'The guano is mixed with so much limestone debris that the yield is poor.',
-      'Your crew works hard but has little to show for it.'
+      'Thin deposits. More rock than guano. The cave is stingy today.',
+      'Scattered guano mixed with limestone rubble. Your crew works twice as hard for half the yield.',
+      'Slim pickings. The good deposits have been stripped by men who came before you.',
+      'Hard work and not much to show for it. The cave gives what it gives.'
     ],
     exhausted: [
-      'This chamber has been mined out. Nothing left worth harvesting.',
-      'Previous miners have stripped this section clean.',
-      'Only dust remains where guano once lay. Time to move on.'
+      'Mined out. Previous crews have scraped this chamber to bare stone.',
+      'Nothing left. The guano is gone and only dust remains.',
+      'Exhausted deposits. Time to go deeper if you want to fill those sacks.'
     ],
     interrupted: [
-      'Mining is interrupted by a disturbance in the cave.',
-      'Your crew is forced to stop work and deal with a problem.',
-      'An unexpected event halts mining operations.'
+      'The cave interrupts. It does not ask permission.',
+      'Work stops. Something else demands your attention.',
+      'Mining halted. The cave has other plans today.'
     ]
   };
 
   // ─── Miscellaneous / UI Text ─────────────────────────────────────
   var UI_TEXT = {
     confirm_descend: 'Descend deeper into the cave?',
-    confirm_ascend: 'Begin the climb back toward the surface?',
+    confirm_ascend: 'Begin the climb back toward daylight?',
     confirm_mine: 'Set up mining operations here?',
     confirm_rest: 'Rest here and tend to the crew?',
-    confirm_quit: 'Abandon the mining operation and return to the surface?',
-    no_oil: 'You are out of lantern oil. You must turn back or risk the darkness.',
-    no_food: 'You are out of food. Your crew grows weak with hunger.',
-    no_rope: 'You are out of rope. You cannot safely descend further.',
-    crew_dead: 'Your last crew member has died. You are alone in the darkness.',
+    confirm_quit: 'Abandon the operation and climb for the surface?',
+    no_oil: 'Out of oil. Turn back now or die in the dark. Those are your options.',
+    no_food: 'Out of food. Your crew grows weak. Hunger is patient but thorough.',
+    no_rope: 'Out of rope. You cannot safely descend. The cave charges admission.',
+    crew_dead: 'Your last crew member is dead. You are alone in five hundred feet of darkness.',
     game_over: 'Your mining operation has come to an end.',
     press_continue: 'Press any key to continue...',
     loading: 'Loading...',
@@ -1205,13 +1325,13 @@
       ending_bonus: 'Ending Choice Bonus'
     },
     ranks: [
-      { minScore: 0, title: 'Tenderfoot', description: 'You barely scratched the surface.' },
-      { minScore: 200, title: 'Greenhorn', description: 'You survived, but just barely.' },
-      { minScore: 500, title: 'Working Miner', description: 'A respectable effort underground.' },
-      { minScore: 1000, title: 'Experienced Miner', description: 'You know your way in the dark.' },
-      { minScore: 2000, title: 'Master Miner', description: 'The cave holds few secrets from you.' },
-      { minScore: 3500, title: 'Cave Legend', description: 'Songs will be sung about your deeds.' },
-      { minScore: 5000, title: 'King of the Mountain', description: 'You have conquered Marvel Cave itself. Blondie Putnam would be proud.' }
+      { minScore: 0, title: 'Tenderfoot', description: 'You saw the sinkhole and reconsidered your life choices.' },
+      { minScore: 200, title: 'Greenhorn', description: 'You went underground and came back up. That counts.' },
+      { minScore: 500, title: 'Working Miner', description: 'You earned your keep and your scars.' },
+      { minScore: 1000, title: 'Experienced Miner', description: 'You know the dark. The dark knows you.' },
+      { minScore: 2000, title: 'Master Miner', description: 'The cave respects you. That is the highest compliment it gives.' },
+      { minScore: 3500, title: 'Cave Legend', description: 'Red Sullivan will tell your story. He will embellish it. You will deserve it.' },
+      { minScore: 5000, title: 'King of the Mountain', description: 'Five hundred feet of darkness and you conquered every inch. Blondie Putnam would tip his hat.' }
     ]
   };
 

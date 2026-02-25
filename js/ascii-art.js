@@ -796,96 +796,114 @@
     // =========================================================
 
     var ambientGeneral = [
-        'You hear water dripping in the distance...',
-        'A bat flutters past your lantern...',
-        'The air smells of sulfur and damp earth...',
-        'Your footsteps echo off the chamber walls...',
-        'Something scurries in the darkness ahead...',
-        'Your lantern casts long, dancing shadows...',
-        'A cool breeze drifts from somewhere deeper...',
-        'Minerals glitter in the lamplight...',
-        'You hear a distant, low rumble...',
-        'The walls feel slick with moisture...',
-        'Silence presses in around you...',
-        'Your breath makes small clouds in the cold air...',
-        'The smell of ancient stone fills your nostrils...',
-        'A pebble falls somewhere in the dark...',
-        'The weight of the earth above is palpable...'
+        'Water drips in the distance, counting seconds the cave has no use for...',
+        'A bat flutters past your lantern, close enough to feel the wind off its wings...',
+        'The air smells of sulfur and wet limestone and the slow patience of geological time...',
+        'Your footsteps echo off the chamber walls and come back changed, as if the cave is learning your gait...',
+        'Something scurries in the darkness ahead. Something that lives here. You do not...',
+        'Your lantern casts dancing shadows that move in ways the flame does not explain...',
+        'A cool breeze drifts from somewhere deeper. The cave is breathing. It breathes out when the barometric pressure drops...',
+        'Minerals glitter in the lamplight like a fortune that cannot be spent...',
+        'A distant low rumble. The mountain settling. Or something else. The cave does not clarify...',
+        'The walls are slick with mineral seepage. The limestone weeps. It has been weeping for ten thousand years...',
+        'Silence presses in like a physical thing with weight and intention...',
+        'Your breath makes small clouds in the fifty-eight-degree air. The only warm thing down here is you...',
+        'The smell of ancient stone. Three hundred million years of Mississippian limestone. You are a footnote in its history...',
+        'A pebble falls somewhere in the dark. Gravity is the cave\'s only law and it enforces it without mercy...',
+        'The weight of the earth above is palpable. Hundreds of feet of Ozark ridge balanced on the stone around you...',
+        'The candle flame leans toward a draft you cannot feel. The cave has currents you do not understand...',
+        'Old pick marks on the wall. Someone was here before you. They did not leave their name...',
+        'A mineral deposit on the wall catches the light and for one moment looks exactly like a handprint...'
     ];
 
     var ambientByChamberId = {
         marmaros: [
-            'Wagons creak along the dirt road...',
-            'A dog barks from behind the general store...',
-            'The blacksmith\'s hammer rings out across town...',
-            'Locals eye you warily from the tavern porch...',
-            'The smell of woodsmoke hangs in the air...',
-            'A rooster crows from a nearby farm...',
-            'You hear fiddle music drifting from the tavern...'
+            'Wagons creak along the dirt road. Marmaros: twenty-eight souls and a hole in the ground worth fighting over...',
+            'A dog barks from behind the general store. It has learned to bark at miners. There are so many miners...',
+            'Jebediah Colt\'s hammer rings out across town. Steel on steel. The sound of a man who trusts metal more than men...',
+            'Locals eye you from the tavern porch. Stone County folk do not trust outsiders. The Bald Knobbers taught them that...',
+            'Woodsmoke and the faint ammonia stink that clings to everything within a mile of the sinkhole...',
+            'A rooster crows from a nearby farm. The sound is jarringly normal. You had forgotten what normal sounds like...',
+            'Fiddle music drifts from the Lantern Tavern. Someone is playing "Barbara Allen." The miners hum along without knowing they are doing it...',
+            'The sinkhole exhales cold air into the warm Ozark afternoon. The locals say the cave breathes. They are not wrong...'
         ],
         cathedral_entrance: [
-            'Sunlight filters down from the cave mouth above...',
-            'The temperature drops sharply as you enter...',
-            'Birds nest in the crevices near the entrance...',
-            'The cave exhales a breath of cold, stale air...',
-            'You can still see daylight behind you...',
-            'Strange V-shaped cuts on nearby stone look too deliberate to be natural...',
-            'Old warning marks near the entrance make your skin crawl...'
+            'Sunlight filters down from the cave mouth ninety-four feet above. It will be the last sunlight you see for a while...',
+            'The temperature drops thirty degrees in ten steps. The cave sets its own terms...',
+            'Swallows nest in the crevices near the entrance. They know when to leave. You should learn from them...',
+            'The cave exhales cold stale air like a sleeping animal. The Osage said it was the Devil breathing...',
+            'Daylight behind you. Darkness ahead. The boundary is sharper than a knife...',
+            'V-shaped marks cut deep into the limestone near the entrance. Osage warnings. Centuries old. Still legible. Still relevant...',
+            'Old rope burns scar the entrance rocks. How many crews have lowered themselves into this? How many climbed back out?...',
+            'A notched pine log leans against the wall -- a fragment of the Spanish ladders from 1541. Three hundred years old and still standing...'
         ],
         cathedral_floor: [
-            'The ceiling vanishes into darkness 200 feet above...',
-            'Bats swirl in vast spirals overhead...',
-            'Your voice echoes back a dozen times...',
-            'A stalagmite towers above you like a pillar...',
-            'Water has carved this room over millennia...',
-            'You notice strange markings scratched into the wall...',
-            'A few old tool cuts here look far older than the mining company...'
+            'The ceiling vanishes two hundred feet above into a darkness your lantern cannot reach. You could stand the Statue of Liberty in here...',
+            'Bats swirl in vast spirals overhead, a living tornado of forty thousand wings. The sound is not of this world...',
+            'Your voice echoes back a dozen times, each repetition fainter and stranger, as if the cave is learning to speak...',
+            'The Liberty Bell stalagmite towers fifty-five feet, hollow, with a crack that mirrors the real one. Coincidence. Probably...',
+            'The Underground Mountain -- 124 feet of debris that fell through the sinkhole over millennia. Bones mixed with guano mixed with time...',
+            'Strange markings scratched into the wall at knee height. Not pick marks. Something deliberate. Something old...',
+            'Tool cuts in the limestone that predate the mining company by centuries. The Spaniards were here. Or someone was...',
+            'In 1963, a man will fly a hot air balloon in this room. That fact would make no sense to you. It barely makes sense now...'
         ],
         sentinel_chamber: [
-            'The tall stalagmite stands like a silent guard...',
-            'The passage narrows around the sentinel...',
-            'You squeeze past the ancient formation...',
-            'The sentinel has watched this passage for eons...'
+            'The Sentinel stands thirty feet tall, a calcite column where stalactite met stalagmite and fused. It looks like something keeping watch...',
+            'The passage narrows around The Sentinel. Guides tell tourists it holds up the ceiling. The tourists believe them. So does your crew...',
+            'Tobacco offerings sit at the base of The Sentinel. Osage, some say. Miners, say others. No one claims to have left them...',
+            'The Sentinel has stood here for millennia. Drip by drip. Patient as the mountain that made it. It will outlast you and everything you know...',
+            'Behind The Sentinel, a crevice most men walk past. The Spring Room is through there. Orange walls. Hidden waterfalls. The Spaniards thought it was the Fountain of Youth...',
+            'Your crew tips their hats as they pass The Sentinel. A habit no one remembers starting. No one wants to be the first to stop...'
         ],
         crystal_alcove: [
-            'Crystals catch your lantern light and scatter it...',
-            'The formations here are delicate and beautiful...',
-            'You hear a faint chiming as air moves over crystals...',
-            'These crystals took thousands of years to form...',
-            'Your light reveals colors you did not expect...'
+            'Crystals catch your lantern light and scatter it into a hundred tiny fires. Beautiful. Worthless. Priceless...',
+            'The formations here are delicate as lace and older than civilization. One careless elbow and ten thousand years of work is gone...',
+            'A faint chiming as air moves over crystal edges. Music the cave makes for no audience...',
+            'Dog-tooth spar crystals line the walls. Calcium carbonate. The same stuff in your bones, arranged by water and patience...',
+            'Your light reveals colors in the crystal -- amber, rose, pale violet -- that have never been seen. You are the first eyes...',
+            'Someone has scratched a cross into the wall near the crystals. Spanish. The cross is small and precise and very, very old...'
         ],
         upper_passage: [
-            'Old rope marks scar the walls here...',
-            'Others have passed this way before you...',
-            'The passage twists and turns unpredictably...',
-            'You trace your hand along the rough wall...'
+            'Old rope burns scar the walls. Decades of crews hauling guano sacks through this passage, one at a time, fifty pounds each...',
+            'Others have passed this way. Their boot prints are fossilized in the clay floor like a record of the desperate and the brave...',
+            'The passage twists like something alive. Scalloped walls carved by pressurized water a million years before you were born...',
+            'You trace your hand along the rough wall and feel the teeth marks of a thousand pickaxes. The limestone always wins. But slowly...',
+            'A miner\'s graffiti: "T. MILLER 1883" scratched at shoulder height. You wonder if T. Miller made it home...',
+            'The air moves here in unpredictable drafts. The cave breathes through passages you cannot see...'
         ],
         echo_hall: [
-            'Every sound you make returns threefold...',
-            'The chamber swallows your voice and spits it back...',
-            'You clap your hands and hear it echo for seconds...',
-            'The acoustics here are eerie and disorienting...'
+            'Every sound returns threefold and distorted. The cave speaks your words back in a voice that is not yours...',
+            'The chamber swallows your voice and returns it changed. Syllables rearranged. Meaning shifted...',
+            'You clap your hands and hear it echo for seven full seconds. The silence after is louder than the clap...',
+            'The acoustics are disorienting. Sound comes from everywhere and nowhere. Your crew instinctively moves closer together...',
+            'An old miner\'s trick: shout a number into the echo hall. Count the echoes. That\'s how many days you have left. Nobody does this twice...',
+            'Something in the echo does not match. A sound returns that you did not make. Probably your imagination. Probably...'
         ],
         bat_colony: [
-            'Thousands of bats hang overhead like dark fruit...',
-            'The stench of guano is nearly overwhelming...',
-            'A few bats take flight as you approach...',
-            'The floor is thick with centuries of guano...',
-            'Wings rustle above like dry leaves in wind...'
+            'Thousands of gray bats hang overhead like dark fruit. Each one will eat its weight in insects tonight...',
+            'The stench of guano is a physical force. Ammonia so thick you can taste it. Your eyes stream. Your lungs rebel...',
+            'A few bats take flight as you approach, launching themselves with a sound like wet leather snapping...',
+            'Centuries of guano on the floor. Nitrogen-rich. Worth seven hundred dollars a ton. Also full of a fungus that eats lungs...',
+            'Wings rustle overhead like dry leaves in wind. Forty thousand bats. They were here before the Osage. They will be here after you...',
+            'The bats are federally endangered gray bats -- Myotis grisescens. Science will protect them someday. Today they are just in the way...',
+            'At dusk the colony pours from the sinkhole in a spiraling vortex that takes twenty minutes to pass. Twenty-four million insects die nightly...'
         ],
         the_narrows: [
-            'The walls close in on both sides...',
-            'You have to turn sideways to fit through...',
-            'Rock scrapes against your back and chest...',
-            'Panic rises as the passage tightens...',
-            'You can feel the stone pressing on your ribs...'
+            'The walls close in. Four feet seven inches of headroom. Seven feet of passage. The Ozarks pressing on your spine...',
+            'You turn sideways and empty your lungs. The stone scrapes your chest and back simultaneously. Inch by inch...',
+            'A three-hundred-pound man got wedged here once. They greased him with lard and hauled him out with rope. He never went underground again...',
+            'Panic rises like water. The passage does not care about your fear. It was this narrow before you came and it will be this narrow after...',
+            'Your ribs compress. Your lantern scrapes the ceiling. The sound of stone on glass is the sound of your life being negotiated...',
+            'Beyond this point, the cave does not let go easily. Check your nerve. Check your rope. Check your reasons for being here...'
         ],
         gulf_of_doom: [
-            'A stone falls and you never hear it land...',
-            'The void before you seems to breathe...',
-            'Vertigo grips you at the chasm\'s edge...',
-            'The gulf is deeper than your lantern can show...',
-            'One wrong step here means the end...'
+            'Drop a stone. Listen. Keep listening. The silence where the impact should be is worse than any sound...',
+            'The void breathes. A cold updraft from a depth your lantern cannot reach. Three miners fell here. They were not found...',
+            'Vertigo seizes you at the edge. Your body knows things your mind has not yet calculated...',
+            'The richest guano deposits in the cave crust the ledges around this rim. The cave puts its treasure at the edge of the abyss...',
+            'One wrong step. One wet boot. One moment of inattention. The Gulf of Doom does not offer second chances...',
+            'Early explorers called this pit bottomless. The scientific explanation: clay-and-guano slurry absorbs all sound. The practical explanation: it does not matter. You are still dead...',
+            'A tarnished glint in a crevice near the rim. Probably mineral deposits. Probably not a Spanish coin from 1743. Probably...'
         ],
         lost_river: [
             'The underground river rushes past, ice cold...',
