@@ -337,6 +337,7 @@
   function statusScreen() {
     var state = gs();
     if (!state) { titleScreen(); return; }
+    if (state.gameOver) { gameOverScreen(state.gameOverReason); return; }
 
     // Play context-appropriate music
     if (window.Audio_Manager) Audio_Manager.playForContext(state);
@@ -666,6 +667,12 @@
       state.currentZone = 'surface';
       if (window.Engine) window.Engine.advanceDay();
       UI.hideBars();
+      if (state.gameOver) {
+        UI.render('<div class="text-bright">Daylight hits you like a fist. You stand blinking in the Missouri sun.</div>' +
+          '<div class="text-dim" style="margin-top:8px">A full day spent hauling rope, tools, and reeking guano sacks up the ladder. Every man moves like he\'s aged ten years.</div>');
+        UI.pressEnter(function () { gameOverScreen(state.gameOverReason); });
+        return;
+      }
       UI.render('<div class="text-bright">Daylight hits you like a fist. You stand blinking in the Missouri sun.</div>' +
         '<div class="text-dim" style="margin-top:8px">A full day spent hauling rope, tools, and reeking guano sacks up the ladder. Every man moves like he\'s aged ten years.</div>');
       UI.pressEnter(function () { statusScreen(); });
@@ -697,6 +704,10 @@
       UI.hideBars();
       UI.render('<div class="text-bright">You climb back to ' + (t ? t.name : 'the chamber above') + '.</div>' +
         '<div class="text-dim" style="margin-top:8px">Hand over hand up slick limestone, the rope burning through calluses. A full day\'s labor just to gain what gravity gave away for free.</div>');
+    }
+    if (state.gameOver) {
+      UI.pressEnter(function () { gameOverScreen(state.gameOverReason); });
+      return;
     }
     UI.pressEnter(function () { statusScreen(); });
   }
@@ -742,6 +753,10 @@
     } else {
       state.workPace = orig;
       UI.render('<div class="text-bright">The men rest. Wounds knit slow but they knit.</div>');
+    }
+    if (state.gameOver) {
+      UI.pressEnter(function () { gameOverScreen(state.gameOverReason); });
+      return;
     }
     UI.pressEnter(function () { statusScreen(); });
   }
