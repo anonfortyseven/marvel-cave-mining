@@ -792,6 +792,36 @@
     };
 
     // =========================================================
+    //  GAMEPLAY MICRO ART (new)
+    // =========================================================
+
+    var gameplayArt = {
+        mining: ['  /\  ', ' /  \_', '/_/\__\\', '  ||  '].join('\n'),
+        descend: ['  ||', '  ||', ' /  \\', '/_/\\_\\'].join('\n'),
+        ascend: ['  /\\', ' /  \\', '/_/\\_\\', '  ||'].join('\n'),
+        day: [' \\ | / ', ' - O - ', ' / | \\ '].join('\n'),
+        night: ['  .--. ', ' ( __ )', '  `--\' '].join('\n'),
+        discovery: [' _____  _____ ', '|  _  \\|_   _|', '| | | |  | |  ', '|_| |_|  |_|  '].join('\n'),
+        milestone25: ['[==      ]', ' 25% DONE '].join('\n'),
+        milestone50: ['[=====   ]', ' HALF WAY '].join('\n'),
+        milestone75: ['[======= ]', ' ALMOST!  '].join('\n'),
+        status_surface: [' _/\\_ ', '/_.._\\', '  ||  '].join('\n'),
+        status_mining: [' /\\ ', '/__\\', ' || '].join('\n'),
+        status_rest: [' zZ ', '(..)', '/__\\'].join('\n')
+    };
+
+    var eventArt = {
+        bat_swarm: [' /\ /\ ', '( o.o )', ' > ^ < '].join('\n'),
+        rockfall: ['  ___ ', ' /###\\', '/#####\\'].join('\n'),
+        flooding: ['~~~~~~', ' ~~~~ ', '~~~~~~'].join('\n'),
+        bad_air: [' . . . ', '( x x )', ' \___/ '].join('\n'),
+        cave_in: ['\\\\|////', ' --*-- ', '////|\\\\'].join('\n'),
+        equipment_break: [' |-| ', ' /X\\ ', ' |_| '].join('\n'),
+        snakebite: [' /^\/^\\', '>_  _<', '  \\/  '].join('\n'),
+        rope_break: [' |||| ', ' ||// ', '  /   '].join('\n')
+    };
+
+    // =========================================================
     //  AMBIENT TEXT POOLS
     // =========================================================
 
@@ -910,14 +940,24 @@
             'The current looks deceptively strong...',
             'Where does this water go? Nobody knows...',
             'The river carved this passage over ages...',
-            'Mist rises from the churning water...'
+            'Mist rises from the churning water...',
+            'Pebbles rattle along the current like teeth...',
+            'Your lantern throws broken light across black water...',
+            'A surge upstream changes the river\'s pitch...',
+            'Wet stone sweats against your palms...',
+            'Every splash sounds closer than it is...'
         ],
         spanish_passage: [
             'Old Spanish carvings mark these walls...',
             'Who were the Spaniards who came here in 1541?...',
             'A carved cross marks an old resting point...',
             'The markings are worn but still legible...',
-            'Conquistadors once stood where you stand now...'
+            'Conquistadors once stood where you stand now...',
+            'Soot smears mark where old torches once burned...',
+            'A crude arrow is scratched toward deeper dark...',
+            'The limestone here bears old boot scuffs...',
+            'You find initials in fading charcoal...',
+            'The passage holds old prayers in newer dust...'
         ],
         deep_descent: [
             'The drop-off ahead is steep and treacherous...',
@@ -1068,6 +1108,14 @@
                 };
             }
             return null;
+        },
+
+        getGameplayArt: function(id) {
+            return (id && gameplayArt[id]) ? gameplayArt[id] : '';
+        },
+
+        getEventArt: function(id) {
+            return (id && eventArt[id]) ? eventArt[id] : '';
         },
 
         /**

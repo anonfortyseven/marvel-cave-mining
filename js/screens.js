@@ -92,6 +92,56 @@
     return '';
   }
 
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  var TEXT_VARIANTS = {
+    mining: [
+      'Shovel after shovel, your crew drags fresh guano into sacks.',
+      'Picks ring against limestone as the bags fill by lantern light.',
+      'You work the seam in silence, broken only by grunts and scraping steel.',
+      'The chamber gives up another day\'s filthy fortune.',
+      'Dust rises, shoulders burn, and the stockpile grows.',
+      'A hard day\'s dig leaves every man reeking and richer.'
+    ],
+    descend: [
+      'You feed rope through gloved hands and ease into deeper dark.',
+      'The ladder creaks while the chamber above shrinks to a coin of light.',
+      'One careful step at a time, the earth closes around you.',
+      'You descend with lamps low and nerves tight.',
+      'The air turns colder as you drop beneath the known passages.',
+      'Boots scrape slick stone on the way down.'
+    ],
+    ascend: [
+      'You climb hand over hand toward thinner darkness.',
+      'The rope burns your palms as you haul yourself upward.',
+      'Each rung buys a little more air and a little less dread.',
+      'The chamber below falls away while your shoulders scream.',
+      'You grind upward through mud and limestone grit.',
+      'At last, the way up feels possible.'
+    ],
+    restSurface: [
+      'A quiet day in Marmaros steadies everyone.', 'You rest on the surface and breathe like humans again.',
+      'No picks today—just food, sleep, and daylight.', 'Boots dry by the fire while tempers cool.',
+      'You take a full day to mend gear and nerves.', 'The crew spends the day aboveground, grateful for open sky.'
+    ],
+    restUnderground: [
+      'Bedrolls hit stone and the cave watches you sleep.', 'The crew dozes in shifts by a wavering lantern.',
+      'No digging today—just coughing, coffee, and quiet.', 'You camp in the dark and let bruises settle.',
+      'A rest day underground feels less like comfort and more like survival.', 'Picks stay down while lungs and hands recover.'
+    ],
+    dayAdvance: [
+      'Another day scratched off the contract ledger.', 'Daylight turns over whether you see it or not.',
+      'The calendar advances. The cave does not care.', 'A new day begins with the same old mountain.',
+      'Time moves forward, with or without your consent.', 'One more day spent bargaining with stone.'
+    ]
+  };
+
+  var RETURN_CHAMBER_TEXT = {
+    cathedral_entrance: ['Back at the Den mouth, cold air pours up from below.', 'The entrance yawns wide, waiting.', 'Rope anchors still hold at the lip.', 'Same sinkhole, same bad feeling.'],
+    cathedral_floor: ['The giant chamber swallows your lantern again.', 'You return to the Cathedral floor and its endless echo.', 'Bat-noise rolls overhead as you step back in.', 'The Underground Mountain looms in the half-light.'],
+    serpentine_passage: ['You re-enter the twisting throat of stone.', 'The Serpentine winds on, familiar and unfriendly.', 'Old pick marks guide your hands forward.', 'The narrow passage takes you back in.'],
+    cloud_room: ['Mist and guano stench welcome you back.', 'The Cloud Room hangs low and heavy.', 'Your lantern struggles in the vapor again.', 'Back in the richest and foulest room around.']
+  };
+
   function getCrewByRole(state, roleId) {
     if (!state || !state.crew) return null;
     for (var i = 0; i < state.crew.length; i++) {
@@ -288,7 +338,18 @@
 
     // Show chamber art line-by-line typewriter style
     var art = getArt(chamberId);
+    var seen = !!(state && state.visitedChambers && state.visitedChambers[chamberId]);
     var lines = window.Content ? window.Content.getLandmarkText(chamberId) : ['You descend into the cave...'];
+    if (seen) {
+      var shortPool = RETURN_CHAMBER_TEXT[chamberId] || ['You return to familiar stone.', 'The chamber feels known now.', 'Back through the same passage, different day.'];
+      lines = [pick(shortPool)];
+    } else if (state && state.visitedChambers) {
+      state.visitedChambers[chamberId] = true;
+      if (window.AsciiArt && window.AsciiArt.getGameplayArt) {
+        var disc = window.AsciiArt.getGameplayArt('discovery');
+        if (disc) lines = [disc, ''].concat(lines);
+      }
+    }
 
     var html = '';
     if (art) html += '<pre class="chamber-art" id="landmark-art"></pre>';
@@ -338,6 +399,17 @@
     var state = gs();
     if (!state) { titleScreen(); return; }
     if (state.gameOver) { gameOverScreen(state.gameOverReason); return; }
+
+    // Surface market fluctuation updates each new surface day
+    if (!state.isUnderground) {
+      if (state.lastMarketDay !== state.totalDays) {
+        state.lastMarketDay = state.totalDays;
+        state.marketPrice = 600 + Math.floor(Math.random() * 201);
+        state.marketHistory = state.marketHistory || [];
+        state.marketHistory.push({ day: state.totalDays, price: state.marketPrice });
+        if (state.marketHistory.length > 10) state.marketHistory.shift();
+      }
+    }
 
     // Play context-appropriate music
     if (window.Audio_Manager) Audio_Manager.playForContext(state);
@@ -432,20 +504,25 @@
     html += UI.progressBar(state.guanoShipped, state.contractTarget);
     html += '</div>';
 
-    // Chamber description (compact flavor)
-    if (chamber && chamber.description) {
+    // Chamber description + ambient pool
+    if (state.lastAmbientDay !== state.totalDays || !state.currentAmbientText) {
+      state.lastAmbientDay = state.totalDays;
+      state.currentAmbientText = getAmbient(state.currentChamber);
+    }
+    if (state.currentAmbientText) {
+      html += '<div class="zone-desc">' + UI.escapeHtml(state.currentAmbientText) + '</div>';
+    } else if (chamber && chamber.description) {
       html += '<div class="zone-desc">' + UI.escapeHtml(chamber.description) + '</div>';
     }
 
-    if (state.isUnderground) {
-      if (state.lastAmbientDay !== state.totalDays) {
-        state.lastAmbientDay = state.totalDays;
-        state.currentAmbientText = getAmbient(state.currentChamber);
-      }
-      if (state.currentAmbientText) {
-        html += '<div class="text-dim" style="margin-top:6px;font-style:italic">' + UI.escapeHtml(state.currentAmbientText) + '</div>';
-      }
+    var statusArt = '';
+    if (window.AsciiArt && window.AsciiArt.getGameplayArt) {
+      if (!state.isUnderground) statusArt = window.AsciiArt.getGameplayArt('status_surface');
+      else if (state.workPace === 'careful') statusArt = window.AsciiArt.getGameplayArt('status_rest');
+      else statusArt = window.AsciiArt.getGameplayArt('status_mining');
     }
+    if (statusArt) html += '<pre class="title-art" style="margin-top:6px">' + UI.escapeHtml(statusArt) + '</pre>';
+
 
     UI.render(html);
 
@@ -461,7 +538,8 @@
         { key: '5', label: 'Rations', value: 'rations' },
         { key: '6', label: 'Rest', value: 'rest' },
         { key: '7', label: 'Map', value: 'map' },
-        { key: '8', label: musicLabel, value: 'music' }
+        { key: '8', label: 'Crew', value: 'crew' },
+        { key: '9', label: musicLabel, value: 'music' }
       ];
     } else {
       actions = [
@@ -470,8 +548,9 @@
         { key: '3', label: 'Ship Guano', value: 'ship' },
         { key: '4', label: 'Rest', value: 'rest' },
         { key: '5', label: 'Supplies', value: 'supplies' },
-        { key: '6', label: 'Save', value: 'save' },
-        { key: '7', label: musicLabel, value: 'music' }
+        { key: '6', label: 'Crew', value: 'crew' },
+        { key: '7', label: 'Save', value: 'save' },
+        { key: '8', label: musicLabel, value: 'music' }
       ];
     }
 
@@ -501,13 +580,14 @@
   // =========================================
   function handleAction(action) {
     switch (action) {
-      case 'mine': advanceGame(); break;
+      case 'mine': chooseMiningApproach(); break;
       case 'descend': attemptDescent(); break;
       case 'ascend': attemptAscent(); break;
       case 'pace': changePace(); break;
       case 'rations': changeRations(); break;
       case 'rest': restDay(); break;
       case 'map': showCaveMap(); break;
+      case 'crew': crewAssignmentScreen(); break;
       case 'enter': enterCave(); break;
       case 'town': visitTown(); break;
       case 'ship': shipGuano(); break;
@@ -645,7 +725,10 @@
           return;
         }
       }
-      UI.transition(landmarkScreen);
+      var dArt = (window.AsciiArt && window.AsciiArt.getGameplayArt) ? window.AsciiArt.getGameplayArt('descend') : '';
+      var dMsg = pick(TEXT_VARIANTS.descend);
+      UI.render((dArt ? '<pre class="title-art">' + UI.escapeHtml(dArt) + '</pre>' : '') + '<div class="text-bright">' + UI.escapeHtml(dMsg) + '</div>');
+      UI.pressEnter(function(){ UI.transition(landmarkScreen); });
     });
   }
 
@@ -673,8 +756,9 @@
         UI.pressEnter(function () { gameOverScreen(state.gameOverReason); });
         return;
       }
-      UI.render('<div class="text-bright">Daylight hits you like a fist. You stand blinking in the Missouri sun.</div>' +
-        '<div class="text-dim" style="margin-top:8px">A full day spent hauling rope, tools, and reeking guano sacks up the ladder. Every man moves like he\'s aged ten years.</div>');
+      var aArt0 = (window.AsciiArt && window.AsciiArt.getGameplayArt) ? window.AsciiArt.getGameplayArt('ascend') : '';
+      UI.render((aArt0 ? '<pre class="title-art">' + UI.escapeHtml(aArt0) + '</pre>' : '') + '<div class="text-bright">' + UI.escapeHtml(pick(TEXT_VARIANTS.ascend)) + '</div>' +
+        '<div class="text-dim" style="margin-top:8px">' + UI.escapeHtml(pick(TEXT_VARIANTS.dayAdvance)) + '</div>');
       UI.pressEnter(function () { statusScreen(); });
       return;
     }
@@ -697,13 +781,15 @@
       state.currentZone = 'surface';
       if (window.Engine) window.Engine.advanceDay();
       UI.hideBars();
-      UI.render('<div class="text-bright">You crawl out of the Den and into the light at Marmaros.</div>' +
-        '<div class="text-dim" style="margin-top:8px">The last man up the rope ladder collapses in the grass. A full day gone to climbing. The sun feels foreign on your skin.</div>');
+      var aArt1 = (window.AsciiArt && window.AsciiArt.getGameplayArt) ? window.AsciiArt.getGameplayArt('ascend') : '';
+      UI.render((aArt1 ? '<pre class="title-art">' + UI.escapeHtml(aArt1) + '</pre>' : '') + '<div class="text-bright">' + UI.escapeHtml(pick(TEXT_VARIANTS.ascend)) + '</div>' +
+        '<div class="text-dim" style="margin-top:8px">' + UI.escapeHtml(pick(TEXT_VARIANTS.dayAdvance)) + '</div>');
     } else {
       if (window.Engine) window.Engine.advanceDay();
       UI.hideBars();
-      UI.render('<div class="text-bright">You climb back to ' + (t ? t.name : 'the chamber above') + '.</div>' +
-        '<div class="text-dim" style="margin-top:8px">Hand over hand up slick limestone, the rope burning through calluses. A full day\'s labor just to gain what gravity gave away for free.</div>');
+      var aArt2 = (window.AsciiArt && window.AsciiArt.getGameplayArt) ? window.AsciiArt.getGameplayArt('ascend') : '';
+      UI.render((aArt2 ? '<pre class="title-art">' + UI.escapeHtml(aArt2) + '</pre>' : '') + '<div class="text-bright">' + UI.escapeHtml(pick(TEXT_VARIANTS.ascend) + ' You reach ' + (t ? t.name : 'the chamber above') + '.') + '</div>' +
+        '<div class="text-dim" style="margin-top:8px">' + UI.escapeHtml(pick(TEXT_VARIANTS.dayAdvance)) + '</div>');
     }
     if (state.gameOver) {
       UI.pressEnter(function () { gameOverScreen(state.gameOverReason); });
@@ -741,9 +827,9 @@
     if (window.Engine) {
       var r = window.Engine.advanceDay();
       state.workPace = orig;
-      var html = state.isUnderground
-        ? '<div class="text-bright">The men lay down their picks and sleep where they fall. The cave breathes around them.</div>'
-        : '<div class="text-bright">A day of rest in Marmaros. Clean air, hot food, and the open sky above.</div>';
+      var dayArt = (window.AsciiArt && window.AsciiArt.getGameplayArt) ? window.AsciiArt.getGameplayArt(state.isUnderground ? 'night' : 'day') : '';
+      var html = (dayArt ? '<pre class="title-art">' + UI.escapeHtml(dayArt) + '</pre>' : '');
+      html += '<div class="text-bright">' + UI.escapeHtml(state.isUnderground ? pick(TEXT_VARIANTS.restUnderground) : pick(TEXT_VARIANTS.restSurface)) + '</div>';
       if (r && r.messages.length > 0) {
         html += '<div class="text-dim" style="margin-top:6px">';
         for (var i = 0; i < r.messages.length; i++) html += UI.escapeHtml(r.messages[i]) + '<br>';
@@ -818,27 +904,67 @@
       return;
     }
 
+    var price = state.marketPrice || 700;
+    var net = Math.max(0, price - 50);
     UI.render('<div class="text-lg text-glow">Ship Guano</div><hr class="separator">' +
       '<div>Stockpile: <span class="text-bright">' + state.guanoStockpile.toFixed(2) + ' tons</span></div>' +
-      '<div>Revenue: $700/ton - $50 shipping = $650/ton net</div>' +
-      '<div>Payment arrives in 14 days</div>');
+      '<div>Market price: <span class="text-yellow">$' + price + '/ton</span> (changes each surface day)</div>' +
+      '<div>Net after shipping: $' + net + '/ton</div>' +
+      '<div class="text-dim">Hold too long and spoilage may hit your stockpile.</div>');
 
     UI.promptChoice([
-      { key: '1', label: 'Ship all', value: 'all' },
-      { key: '2', label: 'Cancel', value: 'no' }
+      { key: '1', label: 'Ship now at $' + price + '/ton', value: 'all' },
+      { key: '2', label: 'Hold for a better market', value: 'hold' },
+      { key: '3', label: 'Cancel', value: 'no' }
     ], function (v) {
       if (v === 'no') { statusScreen(); return; }
-      if (window.Economy) {
-        var r = window.Economy.shipGuano(state.guanoStockpile, state);
-        UI.render('<div class="text-bright">' + (r.message || 'Shipped!') + '</div>');
-      } else {
-        var t = state.guanoStockpile;
-        state.guanoShipped += t;
-        state.guanoStockpile = 0;
-        state.cash += t * 650;
-        UI.render('<div class="text-bright">Shipped ' + t.toFixed(1) + ' tons</div>');
+      if (v === 'hold') {
+        if (Math.random() < 0.18 && state.crewAssignment !== 'guarding') {
+          var spoiled = Math.min(state.guanoStockpile, 0.08 + Math.random() * 0.2);
+          state.guanoStockpile -= spoiled;
+          UI.render('<div class="text-amber">You hold the stockpile. Moisture ruins ' + spoiled.toFixed(2) + ' tons.</div>');
+        } else {
+          UI.render('<div class="text-bright">You hold your guano for a better market day.</div>');
+        }
+        UI.pressEnter(function () { statusScreen(); });
+        return;
       }
+
+      var tons = state.guanoStockpile;
+      var gross = tons * price;
+      var shipCost = tons * 50;
+      state.guanoShipped += tons;
+      state.guanoStockpile = 0;
+      state.cash = Math.round((state.cash + gross - shipCost) * 100) / 100;
+      UI.render('<div class="text-bright">Shipped ' + tons.toFixed(2) + ' tons at $' + price + '/ton.</div><div class="text-green">Net: $' + (gross - shipCost).toFixed(2) + '</div>');
       UI.pressEnter(function () { statusScreen(); });
+    });
+  }
+
+  function crewAssignmentScreen() {
+    UI.hideBars();
+    var state = gs();
+    if (!state) return;
+    UI.render('<div class="text-lg text-glow">Crew Assignment</div><hr class="separator"><div class="text-dim">Current: ' + UI.escapeHtml(state.crewAssignment || 'mining') + '</div>');
+    UI.promptChoice([
+      { key: '1', label: 'Mining (steady output)', value: 'mining' },
+      { key: '2', label: 'Scouting (reveal adjacent chambers)', value: 'scouting' },
+      { key: '3', label: 'Guarding supplies (anti-theft/spoilage)', value: 'guarding' }
+    ], function(v) {
+      state.crewAssignment = v;
+      if (v === 'scouting' && state.isUnderground && window.CaveData) {
+        var ch = window.CaveData.getChamber(state.currentChamber);
+        var found = 0;
+        if (ch && ch.connectedTo) {
+          for (var i = 0; i < ch.connectedTo.length; i++) {
+            if (state.discoveredChambers.indexOf(ch.connectedTo[i]) === -1) { state.discoveredChambers.push(ch.connectedTo[i]); found++; }
+          }
+        }
+        UI.showNotification(found > 0 ? ('Scouts reveal ' + found + ' adjacent chamber(s)!') : 'Scouting posted.', 1400);
+      } else {
+        UI.showNotification('Crew assignment set: ' + v, 1200);
+      }
+      setTimeout(function(){ statusScreen(); }, 1300);
     });
   }
 
@@ -890,6 +1016,44 @@
     setTimeout(statusScreen, 1300);
   }
 
+  function chooseMiningApproach() {
+    UI.hideBars();
+    var state = gs();
+    if (!state) return;
+    UI.render('<div class="text-lg text-glow">Mining Plan</div><hr class="separator">');
+    UI.promptChoice([
+      { key: '1', label: 'Dig the main vein (safe, steady yield)', value: 'main_vein' },
+      { key: '2', label: 'Follow a side passage (risky bonus)', value: 'side_passage' },
+      { key: '3', label: 'Blast with powder (uses 1, high yield + danger)', value: 'blasting' }
+    ], function(v){
+      if (v === 'blasting' && state.dynamite <= 0) {
+        UI.showNotification('No blasting powder/dynamite available.', 1300);
+        setTimeout(statusScreen, 1400);
+        return;
+      }
+      state.miningChoice = v;
+      runChoiceEncounterThenMine();
+    });
+  }
+
+  function runChoiceEncounterThenMine() {
+    var state = gs();
+    if (!state || !window.EventSystem || !window.EventSystem.maybeGetChoiceEncounter) { advanceGame(); return; }
+    var enc = window.EventSystem.maybeGetChoiceEncounter(state);
+    if (!enc) { advanceGame(); return; }
+    var art = (window.AsciiArt && window.AsciiArt.getEventArt) ? (window.AsciiArt.getEventArt('rockfall') || '') : '';
+    var html = '<div class="text-lg text-glow">' + UI.escapeHtml(enc.title) + '</div><hr class="separator"><div class="text-amber">' + UI.escapeHtml(enc.text) + '</div>';
+    if (art) html = '<pre class="title-art">' + UI.escapeHtml(art) + '</pre>' + html;
+    UI.render(html);
+    var opts = [];
+    for (var i = 0; i < enc.options.length; i++) opts.push({ key: enc.options[i].key, label: enc.options[i].label, value: String(i) });
+    UI.promptChoice(opts, function(v){
+      var out = enc.options[parseInt(v,10)].apply(state) || ['Done.'];
+      UI.render('<div class="text-bright">' + UI.escapeHtml(out.join(' ')) + '</div>');
+      UI.pressEnter(function(){ advanceGame(); });
+    });
+  }
+
   // =========================================
   // GAME ADVANCE (mine for a day)
   // =========================================
@@ -898,7 +1062,13 @@
     if (!state) return;
 
     if (window.Engine) {
+      var prevBase = window.Engine.BASE_MINING_RATE;
+      if (state.dailyYieldMultiplier && state.dailyYieldMultiplier > 0) {
+        window.Engine.BASE_MINING_RATE = prevBase * state.dailyYieldMultiplier;
+      }
       var r = window.Engine.advanceDay();
+      window.Engine.BASE_MINING_RATE = prevBase;
+      state.dailyYieldMultiplier = 0;
       if (!r) { statusScreen(); return; }
 
       if (r.deaths && r.deaths.length > 0) {
@@ -937,12 +1107,34 @@
 
   function showDayResults(r, cb) {
     UI.hideBars();
-    var html = '<div class="text-bright">Day ' + (r.day || '?') + ' &mdash; ' + formatDate(gs()) + '</div><hr class="separator">';
+    var mineArt = (window.AsciiArt && window.AsciiArt.getGameplayArt) ? window.AsciiArt.getGameplayArt('mining') : '';
+    var html = (mineArt ? '<pre class="title-art">' + UI.escapeHtml(mineArt) + '</pre>' : '');
+    html += '<div class="text-bright">Day ' + (r.day || '?') + ' &mdash; ' + formatDate(gs()) + '</div><hr class="separator">';
+    html += '<div class="text-dim">' + UI.escapeHtml(pick(TEXT_VARIANTS.dayAdvance)) + '</div>';
+
+    if (r.guanoMinedToday && r.guanoMinedToday > 0) {
+      html += '<div class="text-green">' + UI.escapeHtml(pick(TEXT_VARIANTS.mining)) + '</div>';
+    }
     for (var i = 0; i < r.messages.length; i++) {
       var msg = r.messages[i];
+      if (msg.indexOf('MILESTONE_') === 0) {
+        var mArt = '';
+        if (window.AsciiArt && window.AsciiArt.getGameplayArt) {
+          if (msg === 'MILESTONE_25') mArt = window.AsciiArt.getGameplayArt('milestone25');
+          if (msg === 'MILESTONE_50') mArt = window.AsciiArt.getGameplayArt('milestone50');
+          if (msg === 'MILESTONE_75') mArt = window.AsciiArt.getGameplayArt('milestone75');
+        }
+        if (mArt) html += '<pre class="title-art">' + UI.escapeHtml(mArt) + '</pre>';
+        continue;
+      }
       var cls = msg.indexOf('SHORTAGE') >= 0 || msg.indexOf('died') >= 0 || msg.indexOf('killed') >= 0 ? 'text-red' :
         msg.indexOf('Payment') >= 0 || msg.indexOf('Mined') >= 0 ? 'text-green' : 'text-amber';
       html += '<div class="' + cls + '">' + UI.escapeHtml(msg) + '</div>';
+    }
+    if (r.eventsTriggered && r.eventsTriggered.length > 0 && window.AsciiArt && window.AsciiArt.getEventArt) {
+      var eId = r.eventsTriggered[0].eventId || '';
+      var eArt = window.AsciiArt.getEventArt(eId);
+      if (eArt) html += '<pre class="title-art">' + UI.escapeHtml(eArt) + '</pre>';
     }
     UI.render(html);
     UI.pressEnter(cb);
@@ -1160,7 +1352,9 @@
   function eventScreen(data) {
     UI.hideBars();
     if (!data) { statusScreen(); return; }
-    var html = '<div class="text-lg text-glow">' + UI.escapeHtml(data.eventName || 'Event') + '</div><hr class="separator">';
+    var eArt = (window.AsciiArt && window.AsciiArt.getEventArt) ? window.AsciiArt.getEventArt((data.eventId || '').toLowerCase()) : '';
+    var html = (eArt ? '<pre class="title-art">' + UI.escapeHtml(eArt) + '</pre>' : '');
+    html += '<div class="text-lg text-glow">' + UI.escapeHtml(data.eventName || 'Event') + '</div><hr class="separator">';
     if (data.eventDescription) html += '<div class="text-amber">' + UI.escapeHtml(data.eventDescription) + '</div>';
     if (data.messages) {
       for (var i = 0; i < data.messages.length; i++) {

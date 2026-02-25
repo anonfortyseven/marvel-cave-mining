@@ -417,6 +417,10 @@ window.EventSystem = {
       cooldown: 7,
       effect: function(state) {
         var results = { messages: [], deaths: [] };
+        if (state.crewAssignment === 'guarding') {
+          results.messages.push('Your guarding detail spots masked riders early and secures the camp. The Bald Knobbers move on.');
+          return results;
+        }
         results.messages.push('Flour-sack masks with cane-stalk horns. Hickory switches and revolvers. The Bald Knobbers have come calling.');
         // Steal cash and supplies
         var cashStolen = Math.min(state.cash, Math.floor(Math.random() * 50) + 20);
@@ -482,6 +486,25 @@ window.EventSystem = {
           state.lanternOil += oilGain;
           results.messages.push('Plus ' + oilGain + ' gallons of oil!');
         }
+        return results;
+      }
+    },
+
+    'stockpile_spoilage': {
+      name: 'Stockpile Spoilage',
+      description: 'Moisture and heat begin ruining surface-stored guano sacks.',
+      probability: 0.04,
+      cooldown: 4,
+      condition: function(state) { return state.guanoStockpile > 0.2; },
+      effect: function(state) {
+        var results = { messages: [], deaths: [] };
+        if (state.crewAssignment === 'guarding') {
+          results.messages.push('The guarding crew keeps tarps tight and sacks dry. No spoilage today.');
+          return results;
+        }
+        var lost = Math.min(state.guanoStockpile, 0.1 + Math.random() * 0.25);
+        state.guanoStockpile = Math.max(0, state.guanoStockpile - lost);
+        results.messages.push('Rain and mold ruin ' + lost.toFixed(2) + ' tons of stored guano.');
         return results;
       }
     },
@@ -610,6 +633,69 @@ window.EventSystem = {
         delete state.eventCooldowns[eventId];
       }
     }
+  },
+
+  // Choice-based encounters layered on top of passive events
+  choiceEvents: [
+    {
+      id: 'unstable_passage',
+      title: 'Unstable Passage',
+      text: 'A cracked section groans ahead. Shore it or squeeze through?',
+      options: [
+        { key: '1', label: 'Shore it up (cost 2 timber, safe)', apply: function(state){ if(state.timber>=2){state.timber-=2; return ['You brace the ceiling with fresh timber and pass safely.'];} return ['Not enough timber. You squeeze through anyway.', 'Loose stone clips a shoulder.']; } },
+        { key: '2', label: 'Squeeze through (risky)', apply: function(state){ var out=['You squeeze sideways through splintered rock.']; if(Math.random()<0.4){ var v=window.GameState.getLivingParty()[0]; if(v){window.HealthSystem.applyDamage(v,18); out.push(v.name+' is hurt by falling rubble.');}} else out.push('You clear it without incident.'); return out; } }
+      ]
+    },
+    {
+      id: 'rival_miners',
+      title: 'Rival Miners',
+      text: 'Another crew claims your vein.',
+      options: [
+        { key: '1', label: 'Share the vein (split yield)', apply: function(state){ state.dailyYieldMultiplier = 0.5; return ['You split the chamber and keep the peace.']; } },
+        { key: '2', label: 'Stake your claim (possible confrontation)', apply: function(state){ var out=['You stand your ground.']; if(Math.random()<0.35){ var v=window.GameState.getLivingParty()[0]; if(v){window.HealthSystem.applyDamage(v,15); out.push(v.name+' takes a blow in the scuffle.');}} else { state.dailyYieldMultiplier = 1.25; out.push('The rivals back off; you keep the richer seam.'); } return out; } }
+      ]
+    },
+    {
+      id: 'injured_crew',
+      title: 'Injured Crewman',
+      text: 'A crewman twists hard on wet stone.',
+      options: [
+        { key: '1', label: 'Rest him (lose a worker for 2 days)', apply: function(state){ state.injuredCrewDays=(state.injuredCrewDays||0)+2; return ['You set a splint and lighten his load for two days.']; } },
+        { key: '2', label: 'Push through (risk of death)', apply: function(state){ var out=['You keep the line moving.']; var v=window.GameState.getLivingParty()[0]; if(v&&Math.random()<0.15){v.alive=false; out.push(v.name+' collapses and does not rise.');} else if(v){window.HealthSystem.applyDamage(v,20); out.push(v.name+' soldiers on through pain.');} return out; } }
+      ]
+    },
+    {
+      id: 'strange_sounds',
+      title: 'Strange Sounds Deeper',
+      text: 'A hollow knocking echoes from a side throat.',
+      options: [
+        { key: '1', label: 'Investigate (uses a day, might find secret)', apply: function(state){ state.extraDayCost=true; if(window.CaveData){var c=window.CaveData.getChamber(state.currentChamber); if(c&&c.connectedTo){ for(var i=0;i<c.connectedTo.length;i++){ if(state.discoveredChambers.indexOf(c.connectedTo[i])===-1){state.discoveredChambers.push(c.connectedTo[i]); return ['You spend the day scouting and chart a hidden connection.'];}}}} return ['You lose a day chasing echoes and find nothing but stone.']; } },
+        { key: '2', label: 'Ignore it', apply: function(){ return ['You keep to the known route and press on.']; } }
+      ]
+    },
+    {
+      id: 'supply_trader',
+      title: 'Passing Trader',
+      text: 'A mule train offers emergency supplies at steep markup.',
+      options: [
+        { key: '1', label: 'Buy emergency bundle ($8)', apply: function(state){ if(state.cash>=8){state.cash-=8; state.food+=12; state.lanternOil+=1; return ['You buy food and oil at a painful price.'];} return ['You cannot afford the trader\'s terms.']; } },
+        { key: '2', label: 'Refuse', apply: function(){ return ['You save your cash and trust your stores.']; } }
+      ]
+    },
+    {
+      id: 'old_shaft',
+      title: 'Old Shaft',
+      text: 'A rotted ladder descends to an old pocket seam.',
+      options: [
+        { key: '1', label: 'Climb down carefully (risk/reward)', apply: function(state){ var out=['You test each rung and descend.']; if(Math.random()<0.25){ var v=window.GameState.getLivingParty()[0]; if(v){window.HealthSystem.applyDamage(v,16); out.push('A rung snaps and '+v.name+' is injured.');}} else { state.guanoStockpile += 0.25; out.push('You recover extra high-grade guano: +0.25 tons.'); } return out; } },
+        { key: '2', label: 'Leave it', apply: function(){ return ['You leave the rotten shaft untouched.']; } }
+      ]
+    }
+  ],
+
+  maybeGetChoiceEncounter: function(state) {
+    if (!state || Math.random() > 0.22) return null;
+    return this.choiceEvents[Math.floor(Math.random() * this.choiceEvents.length)];
   },
 
   // Get a random discovery event for a chamber (one-time events)

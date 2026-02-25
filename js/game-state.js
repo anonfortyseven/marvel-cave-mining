@@ -85,7 +85,15 @@ window.GameState = {
     gameOver: false,
     gameOverReason: '',
     score: 0,
-    isUnderground: false
+    isUnderground: false,
+
+    // Expanded gameplay systems
+    visitedChambers: {},
+    crewAssignment: 'mining',
+    marketPrice: 700,
+    marketHistory: [],
+    miningChoice: 'main_vein',
+    lastMilestoneShown: 0
   },
 
   state: null,
@@ -237,6 +245,12 @@ window.GameState = {
       if (saveData.clothing !== undefined) delete saveData.clothing;
       if (!Array.isArray(saveData.discoveredChambers)) saveData.discoveredChambers = [];
       if (saveData.discoveredChambers.indexOf('marmaros') === -1) saveData.discoveredChambers.unshift('marmaros');
+      if (!saveData.visitedChambers || typeof saveData.visitedChambers !== 'object') saveData.visitedChambers = {};
+      if (!saveData.crewAssignment) saveData.crewAssignment = 'mining';
+      if (typeof saveData.marketPrice !== 'number') saveData.marketPrice = 700;
+      if (!Array.isArray(saveData.marketHistory)) saveData.marketHistory = [];
+      if (!saveData.miningChoice) saveData.miningChoice = 'main_vein';
+      if (typeof saveData.lastMilestoneShown !== 'number') saveData.lastMilestoneShown = 0;
 
       this.state = saveData;
       return true;

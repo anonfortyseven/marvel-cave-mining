@@ -95,6 +95,38 @@ window.Engine = {
         state.guanoStockpile += mined;
         results.guanoMinedToday = mined;
         results.messages.push('Mined ' + mined.toFixed(3) + ' tons of guano today.');
+
+        // Milestone markers for UI celebration art
+        var pct = state.contractTarget > 0 ? (state.guanoShipped + state.guanoStockpile) / state.contractTarget : 0;
+        if (pct >= 0.75 && state.lastMilestoneShown < 75) { state.lastMilestoneShown = 75; results.messages.push('MILESTONE_75'); }
+        else if (pct >= 0.50 && state.lastMilestoneShown < 50) { state.lastMilestoneShown = 50; results.messages.push('MILESTONE_50'); }
+        else if (pct >= 0.25 && state.lastMilestoneShown < 25) { state.lastMilestoneShown = 25; results.messages.push('MILESTONE_25'); }
+      }
+    }
+
+    // 6b. Mining method risks
+    if (state.isUnderground && state.miningChoice === 'side_passage' && Math.random() < 0.2) {
+      results.messages.push('A side tunnel slumps and nearly buries the lead team.');
+      var livingSide = window.GameState.getLivingParty();
+      if (livingSide.length > 0) {
+        var sideVictim = livingSide[Math.floor(Math.random() * livingSide.length)];
+        window.HealthSystem.applyDamage(sideVictim, 18 + Math.floor(Math.random() * 12));
+        results.messages.push(sideVictim.name + ' is bruised by a cave-in while scouting the side passage.');
+      }
+    }
+    if (state.isUnderground && state.miningChoice === 'blasting') {
+      if (state.dynamite > 0) state.dynamite -= 1;
+      if (Math.random() < 0.15) {
+        var livingBlast = window.GameState.getLivingParty();
+        if (livingBlast.length > 0) {
+          var blastVictim = livingBlast[Math.floor(Math.random() * livingBlast.length)];
+          var blastDied = window.HealthSystem.applyDamage(blastVictim, 25 + Math.floor(Math.random() * 20));
+          results.messages.push('Powder flash! ' + blastVictim.name + ' catches flying stone.');
+          if (blastDied) {
+            results.messages.push(blastVictim.name + ' was killed in the blast.');
+            results.deaths.push(blastVictim.name);
+          }
+        }
       }
     }
 
@@ -124,6 +156,20 @@ window.Engine = {
     var contractResults = window.Economy.checkContracts(state);
     for (var c = 0; c < contractResults.length; c++) {
       results.messages.push(contractResults[c].message);
+    }
+
+    // 9b. Crew scouting can reveal adjacent chambers without travel
+    if (state.isUnderground && state.crewAssignment === 'scouting' && window.CaveData) {
+      var current = window.CaveData.getChamber(state.currentChamber);
+      if (current && current.connectedTo) {
+        for (var sc = 0; sc < current.connectedTo.length; sc++) {
+          var cid = current.connectedTo[sc];
+          if (state.discoveredChambers.indexOf(cid) === -1) {
+            state.discoveredChambers.push(cid);
+            results.messages.push('Scouts map a new adjacent chamber: ' + (window.CaveData.getChamber(cid).name || cid) + '.');
+          }
+        }
+      }
     }
 
     // 10. Morale updates
@@ -177,6 +223,22 @@ window.Engine = {
         var yieldMod = window.CaveData.getGuanoMultiplier(chamber.guanoYield);
         output *= yieldMod;
       }
+    }
+
+    // Crew assignment impact
+    if (state.crewAssignment === 'scouting') output *= 0.8;
+    if (state.crewAssignment === 'guarding') output *= 0.9;
+
+    // Mining method impact
+    if (state.miningChoice === 'side_passage') {
+      var sideRoll = Math.random();
+      if (sideRoll < 0.3) {
+        output *= 1.5;
+      } else if (sideRoll < 0.5) {
+        output *= 0.2;
+      }
+    } else if (state.miningChoice === 'blasting') {
+      output *= 2.0;
     }
 
     // Rope check - need rope to haul effectively
