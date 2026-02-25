@@ -789,7 +789,7 @@
     }
 
     UI.render('<div class="text-lg text-glow">Surveyor\'s Cave Map</div><hr class="separator">' +
-      '<pre class="title-art" style="font-size:13px;line-height:1.25">' + UI.escapeHtml(lines.join('\\n')) + '</pre>' +
+      '<pre class="title-art" style="font-size:13px;line-height:1.25">' + UI.escapeHtml(lines.join('\n')) + '</pre>' +
       '<div class="text-dim">[brackets] mark your current chamber.</div>');
     UI.pressEnter(function () { statusScreen(); });
   }
