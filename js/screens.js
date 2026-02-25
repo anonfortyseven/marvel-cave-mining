@@ -102,10 +102,10 @@
 
   function getRandomCrewCampQuote(state) {
     var pool = [
-      { role: 'ropeman', lines: ['That rope held today. It\'ll hold tomorrow.', 'Tie it right tonight, and we live to laugh about this in town.'] },
-      { role: 'lampkeeper', lines: ['I\'ll trim the wicks before dawn. We won\'t lose the light.', 'Oil\'s low, but I can make every drop count.'] },
-      { role: 'blastman', lines: ['Stone\'s stubborn, but it always cracks in the end.', 'Tomorrow I\'ll place the charge cleaner. Less waste, more ore.'] },
-      { role: 'cartdriver', lines: ['Donkeys are fed and calm. We\'ll haul fast at first light.', 'Tracks are muddy, but I can keep the loads moving.'] }
+      { role: 'ropeman', lines: ['Rope held today. Might hold tomorrow. Might not.', 'I check every knot twice. The dead ones didn\'t.'] },
+      { role: 'lampkeeper', lines: ['I\'ll trim the wicks. We ain\'t dyin in the dark. Not tonight.', 'Oil\'s thin but I can stretch it. Done worse with less.'] },
+      { role: 'blastman', lines: ['Limestone don\'t argue with black powder. Never has.', 'I dream of fuses sometimes. Wake up counting seconds.'] },
+      { role: 'cartdriver', lines: ['Donkeys is calm. They know the way better than we do now.', 'Hauled near a ton today. Shoulders say so even if the scale don\'t.'] }
     ];
     var pick = pool[Math.floor(Math.random() * pool.length)];
     var crew = getCrewByRole(state, pick.role);
@@ -128,7 +128,7 @@
     var art = (window.AsciiArt && window.AsciiArt.getTitleArt) ? window.AsciiArt.getTitleArt() : CAVE_ART;
     html += '<div class="title-art">' + art + '</div>\n';
     html += '<div class="title-name text-glow-strong">The Marvel Cave Mining Company</div>\n';
-    html += '<div class="subtitle">Stone County, Missouri &bull; 1884</div>\n';
+    html += '<div class="subtitle">Stone County, Missouri &mdash; Anno Domini 1884</div>\n';
     html += '<div style="margin-top:16px"></div>';
     UI.render(html);
     // CRT boot flicker effect
@@ -168,7 +168,7 @@
 
     var html = '<div class="text-lg text-glow">Choose Your Background</div>';
     html += '<hr class="separator-double">';
-    html += '<div class="text-dim" style="margin:6px 0">Your 30-day mining contract with the Marble Cave Mining Co. begins now.</div>';
+    html += '<div class="text-dim" style="margin:6px 0">T. Hodges Jones offers a 30-day contract. Guano at $700 the ton. You provide the men. The cave provides the rest.</div>';
 
     for (var i = 0; i < keys.length; i++) {
       var p = profs[keys[i]];
@@ -201,7 +201,7 @@
     var totalCount = crewCount + 1; // +1 for foreman
     var names = [];
     UI.render('<div class="text-lg text-glow">Name Your Mining Crew</div><hr class="separator-double">' +
-      '<div class="text-dim" style="margin:6px 0">Name your foreman and ' + crewCount + ' miner' + (crewCount !== 1 ? 's' : '') + '.</div>');
+      '<div class="text-dim" style="margin:6px 0">Every man goes into the dark with a name. Give yours theirs.</div>');
     askName(0);
 
     function askName(index) {
@@ -225,7 +225,7 @@
         state.foreman.name = names[0];
         for (var i = 0; i < state.crew.length; i++) if (names[i + 1]) state.crew[i].name = names[i + 1];
       }
-      UI.append('<div style="margin-top:10px" class="text-bright">Your crew is assembled!</div>');
+      UI.append('<div style="margin-top:10px" class="text-bright">Your crew stands assembled. God help them.</div>');
       UI.pressEnter(function () { UI.transition(seasonScreen); });
     }
   }
@@ -236,11 +236,11 @@
   function seasonScreen() {
     UI.hideBars();
     var html = '<div class="text-lg text-glow">Choose Starting Season</div><hr class="separator-double">';
-    html += '<div class="text-dim" style="margin:6px 0">Your 30-day contract begins on the 1st of the month.</div>';
-    html += '<div class="box" style="margin:6px 0"><div class="box-title">1. Spring</div><div class="text-dim">March. Spring rains swell the Lost River. Flash flooding risk is severe.</div></div>';
-    html += '<div class="box" style="margin:6px 0"><div class="box-title">2. Summer</div><div class="text-dim">June. The 40,000-strong bat colony is at peak activity. The ammonia is choking.</div></div>';
-    html += '<div class="box" style="margin:6px 0"><div class="box-title">3. Fall</div><div class="text-dim">September. Bats begin hibernation in the Mammoth Room. The cave grows quiet.</div></div>';
-    html += '<div class="box" style="margin:6px 0"><div class="box-title">4. Winter</div><div class="text-dim">December. Ice at the Devil\'s Den entrance. Inflation doubled. Hard mode.</div></div>';
+    html += '<div class="text-dim" style="margin:6px 0">Thirty days. Choose when you descend into the earth.</div>';
+    html += '<div class="box" style="margin:6px 0"><div class="box-title">1. Spring</div><div class="text-dim">March. The Ozarks thaw and the Lost River swells. Flash floods drown men in minutes down there.</div></div>';
+    html += '<div class="box" style="margin:6px 0"><div class="box-title">2. Summer</div><div class="text-dim">June. Forty thousand gray bats roost in the Mammoth Room. The ammonia will strip the lining from your throat.</div></div>';
+    html += '<div class="box" style="margin:6px 0"><div class="box-title">3. Fall</div><div class="text-dim">September. The bats settle into torpor. The cave goes still as a churchyard. Best season, if you believe in luck.</div></div>';
+    html += '<div class="box" style="margin:6px 0"><div class="box-title">4. Winter</div><div class="text-dim">December. Ice seals the Den. Prices double. Only the desperate or the foolish go underground in winter.</div></div>';
     UI.render(html);
     UI.promptChoice([
       { key: '1', label: 'Spring (March)', value: 'spring' },
@@ -531,9 +531,9 @@
     UI.hideBars();
     UI.render('<div class="text-lg text-glow">Set Work Pace</div><hr class="separator">');
     UI.promptChoice([
-      { key: '1', label: 'Careful - 0.5x output, health recovers', value: 'careful' },
-      { key: '2', label: 'Steady - 1x output, neutral', value: 'steady' },
-      { key: '3', label: 'Grueling - 1.5x output, health decays', value: 'grueling' }
+      { key: '1', label: 'Careful — Half output. Men heal.', value: 'careful' },
+      { key: '2', label: 'Steady — Full output. Honest work.', value: 'steady' },
+      { key: '3', label: 'Grueling — Half again output. Bodies break.', value: 'grueling' }
     ], function (v) {
       var s = gs();
       if (s) s.workPace = v;
@@ -546,9 +546,9 @@
     UI.hideBars();
     UI.render('<div class="text-lg text-glow">Set Rations</div><hr class="separator">');
     UI.promptChoice([
-      { key: '1', label: 'Full - ~12 lbs/day, health bonus', value: 'full' },
-      { key: '2', label: 'Half - ~6 lbs/day, slight penalty', value: 'half' },
-      { key: '3', label: 'Scraps - ~3 lbs/day, serious penalty', value: 'scraps' }
+      { key: '1', label: 'Full rations — Men eat proper. They work proper.', value: 'full' },
+      { key: '2', label: 'Half rations — Bellies grumble but nobody starves yet.', value: 'half' },
+      { key: '3', label: 'Scraps — Hardtack and prayer. They\'ll hate you for it.', value: 'scraps' }
     ], function (v) {
       var s = gs();
       if (s) s.rationLevel = v;
@@ -605,12 +605,12 @@
     });
 
     if (deeper.length === 0) {
-      UI.render('<div class="text-amber">No deeper passages from here.</div>');
+      UI.render('<div class="text-amber">The stone offers no passage deeper. This is as far as the earth opens.</div>');
       UI.pressEnter(function () { statusScreen(); });
       return;
     }
     if (state.rope < 20) {
-      UI.render('<div class="text-red">Not enough rope! Need 20+ ft to descend.</div>');
+      UI.render('<div class="text-red">Not enough rope. Twenty feet minimum or you\'re jumping blind.</div>');
       UI.pressEnter(function () { statusScreen(); });
       return;
     }
@@ -666,8 +666,8 @@
       state.currentZone = 'surface';
       if (window.Engine) window.Engine.advanceDay();
       UI.hideBars();
-      UI.render('<div class="text-bright">You emerge from the cave into daylight at Marmaros.</div>' +
-        '<div class="text-dim" style="margin-top:8px">Your crew spends a full day hauling ropes, tools, and guano sacks to the surface before camp can be struck.</div>');
+      UI.render('<div class="text-bright">Daylight hits you like a fist. You stand blinking in the Missouri sun.</div>' +
+        '<div class="text-dim" style="margin-top:8px">A full day spent hauling rope, tools, and reeking guano sacks up the ladder. Every man moves like he\'s aged ten years.</div>');
       UI.pressEnter(function () { statusScreen(); });
       return;
     }
@@ -690,13 +690,13 @@
       state.currentZone = 'surface';
       if (window.Engine) window.Engine.advanceDay();
       UI.hideBars();
-      UI.render('<div class="text-bright">You emerge at Marmaros.</div>' +
-        '<div class="text-dim" style="margin-top:8px">Your crew hauls gear up the final rope ladder and squints into daylight. The climb has cost a full day and every shoulder aches.</div>');
+      UI.render('<div class="text-bright">You crawl out of the Den and into the light at Marmaros.</div>' +
+        '<div class="text-dim" style="margin-top:8px">The last man up the rope ladder collapses in the grass. A full day gone to climbing. The sun feels foreign on your skin.</div>');
     } else {
       if (window.Engine) window.Engine.advanceDay();
       UI.hideBars();
-      UI.render('<div class="text-bright">You ascend to ' + (t ? t.name : 'the previous chamber') + '.</div>' +
-        '<div class="text-dim" style="margin-top:8px">Your crew hauls equipment hand-over-hand up wet limestone and fraying rope. A full day is spent climbing and securing the line.</div>');
+      UI.render('<div class="text-bright">You climb back to ' + (t ? t.name : 'the chamber above') + '.</div>' +
+        '<div class="text-dim" style="margin-top:8px">Hand over hand up slick limestone, the rope burning through calluses. A full day\'s labor just to gain what gravity gave away for free.</div>');
     }
     UI.pressEnter(function () { statusScreen(); });
   }
@@ -712,7 +712,7 @@
         var campfire = window.AsciiArt.getAnimation('campfire');
         if (campfire && campfire.frames && campfire.frames.length > 0) campfireFrame = campfire.frames[0];
       }
-      var campHtml = '<div class="text-lg text-glow">Night in Camp</div><hr class="separator">';
+      var campHtml = '<div class="text-lg text-glow">Camp in the Dark</div><hr class="separator">';
       if (campfireFrame) campHtml += '<pre class="title-art">' + UI.escapeHtml(campfireFrame) + '</pre>';
       campHtml += '<div class="text-dim" style="font-style:italic">' + UI.escapeHtml(getRandomCrewCampQuote(state)) + '</div>';
       UI.render(campHtml);
@@ -731,8 +731,8 @@
       var r = window.Engine.advanceDay();
       state.workPace = orig;
       var html = state.isUnderground
-        ? '<div class="text-bright">The crew rests underground for the day.</div>'
-        : '<div class="text-bright">Your crew rests for the day in Marmaros. Health recovers slightly.</div>';
+        ? '<div class="text-bright">The men lay down their picks and sleep where they fall. The cave breathes around them.</div>'
+        : '<div class="text-bright">A day of rest in Marmaros. Clean air, hot food, and the open sky above.</div>';
       if (r && r.messages.length > 0) {
         html += '<div class="text-dim" style="margin-top:6px">';
         for (var i = 0; i < r.messages.length; i++) html += UI.escapeHtml(r.messages[i]) + '<br>';
@@ -741,7 +741,7 @@
       UI.render(html);
     } else {
       state.workPace = orig;
-      UI.render('<div class="text-bright">Your crew rests for the day. Health improves.</div>');
+      UI.render('<div class="text-bright">The men rest. Wounds knit slow but they knit.</div>');
     }
     UI.pressEnter(function () { statusScreen(); });
   }
@@ -764,7 +764,7 @@
     };
     var zoneOrder = ['zone1', 'zone2', 'zone3', 'zone4', 'zone5'];
     var lines = [];
-    lines.push('CAVE MAP (Discovered chambers shown)');
+    lines.push('SURVEYOR\'S MAP — Marvel Cave, Stone County MO');
     lines.push('');
 
     for (var z = 0; z < zoneOrder.length; z++) {
@@ -984,7 +984,7 @@
   function gameOverScreen(reason) {
     UI.hideBars();
     UI.render('<div class="text-center" style="margin-top:30px">' +
-      '<div class="text-red text-lg">THE EXPEDITION HAS ENDED</div><hr class="separator">' +
+      '<div class="text-red text-lg">THE MOUNTAIN HAS CLAIMED ITS DUE</div><hr class="separator">' +
       '<div class="text-bright" style="margin:12px 0">' + UI.escapeHtml(reason || 'Your expedition is over.') + '</div></div>');
     UI.promptChoice([
       { key: '1', label: 'View final score', value: 'score' },
@@ -1009,28 +1009,31 @@
     var html = '';
     if (window.Images) html += Images.getImageHtml('victory');
     if (trophyArt) html += '<pre class="title-art">' + trophyArt + '</pre>';
-    html += '<div class="text-lg text-glow text-center" style="margin-top:10px">CONTRACT FULFILLED!</div><hr class="separator-double">';
-    html += '<div class="text-bright text-center" style="margin:12px 0">You shipped ' + (state ? state.guanoShipped.toFixed(1) : '?') + ' tons of guano.</div>';
-    html += '<hr class="separator"><div class="text-dim text-center">What will you do now?</div>';
+    html += '<div class="text-lg text-glow text-center" style="margin-top:10px">CONTRACT FULFILLED</div><hr class="separator-double">';
+    html += '<div class="text-bright text-center" style="margin:12px 0">' + (state ? state.guanoShipped.toFixed(1) : '?') + ' tons of bat guano hauled from the belly of the earth. T. Hodges Jones tips his hat.</div>';
+    html += '<hr class="separator"><div class="text-dim text-center">The contract is done. But the cave is still there. What now?</div>';
 
     UI.render(html);
     UI.promptChoice([
-      { key: '1', label: 'Sell everything and leave', value: 'sell' },
-      { key: '2', label: 'Turn the cave into a tourist attraction', value: 'tour' },
-      { key: '3', label: 'Search deeper for treasure', value: 'deep' }
+      { key: '1', label: 'Take the money and ride out', value: 'sell' },
+      { key: '2', label: 'Open the cave to paying visitors', value: 'tour' },
+      { key: '3', label: 'Go deeper. There\'s something down there.', value: 'deep' }
     ], function (v) {
       var h;
       if (v === 'tour') {
         h = '<div class="text-center text-glow" style="margin-top:20px"><div class="text-lg">The Visionary</div><br>' +
-          '<div class="text-dim">You saw what others could not. The cave was the treasure.<br><br>' +
-          'In 1889, William Lynch would begin giving tours.<br>In 1950, Silver Dollar City would rise.<br>' +
-          'You were ahead of your time.</div></div>';
+          '<div class="text-dim">You saw what others could not. The cave itself was the fortune.<br><br>' +
+          'In 1889, William Henry Lynch will buy this mountain for $10,000 and open its wonders to the world.<br>' +
+          'In 1950, the Herschend family will build Silver Dollar City above the Den.<br>' +
+          'You were thirty years early and not a day wrong.</div></div>';
       } else if (v === 'deep') {
-        h = '<div class="text-center text-glow" style="margin-top:20px"><div class="text-lg">The Gambler</div><br>' +
-          '<div class="text-dim">One more descent. One more haul.<br>The cave whispers of riches below...</div></div>';
+        h = '<div class="text-center text-glow" style="margin-top:20px"><div class="text-lg">The Seeker</div><br>' +
+          '<div class="text-dim">The Osage marked the trees for a reason. The Spanish left their ladders and never returned.<br>' +
+          'Below the Waterfall Room the river goes somewhere.<br>You mean to follow it.</div></div>';
       } else {
-        h = '<div class="text-center text-glow" style="margin-top:20px"><div class="text-lg">The Pragmatist</div><br>' +
-          '<div class="text-dim">You take your earnings, tip your hat,<br>and ride the stagecoach back to civilization.</div></div>';
+        h = '<div class="text-center text-glow" style="margin-top:20px"><div class="text-lg">The Survivor</div><br>' +
+          '<div class="text-dim">You settle accounts, pack your kit, and board the stage to Springfield.<br>' +
+          'Behind you Roark Mountain sits quiet under the stars, keeping its secrets.</div></div>';
       }
       UI.render(h);
       UI.pressEnter(scoringScreen);

@@ -1,5 +1,5 @@
 // game-state.js - Core game state management
-// The Marvel Cave Mining Company - 1884
+// The Marvel Cave Mining Company — Stone County, Missouri, 1884
 
 window.GameState = {
   defaults: {

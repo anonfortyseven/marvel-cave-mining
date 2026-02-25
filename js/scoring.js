@@ -93,19 +93,19 @@ window.Scoring = {
     }
     if (allCrewAlive && state.foreman.alive) {
       breakdown.multiplier *= this.MULTIPLIERS.ALL_CREW_ALIVE;
-      breakdown.multiplierReasons.push('All party members survived (x' + this.MULTIPLIERS.ALL_CREW_ALIVE + ')');
+      breakdown.multiplierReasons.push('Every soul came back alive (x' + this.MULTIPLIERS.ALL_CREW_ALIVE + ')');
     }
 
     // No deaths at all (including donkeys at full count)
     if (allCrewAlive && state.foreman.alive && state.donkeys.count >= 2) {
       breakdown.multiplier *= this.MULTIPLIERS.NO_DEATHS;
-      breakdown.multiplierReasons.push('No deaths at all (x' + this.MULTIPLIERS.NO_DEATHS + ')');
+      breakdown.multiplierReasons.push('Not a man nor beast lost to the mountain (x' + this.MULTIPLIERS.NO_DEATHS + ')');
     }
 
     // Early finish (before day 20 of 30)
     if (state.totalDays < 20 && state.guanoShipped >= state.contractTarget) {
       breakdown.multiplier *= this.MULTIPLIERS.EARLY_FINISH;
-      breakdown.multiplierReasons.push('Contract completed before Day 20 (x' + this.MULTIPLIERS.EARLY_FINISH + ')');
+      breakdown.multiplierReasons.push('Contract filled ahead of schedule (x' + this.MULTIPLIERS.EARLY_FINISH + ')');
     }
 
     // All discoveries (match GameState flags)
@@ -115,20 +115,20 @@ window.Scoring = {
       state.foundBlindCavefish && state.foundCivilWarCache;
     if (allDiscoveries) {
       breakdown.multiplier *= this.MULTIPLIERS.ALL_DISCOVERIES;
-      breakdown.multiplierReasons.push('All discoveries found (x' + this.MULTIPLIERS.ALL_DISCOVERIES + ')');
+      breakdown.multiplierReasons.push('Every secret the cave holds, laid bare (x' + this.MULTIPLIERS.ALL_DISCOVERIES + ')');
     }
 
     // Morale bonus
     var morale = state.morale !== undefined ? state.morale : 50;
     if (morale >= 70) {
       breakdown.subtotal += 100;
-      breakdown.multiplierReasons.push('High morale (+100 pts)');
+      breakdown.multiplierReasons.push('Crew in high spirits — men would follow you again (+100 pts)');
     }
 
     // Town visitor bonus
     if (window.Town && window.Town.visitedShops && window.Town.visitedShops.length >= 3) {
       breakdown.multiplier *= 1.1;
-      breakdown.multiplierReasons.push('Visited all shops (x1.1)');
+      breakdown.multiplierReasons.push('Patron of every shop in Marmaros (x1.1)');
     }
 
     // --- Final score ---
@@ -142,13 +142,13 @@ window.Scoring = {
 
   // Get score rank/title
   getRank: function(score) {
-    if (score >= 3000) return 'Master Spelunker';
-    if (score >= 2000) return 'Expert Miner';
-    if (score >= 1200) return 'Skilled Foreman';
-    if (score >= 700)  return 'Journeyman';
-    if (score >= 300)  return 'Greenhorn';
+    if (score >= 3000) return 'King of the Underground Mountain';
+    if (score >= 2000) return 'Master of the Devil\'s Den';
+    if (score >= 1200) return 'Veteran Foreman';
+    if (score >= 700)  return 'Ozark Spelunker';
+    if (score >= 300)  return 'Greenhorn with Grit';
     if (score >= 50)   return 'Tenderfoot';
-    return 'Failed Prospector';
+    return 'Cave Fodder';
   },
 
   // --- TOP TEN BOARD ---
@@ -211,7 +211,7 @@ window.Scoring = {
   // Format score breakdown for display
   formatBreakdown: function(breakdown) {
     var lines = [];
-    lines.push('=== FINAL SCORE ===');
+    lines.push('=== THE RECKONING ===');
     lines.push('');
     lines.push('Survivors:    ' + breakdown.survivors + ' pts');
     lines.push('Resources:    ' + breakdown.resources + ' pts');

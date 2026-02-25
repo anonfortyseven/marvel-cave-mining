@@ -27,7 +27,7 @@
       name: 'Food Rations',
       unit: 'pounds',
       price: 0.20,
-      description: 'Hardtack, jerky, beans & coffee',
+      description: 'Salt pork, hardtack, parched corn, and coffee black as perdition',
       recommended: { mine_foreman: 200, geologist: 150, farmer: 120, drifter: 80 },
       min: 0,
       max: 2000
@@ -38,7 +38,7 @@
       name: 'Lantern Oil',
       unit: 'gallons',
       price: 3.00,
-      description: 'Kerosene for carbide lanterns',
+      description: 'Whale oil for the lamps. Two days per gallon if you\'re careful. You won\'t be.',
       recommended: { mine_foreman: 10, geologist: 8, farmer: 6, drifter: 4 },
       min: 0,
       max: 100
@@ -49,7 +49,7 @@
       name: 'Rope',
       unit: 'feet',
       price: 0.10,
-      description: 'Hemp rope for descents and hauling',
+      description: 'Manila hemp, three-strand. The only thing between your men and the dark.',
       recommended: { mine_foreman: 300, geologist: 250, farmer: 200, drifter: 100 },
       min: 0,
       max: 1000
@@ -60,7 +60,7 @@
       name: 'Timber Supports',
       unit: 'boards',
       price: 0.50,
-      description: 'Pine boards for shoring tunnels',
+      description: 'Green pine, rough-cut. Holds the mountain off your skull if you brace it right.',
       recommended: { mine_foreman: 40, geologist: 30, farmer: 25, drifter: 15 },
       min: 0,
       max: 200
@@ -71,7 +71,7 @@
       name: 'Dynamite',
       unit: 'sticks',
       price: 2.00,
-      description: 'Nobel blasting sticks',
+      description: 'Nobel\'s patent. Sweats nitroglycerin in the heat. Handle accordingly.',
       recommended: { mine_foreman: 15, geologist: 12, farmer: 10, drifter: 5 },
       min: 0,
       max: 50
@@ -126,12 +126,12 @@
     if (window.Content && window.Content.getShopkeeperLine) {
       shopLine = window.Content.getShopkeeperLine();
     } else {
-      shopLine = '"Stock up well, friend. The cave don\'t forgive the unprepared."';
+      shopLine = '"Buy what you need. Leave what you don\'t. I ain\'t in the advice business."';
     }
 
     var html = '<pre class="title-art">' + STORE_ASCII + '</pre>\n';
     html += '<div class="text-bright text-center" style="margin:8px 0">';
-    html += 'Welcome to Marmaros Outfitters!</div>\n';
+    html += 'Marmaros Outfitters — Herschel Barnes, Prop.</div>\n';
     html += '<div class="text-dim text-center" style="margin-bottom:8px">';
     html += UI.escapeHtml(shopLine) + '</div>\n';
     html += '<div class="text-center">Cash available: <span class="text-yellow">';
@@ -175,7 +175,7 @@
     UI.promptNumber('How many ' + cat.unit + '? ', function (val) {
       if (val > maxAfford) {
         val = maxAfford;
-        UI.showNotification('Adjusted to ' + val + ' (max affordable)', 1500);
+        UI.showNotification('Your purse says ' + val + '. No credit.', 1500);
       }
       if (val > cat.max) val = cat.max;
       cart[cat.key] = val;
@@ -215,12 +215,12 @@
 
     UI.render(html);
     UI.promptChoice([
-      { key: '1', label: 'Accept and head to the cave', value: 'accept' },
-      { key: '2', label: 'Change purchases', value: 'redo' },
+      { key: '1', label: 'Load the mules and ride for the Den', value: 'accept' },
+      { key: '2', label: 'Reconsider your provisions', value: 'redo' },
     ], function (val) {
       if (val === 'accept') {
         applyPurchases();
-        UI.showNotification('Supplies loaded!', 1200);
+        UI.showNotification('Barnes nods. "Don\'t come back short."', 1200);
         setTimeout(function () {
           if (onCompleteCallback) onCompleteCallback();
         }, 1300);

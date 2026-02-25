@@ -207,14 +207,14 @@ window.Engine = {
     // Foreman dead
     if (!state.foreman.alive) {
       state.gameOver = true;
-      state.gameOverReason = 'The foreman has died. The operation is over.';
+      state.gameOverReason = 'The foreman is dead. Without him the crew scatters like quail.';
       return true;
     }
 
     // All crew dead
     if (window.GameState.getLivingCrewCount() === 0) {
       state.gameOver = true;
-      state.gameOverReason = 'All crew members have perished. The operation cannot continue.';
+      state.gameOverReason = 'Every last man is dead. The cave keeps what it takes.';
       return true;
     }
 
@@ -222,14 +222,14 @@ window.Engine = {
     var duration = state.gameDuration || 30;
     if (state.totalDays >= duration) {
       state.gameOver = true;
-      state.gameOverReason = 'Your ' + duration + '-day mining contract has expired. Time to settle accounts.';
+      state.gameOverReason = 'Thirty days gone. The contract is dust. Time to reckon what you\'ve earned and what you\'ve lost.';
       return true;
     }
 
     // Broke and starving with no pending payments
     if (state.cash <= 0 && state.food <= 0 && state.pendingPayments.length === 0 && state.guanoStockpile <= 0) {
       state.gameOver = true;
-      state.gameOverReason = 'No food, no money, no prospects. The operation has failed.';
+      state.gameOverReason = 'No food. No coin. No guano to sell. The mountain has beaten you hollow.';
       return true;
     }
 
@@ -338,10 +338,10 @@ window.Engine = {
 
     // Mutiny warning
     if (state.morale < 20 && old >= 20) {
-      results.messages.push('The crew grumbles about conditions. Morale is dangerously low!');
+      results.messages.push('The men speak in low voices. They\'re weighing whether you\'re worth following.');
     }
     if (state.morale <= 10) {
-      results.messages.push('The crew threatens mutiny! Rest or improve conditions soon.');
+      results.messages.push('Mutiny hangs in the air thick as guano dust. Do something or lose them.');
     }
   },
 

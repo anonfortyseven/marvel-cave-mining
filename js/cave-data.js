@@ -14,42 +14,42 @@
       id: 'surface',
       name: 'Surface - Marmaros',
       depthRange: [0, 0],
-      description: 'The mining settlement of Marmaros, perched on Roark Mountain above the Devil\'s Den.',
+      description: 'Twenty-eight souls scratching out a living on Roark Mountain. Below them, the earth is hollow.',
       ambient: 'daylight'
     },
     zone1: {
       id: 'zone1',
       name: 'Cathedral Room',
       depthRange: [0, 230],
-      description: 'A colossal bell-shaped chamber, the largest cave entrance room in the United States. 204 feet high, 225 feet wide, 411 feet long.',
+      description: 'A cathedral of stone larger than anything man ever built. Two hundred four feet from floor to dome. The darkness here has weight.',
       ambient: 'dim'
     },
     zone2: {
       id: 'zone2',
       name: 'Upper Passages',
       depthRange: [230, 350],
-      description: 'Winding passages carved by ancient pressurized water, narrowing as they descend through Mississippian limestone strata.',
+      description: 'Serpentine corridors bored through Mississippian limestone by waters older than memory. The walls narrow as you go.',
       ambient: 'dark'
     },
     zone3: {
       id: 'zone3',
       name: 'Middle Depths',
       depthRange: [350, 420],
-      description: 'Deep chambers where the constant temperature holds at 58 degrees. The air grows thick with ammonia from centuries of bat guano.',
+      description: 'Fifty-eight degrees year-round, winter or summer. The ammonia hangs so thick your eyes water before your lamp does.',
       ambient: 'pitch_black'
     },
     zone4: {
       id: 'zone4',
       name: 'Deep Chambers',
       depthRange: [420, 500],
-      description: 'Enormous caverns rich with guano deposits. Home to the 40,000-strong gray bat colony.',
+      description: 'Vast halls crusted with centuries of guano. Forty thousand gray bats roost in the dark overhead like a living ceiling.',
       ambient: 'pitch_black'
     },
     zone5: {
       id: 'zone5',
       name: 'The Abyss',
       depthRange: [500, 505],
-      description: 'The deepest reaches, 505 feet below the surface. The Lost River\'s waterfall roars in the darkness.',
+      description: 'Five hundred five feet down. The Lost River thunders in the blackness. This is as deep as any man has gone and come back.',
       ambient: 'pitch_black'
     }
   };
@@ -66,8 +66,8 @@
       guanoYield: 'none',
       primaryHazard: null,
       hazardModifiers: {},
-      description: 'A rough frontier settlement of 28 souls perched on Roark Mountain above Marvel Cave.',
-      historicalFeature: 'Founded in 1884 by T. Hodges Jones and the Marble Cave Mining and Manufacturing Company. The town boasts a hotel, general store, school, pottery shop, and furniture factory. Named "Marmaros" -- Greek for marble -- after the 1869 expedition\'s mistaken identification of the cave ceiling as pure marble.',
+      description: 'Mud streets, pine-board buildings, and the stink of guano drying in the sun. Twenty-eight people call this home. Most won\'t stay.',
+      historicalFeature: 'T. Hodges Jones planted this settlement in 1884 atop the very mountain he meant to hollow out. Hotel, store, school, pottery works — a town built on bat shit and optimism. They named it Marmaros, Greek for marble, on account of a geologist\'s mistake fifteen years prior. The marble was limestone. The money was real.',
       connectedTo: ['cathedral_entrance'],
       isOptional: false,
       canMine: false,
@@ -85,8 +85,8 @@
       guanoYield: 'none',
       primaryHazard: 'fall',
       hazardModifiers: { fall: 0.05 },
-      description: 'A gaping 94-foot sinkhole plunges into the largest cave entrance room in America.',
-      historicalFeature: 'The Osage people called this entrance "Devil\'s Den" and marked surrounding trees with a sideways V as warning. Legend tells of a young brave who fell to his death here while chasing a bear. In 1541, Spanish conquistadors descended seeking gold and the Fountain of Youth, leaving behind notched pine ladders found three centuries later.',
+      description: 'Ninety-four feet of nothing between the lip and the dark. Wind moans up from below like something breathing.',
+      historicalFeature: 'The Osage carved warning marks into the oaks — a sideways V meaning do not enter. They say a young brave chased a bear over the edge and the earth swallowed them both. In 1541 the Spanish came looking for gold and eternal youth. They found neither but left their pine ladders three hundred feet down, where they rotted for three centuries undisturbed.',
       connectedTo: ['marmaros', 'the_sentinel'],
       isOptional: false,
       canMine: false,
@@ -103,8 +103,8 @@
       guanoYield: 'low',
       primaryHazard: 'rockfall',
       hazardModifiers: { rockfall: 0.03 },
-      description: 'A towering limestone column stands guard at the heart of the Cathedral Room, 230 feet below the surface.',
-      historicalFeature: 'This massive column formed when a stalactite and stalagmite fused together over millennia. Positioned directly before the narrow crevice leading to the Spring Room, guides playfully claimed The Sentinel was the sole structural pillar preventing the Cathedral Room\'s 204-foot dome from catastrophic collapse.',
+      description: 'A limestone pillar thick as a granary silo, standing alone in the void like it was put there on purpose. Maybe it was.',
+      historicalFeature: 'Stalactite met stalagmite and fused across millennia into this single column. It guards the crevice to the Spring Room. Tour guides will later joke that if the Sentinel falls, the entire Cathedral dome comes down — two hundred four feet of mountain crashing into the void. Nobody laughs very hard.',
       connectedTo: ['cathedral_entrance', 'cathedral_floor'],
       isOptional: false,
       canMine: true,
@@ -121,8 +121,8 @@
       guanoYield: 'medium',
       primaryHazard: 'bat_swarm',
       hazardModifiers: { bat_swarm: 0.10, bad_air: 0.05 },
-      description: 'The vast floor of the Cathedral Room, atop the 124-foot debris pile called the Underground Mountain.',
-      historicalFeature: 'The Cathedral Room could contain the entire Statue of Liberty with room to spare. In 1963, aeronaut Don Piccard set an underground altitude record by flying a hot air balloon inside this chamber. The 124-foot conical debris pile formed over thousands of years as soil, rock, and animals fell through the sinkhole. The Liberty Bell -- a 55-foot hollow stalagmite with a crack mimicking the real bell -- stands nearby.',
+      description: 'The Underground Mountain — a cone of debris a hundred and twenty-four feet high, built from everything that ever fell through the Den. Bones included.',
+      historicalFeature: 'Millennia of soil, stone, and unlucky animals tumbled through the sinkhole to build this hill inside a hill. The Cathedral Room could swallow the Statue of Liberty whole. Nearby stands the Liberty Bell — a fifty-five-foot hollow stalagmite split by a crack that mirrors the real one in Philadelphia. Whether God has a sense of humor or the earth does, the effect is the same.',
       connectedTo: ['the_sentinel', 'serpentine_passage'],
       isOptional: false,
       canMine: true,
@@ -140,8 +140,8 @@
       guanoYield: 'low',
       primaryHazard: 'cave_in',
       hazardModifiers: { cave_in: 0.08, stuck: 0.10 },
-      description: 'A meandering, snake-like tunnel with deeply scalloped walls, carved by ancient pressurized water.',
-      historicalFeature: 'The Serpentine Passage connects the Cathedral Room to the Egyptian Room. Its winding architecture preserves a fossilized record of the cave\'s ancient hydrology -- the deeply undercut limestone banks reveal the erosive power of water that bored through the bedrock millions of years ago.',
+      description: 'The passage twists like a wounded snake. Scalloped walls worn smooth by water that hasn\'t flowed here in a million years.',
+      historicalFeature: 'Every curve in this tunnel is a fossil of the river that carved it — pressurized water boring through bedrock when this limestone sat at the bottom of a shallow sea. The undercut banks tell the story plain as writing if you know how to read stone. Most men don\'t. They just squeeze through and try not to think about the weight above.',
       connectedTo: ['cathedral_floor', 'egyptian_room', 'gulf_of_doom'],
       isOptional: false,
       canMine: true,
@@ -158,8 +158,8 @@
       guanoYield: 'medium',
       primaryHazard: 'bad_air',
       hazardModifiers: { bad_air: 0.12, bat_swarm: 0.06 },
-      description: 'A chamber with an extraordinarily flat, polished ceiling shaped like the sole of a giant inverted shoe.',
-      historicalFeature: 'Named by Miriam and Genevieve Lynch for their fascination with Egyptology, this room is more accurately called the Shoe Room. Tour guides point out formations called King Tutankhamen\'s Sarcophagus, the Sphinx\'s Nose, and Cleopatra\'s Sandal. The polished limestone ceiling was mistaken for pure marble by the 1869 Henry T. Blow expedition, giving rise to the "Marble Cave" misnomer that defined the cave\'s entire industrial era.',
+      description: 'Flat ceiling polished to a mirror sheen. Hold your lamp up and it looks like marble. It ain\'t. That mistake cost men their fortunes.',
+      historicalFeature: 'The Lynch daughters — Miriam and Genevieve, half-mad with Egyptology — named every bump and shadow in here. King Tut\'s Sarcophagus. The Sphinx\'s Nose. Cleopatra\'s Sandal. Pretty names for limestone. It was this very ceiling that Henry T. Blow\'s men mistook for pure marble in \'69, christening the whole system Marble Cave and launching an industry built on a geologist\'s error.',
       connectedTo: ['serpentine_passage', 'fat_mans_misery'],
       isOptional: false,
       canMine: true,
@@ -176,8 +176,8 @@
       guanoYield: 'very_high',
       primaryHazard: 'fall',
       hazardModifiers: { fall: 0.20, cave_in: 0.10, bad_air: 0.08 },
-      description: 'A yawning 100-foot vertical shaft beneath the heel of the Shoe Room. The richest guano deposits crust the ledges.',
-      historicalFeature: 'Early explorers believed this pit was literally bottomless -- rocks hurled into the abyss produced no sound upon impact. The scientific explanation: the floor lies buried beneath a thick, viscous mixture of soft cavern clay and nitrogen-dense bat guano that absorbs all kinetic energy. At least three miners vanished into this void during the 1880s. Their lanterns were found, but the men were not.',
+      description: 'A hundred feet of vertical nothing. Drop a rock and you won\'t hear it land. The guano on these ledges is worth dying for. Some did.',
+      historicalFeature: 'They called it bottomless because thrown stones made no sound. The truth is worse — the floor is a soup of clay and ancient guano so thick it swallows everything without a trace. Three miners went into the Gulf in the \'80s. Their lamps were found on the ledges. The men were not. The Osage had a name for this place too but nobody alive remembers it.',
       connectedTo: ['serpentine_passage'],
       isOptional: true,
       canMine: true,
@@ -194,8 +194,8 @@
       guanoYield: 'low',
       primaryHazard: 'stuck',
       hazardModifiers: { stuck: 0.15, cave_in: 0.05 },
-      description: 'The passage constricts to 4 feet 7 inches high and extends 7 feet. You must turn sideways and exhale to squeeze through.',
-      historicalFeature: 'Also known as Tall Man\'s Headache, this is the absolute narrowest bottleneck in the cave system. One tale tells of a 300-pound man who became wedged so tightly that his companions had to grease him with lard and haul him free with ropes. The passage requires significant physical stooping and maneuvering.',
+      description: 'Four feet seven inches of clearance. Seven feet long. You turn sideways, exhale everything, and pray your shoulders clear.',
+      historicalFeature: 'The tightest throat in the whole system. A three-hundred-pound man from Springfield got stuck here so tight they greased him with lard and hauled on his ankles with rope. He came free minus most of his shirt and all of his dignity. The guides call it Tall Man\'s Headache when ladies are present.',
       connectedTo: ['egyptian_room', 'the_dungeon'],
       isOptional: false,
       canMine: false,
@@ -213,8 +213,8 @@
       guanoYield: 'medium',
       primaryHazard: 'bad_air',
       hazardModifiers: { bad_air: 0.15, flooding: 0.05, cave_in: 0.06 },
-      description: 'A narrow, oppressive passage where heavy iron oxide leaches through the limestone, staining the walls blood-red.',
-      historicalFeature: 'The intense rust-colored streaks of iron oxide running down the rock walls appear remarkably like dried blood. During the early 20th century, theatrical cave guides exploited this mineral staining to spin sensationalized tales, falsely claiming the passage was a torture chamber used by Spanish conquistadors.',
+      description: 'Iron oxide bleeds through the limestone in dark red streaks. The walls look like something was butchered here. The smell doesn\'t help.',
+      historicalFeature: 'Rust-colored mineral stains run down the rock like dried blood — vivid enough that later guides will spin tales of Spanish torture chambers and Osage sacrifice. It\'s just iron leaching through the stone. But in the lamplight, alone, with the ammonia burning your eyes, knowing the geology doesn\'t make it any less unnerving.',
       connectedTo: ['fat_mans_misery', 'spring_room'],
       isOptional: false,
       canMine: true,
@@ -231,8 +231,8 @@
       guanoYield: 'none',
       primaryHazard: null,
       hazardModifiers: { flooding: 0.03 },
-      description: 'A hidden chamber coated in brilliant orange calcite, with concealed waterfalls cascading over terraced stone.',
-      historicalFeature: 'Concealed behind The Sentinel through an easily overlooked crevice, this chamber\'s walls blaze with vibrant orange calcite. Several hidden subterranean waterfalls cascade continuously, creating an auditory illusion that mimics heavy rainfall. This concealed beauty and the ethereal glow of the orange stone directly fueled 16th-century folklore that Marvel Cave housed the mythical Fountain of Youth.',
+      description: 'Orange calcite blazes on every surface. Hidden waterfalls murmur behind the stone. It sounds like rain in a place that has never seen the sky.',
+      historicalFeature: 'Tucked behind the Sentinel through a crevice most men walk past without seeing. The orange calcite catches lamplight and throws it back warm as sunset. The cascading water sounds like a summer storm. Small wonder the conquistadors believed they\'d found the Fountain of Youth — this room feels like it belongs to a different world than the one above.',
       connectedTo: ['the_dungeon', 'blondies_throne'],
       isOptional: false,
       canMine: false,
@@ -249,8 +249,8 @@
       guanoYield: 'high',
       primaryHazard: 'bat_swarm',
       hazardModifiers: { bat_swarm: 0.15, bad_air: 0.10 },
-      description: 'A massive, tiered flowstone formation rises like a throne from the cavern floor. Thick guano deposits surround it.',
-      historicalFeature: 'Named after young Charles "Blondie" Smallwood, who became separated from his tour group in the early 20th century. After a frantic search, cave guides discovered the blonde-haired boy fast asleep, nestled safely within the undulating tiers of the flowstone. The formation earned its permanent name that day.',
+      description: 'A throne of flowstone rising in pale tiers from the guano-crusted floor. Something about its shape makes men lower their voices.',
+      historicalFeature: 'Named for young Charles "Blondie" Smallwood, a tow-headed boy who wandered from his tour group and was found hours later, fast asleep in the flowstone\'s lap like a child in a chair. The guides named the formation on the spot. The Osage left offerings here — small stones arranged in patterns that don\'t occur in nature. Whether Blondie\'s throne or something older, the place has a pull to it.',
       connectedTo: ['spring_room', 'cloud_room'],
       isOptional: false,
       canMine: true,
@@ -268,8 +268,8 @@
       guanoYield: 'very_high',
       primaryHazard: 'bad_air',
       hazardModifiers: { bad_air: 0.18, bat_swarm: 0.12, cave_in: 0.06 },
-      description: 'The ceiling transitions from smooth limestone to heavily porous dolomite, its undulating surface resembling dense storm clouds.',
-      historicalFeature: 'Unlike the polished Mississippian limestone observed in adjacent chambers, the ceiling here transitions abruptly into highly porous dolomite. The heavily textured, pocketed surface closely resembles a dense, rolling canopy of low-hanging storm clouds. The richest guano accumulations in the upper cave system cake the floor.',
+      description: 'The ceiling goes from smooth stone to pitted dolomite — pocked and rolling like thunderheads frozen in rock. Guano cakes the floor inches thick.',
+      historicalFeature: 'The geology shifts here without warning. Polished limestone gives way to dolomite so porous it looks like petrified storm clouds pressing down on you. The floor holds the richest guano deposits in the upper system — centuries of accumulation from the colony above. Miners call this the money room. Work fast. The air is poison.',
       connectedTo: ['blondies_throne', 'mammoth_room', 'lost_river'],
       isOptional: false,
       canMine: true,
@@ -286,8 +286,8 @@
       guanoYield: 'high',
       primaryHazard: 'bat_swarm',
       hazardModifiers: { bat_swarm: 0.25, bad_air: 0.15, disease: 0.10 },
-      description: 'An enormous unlit chamber alive with the shrieking of tens of thousands of gray bats.',
-      historicalFeature: 'Left entirely un-modernized and devoid of permanent electric lighting, the Mammoth Room serves as the primary hibernaculum for the cave\'s 40,000-strong bat colony -- historically over 80,000. It was here in 1869 that the Blow expedition discovered the decaying "Spanish ladders" -- notched pine tree trunks left by 1541 conquistadors. The federally endangered gray bat (Myotis grisescens) roosts on these walls. Every dusk, the bats pour from the sinkhole in a tornadic vortex, consuming 24 million insects nightly.',
+      description: 'The shrieking hits you before the smell does. Forty thousand gray bats hang from the ceiling like a living carpet. Their eyes catch the lamplight in pairs.',
+      historicalFeature: 'No lamp has ever been permanently mounted here and none ever will. This is the bats\' cathedral. Eighty thousand once roosted on these walls — forty thousand remain, each one eating its weight in insects every night, pouring from the Den at dusk in a vortex visible for miles. It was here Blow\'s men found the Spanish ladders in \'69 — notched pine trunks three centuries old, left by conquistadors who climbed down and, by all evidence, climbed back up in a hurry.',
       connectedTo: ['cloud_room', 'waterfall_room'],
       isOptional: false,
       canMine: true,
@@ -305,8 +305,8 @@
       guanoYield: 'medium',
       primaryHazard: 'flooding',
       hazardModifiers: { flooding: 0.20, fall: 0.08 },
-      description: 'A dark subterranean river surfaces briefly from the bedrock before plunging back into the stone.',
-      historicalFeature: 'This underground river appears from nowhere, flows briefly through the open chamber, and vanishes back into the rock matrix. Its source and ultimate destination remain unmapped. During intense surface rainfall, the massive influx of water percolating through the karst system causes the river to rapidly and violently swell, filling passages in minutes.',
+      description: 'Black water surfaces from the bedrock, flows thirty feet through open air, and plunges back into the stone. Where it comes from or goes, no man knows.',
+      historicalFeature: 'The Lost River appears and vanishes like something that doesn\'t want to be followed. Its source is unmapped. Its destination is unmapped. When rain falls heavy on Roark Mountain the karst funnels it down and the river swells from a trickle to a torrent in minutes, filling passages to the ceiling. Men who\'ve seen it say the water rises faster than a man can run.',
       connectedTo: ['cloud_room', 'lake_genevieve'],
       isOptional: true,
       canMine: true,
@@ -323,8 +323,8 @@
       guanoYield: 'low',
       primaryHazard: 'flooding',
       hazardModifiers: { flooding: 0.15, hypothermia: 0.10 },
-      description: 'A perfectly still underground lake, 34 feet deep, reflects your lantern like a dark mirror. The water is 56 degrees year-round.',
-      historicalFeature: 'Named by William Henry Lynch after his daughter. Sub-aquatic surveys have mapped submerged passages plunging to 110 feet below the water\'s surface, though many lateral phreatic tunnels remain entirely unexplored due to severe silt-out conditions. Coins and artifacts dropped by early tourists still glint on visible ledges below the surface.',
+      description: 'Still as black glass. Thirty-four feet deep and fifty-six degrees cold. Your lamp reflects off the surface and you can\'t tell which way is up.',
+      historicalFeature: 'Lynch named it for his eldest daughter. Divers will later map submerged passages plunging a hundred and ten feet below the waterline, with lateral tunnels branching into silt-choked darkness no one has entered. Coins and trinkets from early visitors glint on ledges below the surface like offerings to something patient.',
       connectedTo: ['lost_river', 'lake_miriam'],
       isOptional: true,
       canMine: false,
@@ -341,8 +341,8 @@
       guanoYield: 'medium',
       primaryHazard: 'flooding',
       hazardModifiers: { flooding: 0.18, hypothermia: 0.12, lost: 0.10 },
-      description: 'A second, deeper lake connected by a low, half-submerged passage requiring chest-deep wading.',
-      historicalFeature: 'The more remote of Marvel Cave\'s two underground lakes, named after Lynch\'s second daughter. The passage to reach it requires wading through chest-deep 56-degree water. The chamber beyond is utterly silent except for the slow drip of water from the ceiling. Few miners ever ventured this far.',
+      description: 'Chest-deep in fifty-six-degree water through a passage barely four feet high. Beyond it, silence so complete you can hear your own blood.',
+      historicalFeature: 'Named for Lynch\'s younger daughter. Few miners had cause to come this far and fewer still had the nerve. The chamber is silent but for the metronomic drip of water from the ceiling — each drop striking the lake with a sound like a clock ticking in an empty house. The Osage spoke of a place beneath the earth where the living could hear the dead. This feels like it.',
       connectedTo: ['lake_genevieve'],
       isOptional: true,
       canMine: true,
@@ -360,8 +360,8 @@
       guanoYield: 'very_high',
       primaryHazard: 'flooding',
       hazardModifiers: { flooding: 0.22, fall: 0.12, cave_in: 0.08, bad_air: 0.10, hypothermia: 0.08 },
-      description: 'At 505 feet below the surface, a roaring 50-foot waterfall plunges into the deepest accessible chamber.',
-      historicalFeature: 'The absolute lowest accessible point of Marvel Cave. The chamber is dominated by a cascading 50-foot waterfall fed entirely by the subterranean Lost River. During heavy surface rainfall, the influx of water frequently exceeds drainage capacity, causing this room to flood completely to its ceiling. Only the bravest or most desperate miners worked here, and the guano they hauled out was worth its weight in gold.',
+      description: 'Five hundred and five feet down. A fifty-foot waterfall roars out of the dark and vanishes into a pool that has no visible bottom. This is the end of the known world.',
+      historicalFeature: 'The deepest point any man has reached and returned from. The Lost River completes its journey here in a fifty-foot cascade that fills the chamber with mist and thunder. When the rains come heavy the water rises to the ceiling and this room becomes a tomb. The guano here is the richest in the system — worth a fortune to any man willing to work in a place the earth clearly never intended him to be. Beyond the falls, the river goes somewhere. Nobody has followed it. Yet.',
       connectedTo: ['mammoth_room'],
       isOptional: false,
       canMine: true,
@@ -502,25 +502,25 @@
       floodingMod: 1.5,
       batActivity: 1.2,
       temperature: 'cool',
-      description: 'Spring rains swell the Lost River. Flash flooding risk is severe.'
+      description: 'The Ozarks thaw and every creek feeds the Lost River. The deep chambers flood without warning.'
     },
     summer: {
       floodingMod: 0.8,
       batActivity: 1.5,
       temperature: 'warm',
-      description: 'The 40,000-strong bat colony is at peak activity. The ammonia is choking.'
+      description: 'Forty thousand bats at peak frenzy. The ammonia could strip paint. Bring a mask or lose your lungs.'
     },
     fall: {
       floodingMod: 0.6,
       batActivity: 0.8,
       temperature: 'cool',
-      description: 'Bats begin hibernation in the Mammoth Room. The cave grows quiet.'
+      description: 'The colony settles into torpor. The cave goes quiet as a graveyard. Best working season there is.'
     },
     winter: {
       floodingMod: 0.4,
       batActivity: 0.3,
       temperature: 'cold',
-      description: 'Ice forms at the Devil\'s Den entrance. Deep inside, the temperature holds steady at 58 degrees.'
+      description: 'Ice seals the Den. Prices double in Marmaros. Inside the cave it\'s fifty-eight degrees same as always, but getting there might kill you.'
     }
   };
 
@@ -532,7 +532,7 @@
       unit: 'gallon',
       basePrice: 1.50,
       weight: 8,
-      description: 'Whale oil for your carbide lanterns. You burn through a gallon every two days underground.'
+      description: 'Whale oil. Burns clean if the wick is trimmed. A gallon lasts two days underground, less if the men get nervous and turn them up.'
     },
     candles: {
       id: 'candles',
@@ -540,7 +540,7 @@
       unit: 'box of 12',
       basePrice: 0.40,
       weight: 2,
-      description: 'Backup light source. Also serves as a crude air quality test -- if the flame dims, get out.'
+      description: 'Tallow and wick. When the flame turns blue, the air is killing you. When it goes out, you\'re already dead.'
     },
     rope: {
       id: 'rope',
@@ -548,7 +548,7 @@
       unit: '50-foot coil',
       basePrice: 2.00,
       weight: 15,
-      description: 'Essential for descending steep passages and hauling guano bags.'
+      description: 'Manila hemp. Fifty feet per coil. Essential for every descent, every haul, every life saved or lost.'
     },
     timber: {
       id: 'timber',
@@ -556,7 +556,7 @@
       unit: 'bundle',
       basePrice: 3.00,
       weight: 40,
-      description: 'Used to brace tunnel ceilings and prevent cave-ins. Heavy but life-saving.'
+      description: 'Green pine, rough-cut. Brace it under a ceiling and it holds the mountain up. For a while.'
     },
     food: {
       id: 'food',
@@ -564,7 +564,7 @@
       unit: 'week supply',
       basePrice: 2.50,
       weight: 20,
-      description: 'Salt pork, hardtack, dried beans, and coffee. A miner works hard and eats harder.'
+      description: 'Salt pork, hardtack, parched corn, and coffee. A working man eats three pounds a day or he stops being a working man.'
     },
     water: {
       id: 'water',
@@ -572,7 +572,7 @@
       unit: 'barrel',
       basePrice: 0.50,
       weight: 60,
-      description: 'Purified water from Roark Creek. The cave spring can supplement, but you cannot rely on it alone.'
+      description: 'Roark Creek water, boiled and barreled. The cave springs run cold and clean but they run when they please, not when you\'re thirsty.'
     },
     blasting_powder: {
       id: 'blasting_powder',
@@ -580,7 +580,7 @@
       unit: 'keg',
       basePrice: 8.00,
       weight: 25,
-      description: 'Black powder for opening new passages. Handle with extreme care.'
+      description: 'Black powder in a twenty-five-pound keg. One spark in the wrong place and they\'ll bury what\'s left of you in a tobacco tin.'
     },
     pickaxes: {
       id: 'pickaxes',
@@ -588,7 +588,7 @@
       unit: 'each',
       basePrice: 3.50,
       weight: 10,
-      description: 'A miner\'s primary tool. They dull quickly against the Ozark limestone.'
+      description: 'Forged iron head, hickory handle. Dulls fast on Ozark limestone. Sharpen it nightly or you\'re swinging a club.'
     },
     shovels: {
       id: 'shovels',
@@ -596,7 +596,7 @@
       unit: 'each',
       basePrice: 2.00,
       weight: 8,
-      description: 'For scooping guano into sacks. The work is as unpleasant as it sounds.'
+      description: 'Square-point, ash handle. You\'ll be shoveling bat droppings twelve hours a day. Don\'t think about it.'
     },
     guano_sacks: {
       id: 'guano_sacks',
@@ -604,7 +604,7 @@
       unit: 'bundle of 10',
       basePrice: 1.00,
       weight: 3,
-      description: 'Burlap sacks reinforced with wax to hold bat guano. Each sack holds about 50 pounds.'
+      description: 'Waxed burlap, double-stitched. Fifty pounds per sack. The wax keeps the nitrogen in and the stink mostly out.'
     },
     medicine: {
       id: 'medicine',
@@ -612,7 +612,7 @@
       unit: 'kit',
       basePrice: 5.00,
       weight: 5,
-      description: 'Laudanum, quinine, bandages, and a bone saw. Frontier medicine at its finest.'
+      description: 'Laudanum, quinine, linen bandages, and a bone saw. The laudanum does most of the doctorin\'.'
     },
     respirator: {
       id: 'respirator',
@@ -620,7 +620,7 @@
       unit: 'each',
       basePrice: 1.00,
       weight: 0.5,
-      description: 'A simple cloth mask to filter ammonia fumes. Better than nothing, but not by much.'
+      description: 'Muslin soaked in vinegar. Cuts the ammonia enough to keep you conscious. Barely.'
     }
   };
 
@@ -636,7 +636,7 @@
       tradeBonus: 0.10,
       healthBonus: 0,
       scoreMultiplier: 1.0,
-      description: 'Hired by T. Hodges Jones himself. Experienced in Missouri lead mining.'
+      description: 'Hired by Jones himself out of the Joplin lead fields. You know mines. You know men. You know what the dark does to both.'
     },
     geologist: {
       id: 'geologist',
@@ -648,7 +648,7 @@
       tradeBonus: 0,
       healthBonus: 0,
       scoreMultiplier: 1.25,
-      description: 'Sent by Barton County investors to assess the guano deposits.'
+      description: 'Sent by Barton County money men to assay the deposits. You read stone like scripture but the men don\'t trust a man who\'d rather study a rock than dig it.'
     },
     farmer: {
       id: 'farmer',
@@ -660,7 +660,7 @@
       tradeBonus: 0,
       healthBonus: 0.10,
       scoreMultiplier: 1.5,
-      description: 'Heard guano sells at $700 a ton and left the homestead.'
+      description: 'The corn failed. The hogs died. Then you heard bat shit sells for $700 a ton and you sold the mule to buy a pick.'
     },
     drifter: {
       id: 'drifter',
@@ -672,7 +672,7 @@
       tradeBonus: 0,
       healthBonus: 0,
       scoreMultiplier: 2.0,
-      description: 'Drifted in from the territories. Nothing to lose.'
+      description: 'No history. No references. No money. You walked into Marmaros with thirty dollars and a willingness to go where other men won\'t.'
     }
   };
 
