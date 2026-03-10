@@ -2,8 +2,8 @@
  * taffy-game.js - Taffy Pulling Mini-Game
  * The Marvel Cave Mining Company
  *
- * Canvas-based Simon Says pattern-matching mini-game at Penny's
- * Sweet Shop. Watch the coloured sequence, then repeat it.
+ * Canvas-based Simon Says pattern-matching mini-game at June Ward's
+ * sweets counter. Watch the coloured sequence, then repeat it.
  */
 (function () {
   'use strict';
@@ -23,7 +23,7 @@
     green:  '#5cb85c',
     red:    '#c0392b',
     yellow: '#f0d060',
-    blue:   '#4a90d9',
+    blue:   '#8f2934',
     white:  '#dddddd'
   };
 
@@ -175,6 +175,11 @@
   }
 
   function onKeyDown(e) {
+    if (e.code === 'Escape') {
+      e.preventDefault();
+      abortGame();
+      return;
+    }
     var dir = KEY_MAP[e.code];
     if (dir) {
       e.preventDefault();
@@ -424,7 +429,7 @@
 
     ctx.fillStyle = CLR.text;
     ctx.font = (10 * scale) + 'px "Press Start 2P", monospace';
-    ctx.fillText("at Penny's Sweet Shop", 320 * scale, 130 * scale);
+    ctx.fillText("at June Ward's counter", 320 * scale, 130 * scale);
 
     ctx.fillStyle = CLR.dim;
     ctx.fillText('Watch the sequence, then', 320 * scale, 180 * scale);
@@ -562,6 +567,31 @@
         drawResultsScreen();
         break;
     }
+    drawEscHint();
+  }
+
+  function abortGame() {
+    gameRunning = false;
+    if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+
+    document.removeEventListener('keydown', boundKeyDown);
+    canvas.removeEventListener('touchstart', boundTouchStart);
+
+    canvas.classList.add('hidden');
+    var screen = document.getElementById('screen');
+    if (screen) screen.classList.remove('hidden');
+
+    setTimeout(function () {
+      if (callback) callback(null);
+    }, 90);
+  }
+
+  function drawEscHint() {
+    ctx.fillStyle = CLR.dim;
+    ctx.font = (8 * scale) + 'px "Press Start 2P", monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText('ESC EXIT', 610 * scale, 390 * scale);
+    ctx.textAlign = 'left';
   }
 
   // -------- GAME LOOP --------

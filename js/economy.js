@@ -3,20 +3,49 @@
 
 window.Economy = {
   // Constants
-  GUANO_PRICE_PER_TON: 700,        // $700 per ton of guano
-  SHIPPING_COST_PER_TON: 50,        // $50 shipping per ton
+  GUANO_PRICE_PER_TON: 700,        // Historical Marvel Cave wholesale figure
+  MINER_SHARE_RATE: 0.10,          // Contract share paid to the crew lead
+  SHIPPING_COST_PER_TON: 0,        // Company carries the freight risk
   PAYMENT_DELAY_DAYS: 5,            // 5-day payment delay
   BASE_INFLATION_RATE: 0.10,        // 10% per month
   WINTER_INFLATION_MULTIPLIER: 2,   // 2x inflation in winter
 
   // Store prices (base prices before inflation)
   basePrices: {
-    food:       0.10,   // per lb
-    lanternOil: 1.50,   // per gallon
-    rope:       0.08,   // per foot
-    timber:     0.50,   // per board
-    dynamite:   2.00,   // per stick
-    donkey:     40.00   // each
+    food:       0.08,   // per lb
+    lanternOil: 0.25,   // per gallon
+    rope:       0.02    // per foot
+  },
+
+  getCompanyRate: function(state) {
+    return state && state.companySalePrice ? state.companySalePrice : this.GUANO_PRICE_PER_TON;
+  },
+
+  getMinerShareRate: function(state) {
+    return state && state.contractShareRate ? state.contractShareRate : this.MINER_SHARE_RATE;
+  },
+
+  getPayPerTon: function(state) {
+    return Math.round(this.getCompanyRate(state) * this.getMinerShareRate(state) * 100) / 100;
+  },
+
+  getEffectivePayPerTon: function(state) {
+    var payPerTon = this.getCompanyRate(state) * this.getMinerShareRate(state);
+    var doctrine = window.Expedition && window.Expedition.getDoctrine
+      ? window.Expedition.getDoctrine(state && state.expedition ? state.expedition.doctrine : null)
+      : null;
+    var foremanProfile = window.Expedition && window.Expedition.getCrewData
+      ? window.Expedition.getCrewData(state, state ? state.foreman : null)
+      : null;
+    var profession = window.CaveData && window.CaveData.PROFESSIONS && state
+      ? window.CaveData.PROFESSIONS[state.profession]
+      : null;
+
+    if (doctrine && doctrine.id === 'profit_first') payPerTon *= 1.05;
+    if (foremanProfile && foremanProfile.traitId === 'ledger_eye') payPerTon *= 1.04;
+    if (profession && profession.tradeBonus) payPerTon *= (1 + profession.tradeBonus);
+
+    return Math.round(payPerTon * 100) / 100;
   },
 
   // Get current price with inflation applied
@@ -36,13 +65,14 @@ window.Economy = {
   },
 
   // Update inflation based on time passage
-  updateInflation: function(state) {
+  updateInflation: function(state, dayFraction) {
+    dayFraction = typeof dayFraction === 'number' ? dayFraction : 1;
     // 10% per month base, doubled in winter
     var dailyRate = this.BASE_INFLATION_RATE / 30; // approximate daily inflation
     if (state.season === 'winter') {
       dailyRate *= this.WINTER_INFLATION_MULTIPLIER;
     }
-    state.inflationRate += dailyRate;
+    state.inflationRate += dailyRate * dayFraction;
   },
 
   // Purchase an item from the store
@@ -66,11 +96,6 @@ window.Economy = {
       case 'food':       state.food += quantity; break;
       case 'lanternOil': state.lanternOil += quantity; break;
       case 'rope':       state.rope += quantity; break;
-      case 'timber':     state.timber += quantity; break;
-      case 'dynamite':   state.dynamite += quantity; break;
-      case 'donkey':
-        state.donkeys.count += quantity;
-        break;
       default:
         // Refund if unknown item
         state.cash += totalCost;
@@ -88,9 +113,9 @@ window.Economy = {
       return { success: false, message: 'Only ' + state.guanoStockpile.toFixed(1) + ' tons available.' };
     }
 
-    var revenue = tons * this.GUANO_PRICE_PER_TON;
+    var revenue = tons * this.getCompanyRate(state);
     var shippingCost = tons * this.SHIPPING_COST_PER_TON;
-    var netRevenue = revenue - shippingCost;
+    var netRevenue = tons * this.getPayPerTon(state);
 
     // Deduct from stockpile
     state.guanoStockpile -= tons;
@@ -103,7 +128,7 @@ window.Economy = {
     // Create pending payment with 14-day delay
     var dueDate = new Date(state.date.getTime() + (this.PAYMENT_DELAY_DAYS * 86400000));
     state.pendingPayments.push({
-      amount: revenue,
+      amount: netRevenue,
       tons: tons,
       dueDate: dueDate,
       description: tons.toFixed(1) + ' tons guano'
@@ -115,7 +140,7 @@ window.Economy = {
       shippingCost: shippingCost,
       netRevenue: netRevenue,
       dueDate: dueDate,
-      message: 'Shipped ' + tons.toFixed(1) + ' tons. Payment of $' + revenue.toFixed(2) + ' due in ' + this.PAYMENT_DELAY_DAYS + ' days.'
+      message: 'Turned in ' + tons.toFixed(1) + ' tons. Your share of $' + netRevenue.toFixed(2) + ' is due in ' + this.PAYMENT_DELAY_DAYS + ' days.'
     };
   },
 
@@ -185,7 +210,8 @@ window.Economy = {
   },
 
   // Calculate daily food consumption based on ration level and party size
-  getFoodConsumption: function(state) {
+  getFoodConsumption: function(state, dayFraction) {
+    dayFraction = typeof dayFraction === 'number' ? dayFraction : 1;
     var partySize = window.GameState.getPartySize();
     var perPerson;
 
@@ -197,31 +223,47 @@ window.Economy = {
       default:       perPerson = 2.4; break;
     }
 
-    // Donkeys eat too (about 1 lb each per day)
-    var donkeyFood = state.donkeys.count * 1.0;
-
-    return (perPerson * partySize) + donkeyFood;
+    return perPerson * partySize * dayFraction;
   },
 
   // Calculate daily oil consumption
-  getOilConsumption: function(state) {
+  getOilConsumption: function(state, dayFraction) {
     if (!state.isUnderground) return 0;
-    return 0.5; // 0.5 gallons per day underground
+    dayFraction = typeof dayFraction === 'number' ? dayFraction : 1;
+    var amount = 0.5; // 0.5 gallons per day underground
+    if (state.travelDay) {
+      amount = 0.35;
+    }
+    if (window.Expedition && window.Expedition.modifyOilConsumption) {
+      amount = window.Expedition.modifyOilConsumption(state, amount);
+    }
+    return amount * dayFraction;
   },
 
   // Consume daily resources, returns what was consumed and any shortages
-  consumeDailyResources: function(state) {
+  consumeDailyResources: function(state, dayFraction) {
+    dayFraction = typeof dayFraction === 'number' ? dayFraction : 1;
     var result = { shortages: [] };
 
     // Food consumption
-    var foodNeeded = this.getFoodConsumption(state);
-    if (state.food >= foodNeeded) {
-      state.food -= foodNeeded;
+    var foodNeeded = Math.round(this.getFoodConsumption(state, dayFraction) * 100) / 100;
+    if (foodNeeded <= 0) {
+      result.foodConsumed = 0;
+      if (state.food <= 0) {
+        result.shortages.push('food');
+        state.foodShortageDays = Math.round(((state.foodShortageDays || 0) + dayFraction) * 100) / 100;
+      } else {
+        state.foodShortageDays = 0;
+      }
+    } else if (state.food >= foodNeeded) {
+      state.food = Math.round((state.food - foodNeeded) * 100) / 100;
       result.foodConsumed = foodNeeded;
+      state.foodShortageDays = 0;
     } else {
       result.foodConsumed = state.food;
       result.shortages.push('food');
       state.food = 0;
+      state.foodShortageDays = Math.round(((state.foodShortageDays || 0) + dayFraction) * 100) / 100;
       // Force ration level down
       if (state.rationLevel !== 'none') {
         if (state.food <= 0) state.rationLevel = 'none';
@@ -230,9 +272,9 @@ window.Economy = {
 
     // Oil consumption (only underground)
     if (state.isUnderground) {
-      var oilNeeded = this.getOilConsumption(state);
+      var oilNeeded = Math.round(this.getOilConsumption(state, dayFraction) * 100) / 100;
       if (state.lanternOil >= oilNeeded) {
-        state.lanternOil -= oilNeeded;
+        state.lanternOil = Math.round((state.lanternOil - oilNeeded) * 100) / 100;
         result.oilConsumed = oilNeeded;
       } else {
         result.oilConsumed = state.lanternOil;
@@ -246,6 +288,49 @@ window.Economy = {
   },
 
   // Get net worth summary
+  settleFinalAccounts: function(state) {
+    if (!state) return { autoSoldTons: 0, autoSoldPay: 0, pendingReleased: 0, addedCash: 0 };
+    if (state.finalSettlement) return state.finalSettlement;
+
+    var summary = {
+      autoSoldTons: 0,
+      autoSoldPay: 0,
+      pendingReleased: 0,
+      addedCash: 0
+    };
+
+    if (state.guanoStockpile > 0) {
+      var tons = Math.round(state.guanoStockpile * 1000) / 1000;
+      var companyRate = this.getCompanyRate(state);
+      var payPerTon = this.getEffectivePayPerTon(state);
+      var payout = Math.round(tons * payPerTon * 100) / 100;
+
+      state.guanoStockpile = 0;
+      state.guanoShipped = Math.round((state.guanoShipped + tons) * 1000) / 1000;
+      state.companyGrossSales = Math.round(((state.companyGrossSales || 0) + (tons * companyRate)) * 100) / 100;
+      state.totalRevenue = Math.round(((state.totalRevenue || 0) + payout) * 100) / 100;
+      state.cash = Math.round((state.cash + payout) * 100) / 100;
+
+      summary.autoSoldTons = tons;
+      summary.autoSoldPay = payout;
+      summary.addedCash += payout;
+    }
+
+    if (state.pendingPayments && state.pendingPayments.length) {
+      for (var i = 0; i < state.pendingPayments.length; i++) {
+        summary.pendingReleased += state.pendingPayments[i].amount || 0;
+      }
+      summary.pendingReleased = Math.round(summary.pendingReleased * 100) / 100;
+      state.cash = Math.round((state.cash + summary.pendingReleased) * 100) / 100;
+      state.totalRevenue = Math.round(((state.totalRevenue || 0) + summary.pendingReleased) * 100) / 100;
+      state.pendingPayments = [];
+      summary.addedCash = Math.round((summary.addedCash + summary.pendingReleased) * 100) / 100;
+    }
+
+    state.finalSettlement = summary;
+    return summary;
+  },
+
   getNetWorth: function(state) {
     var pendingTotal = 0;
     for (var i = 0; i < state.pendingPayments.length; i++) {
@@ -256,10 +341,7 @@ window.Economy = {
     inventoryValue += state.food * this.basePrices.food;
     inventoryValue += state.lanternOil * this.basePrices.lanternOil;
     inventoryValue += state.rope * this.basePrices.rope;
-    inventoryValue += state.timber * this.basePrices.timber;
-    inventoryValue += state.dynamite * this.basePrices.dynamite;
-    inventoryValue += state.donkeys.count * this.basePrices.donkey;
-    inventoryValue += state.guanoStockpile * this.GUANO_PRICE_PER_TON;
+    inventoryValue += state.guanoStockpile * this.getPayPerTon(state);
 
     return {
       cash: state.cash,

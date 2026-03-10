@@ -14,6 +14,7 @@
     death: 'images/death.png',
     victory: 'images/victory.png',
     scoring: 'images/victory.png',
+    company_logo: 'images/marvel_mining_co_logo.svg',
 
     // Cave locations
     cave_entrance: 'images/cave_entrance.png',
@@ -74,7 +75,6 @@
     for (var cid in CHAMBER_IMAGE_MAP) {
       paths[CHAMBER_IMAGE_MAP[cid]] = true;
     }
-
     for (var path in paths) {
       var img = new Image();
       img.src = path;
@@ -90,6 +90,32 @@
     return '<div class="pixel-banner">' +
       '<img src="' + path + '" class="pixel-banner-img" alt="" loading="lazy">' +
       '</div>';
+  }
+
+  function getImagePath(key) {
+    return IMAGE_MAP[key] || '';
+  }
+
+  function getLogoHtml(variant) {
+    var path = IMAGE_MAP.company_logo;
+    if (!path) return '';
+    var cls = 'company-badge';
+    if (variant === 'hero') cls += ' company-badge--hero';
+    else cls += ' company-badge--panel';
+    return '<div class="' + cls + '">' +
+      '<img src="' + path + '" class="company-badge-img" alt="Marvel Mining Co." loading="lazy">' +
+      '</div>';
+  }
+
+  function getChamberImagePath(chamberId) {
+    var chamberPath = CHAMBER_IMAGE_MAP[chamberId];
+    if (chamberPath) return chamberPath;
+    if (!window.CaveData) return '';
+    var chamber = window.CaveData.getChamber(chamberId);
+    if (!chamber) return '';
+    var zone = chamber.zone || 'zone1';
+    var imgKey = ZONE_IMAGE_MAP[zone] || 'cave_entrance';
+    return IMAGE_MAP[imgKey] || '';
   }
 
   // Get image for a cave chamber — per-chamber image with zone fallback
@@ -136,6 +162,9 @@
     getImageHtml: getImageHtml,
     getCaveImage: getCaveImage,
     getShopImage: getShopImage,
+    getImagePath: getImagePath,
+    getLogoHtml: getLogoHtml,
+    getChamberImagePath: getChamberImagePath,
     preload: preload,
     IMAGE_MAP: IMAGE_MAP
   };

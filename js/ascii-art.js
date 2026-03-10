@@ -324,60 +324,84 @@
     //  TOWN SHOP ART
     // =========================================================
 
+    var townHeroArt = [
+        '       .-------------------------------------------------------.',
+        '      /                 M A R M A R O S                       /|',
+        '     /-------------------------------------------------------/ |',
+        '    |   _[]_      ________      _[]_        ________        |  |',
+        '    |  [____]    | BANK  |     [____]      | DEPOT |        |  |',
+        '    |  |    |    |______|     |    |       |______|        |  |',
+        '    |  |____|   _|_[]___|_    |____|     ___|_[]___        |  |',
+        '    |           |  MAIN ST |               |                |  |',
+        '    |===========|==========|===============|================|  |',
+        '    |   wagons      porches      pick men       cave wind   |  |',
+        '    |_______________________________________________________| /',
+        '    |  Evening over the sinkhole. Lamps on. Business open.  |/',
+        '    `-------------------------------------------------------\''
+    ].join('\n');
+
     var shopArt = {
 
         general_store: [
-            '  ___________________________',
-            ' |  MARMAROS OUTFITTERS     |',
-            ' |  "We Outfit the Brave"   |',
-            ' |__________________________|',
-            ' | [|] [|] [|] [|] [|] [|] |',
-            ' | rope lantrn pick  axe    |',
-            ' |__________________________|',
-            ' | [=] [=] [=] [=] [=] [=] |',
-            ' | cans beans flour salt    |',
-            ' |__________________________|',
-            ' |                          |',
-            ' | OPEN  Mon-Sat  7am-6pm   |',
-            ' |__________________________|',
-            ' |[]          [DOOR]     [] |',
-            ' |__________________________|'
+            '    .----------------------------------------.',
+            '   /        MARMAROS OUTFITTERS             /|',
+            '  /----------------------------------------/ |',
+            ' |  ____   ____   ____   ____   ____      |  |',
+            ' | |____| |____| |____| |____| |____|     |  |',
+            ' | |rope| |oil | |food| |soap| |salt|     |  |',
+            ' |----------------------------------------|  |',
+            ' |==|==================================|==|  |',
+            ' |  |          General Store           |  |  |',
+            ' |==|==================================|==|  |',
+            ' |  seed sacks   lamp glass   coffee       | /',
+            ' |_________________________________________|/',
+            ' | []                                  []  |',
+            ' |______________ OPEN AT SUNUP ____________|'
         ].join('\n'),
 
         blacksmith: [
-            '  ___________________________',
-            ' |   OZARK BLACKSMITH       |',
-            ' |__________________________|',
-            ' |         /\\               |',
-            ' |    ____/  \\____          |',
-            ' |   |   FORGE   |  *CLANG* |',
-            ' |   |_~~fire~~__|          |',
-            ' |       {~~}               |',
-            ' |   _____|_____            |',
-            ' |  /   ANVIL   \\    /|     |',
-            ' |  |___________|   /_|     |',
-            ' |                 HAMMER   |',
-            ' |  Tools * Picks * Repairs |',
-            ' |__________________________|',
-            ' |[]      [DOOR]         [] |'
+            '    .----------------------------------------.',
+            '   /          OZARK BLACKSMITH              /|',
+            '  /----------------------------------------/ |',
+            ' |              /\\                         |  |',
+            ' |         ____/  \\____     * CLANG *      |  |',
+            ' |        |   FORGE    |                   |  |',
+            ' |        |_~~fire~~___|      hammer       |  |',
+            ' |            {~~}            anvil        |  |',
+            ' |----------------------------------------|  |',
+            ' | picks    braces    pitons    repairs    | /',
+            ' |_________________________________________|/',
+            ' | []                                  []  |',
+            ' |______________ SPARKS AT ALL HOURS ______|'
+        ].join('\n'),
+
+        sweets: [
+            '    .----------------------------------------.',
+            '   /        JUNE WARD SWEET SHOP            /|',
+            '  /----------------------------------------/ |',
+            ' |   rock candy   taffy hooks   lemon drops|  |',
+            ' |    [##]          \\    /          [oo]   |  |',
+            ' |                    \\__/                 |  |',
+            ' |----------------------------------------|  |',
+            ' | coffee   cinnamon rolls   paper sacks   | /',
+            ' |_________________________________________|/',
+            ' | []                                  []  |',
+            ' |__________ SUGAR AND GOOD SENSE _________|'
         ].join('\n'),
 
         tavern: [
-            '  ___________________________',
-            ' |  THE LANTERN TAVERN      |',
-            ' |    Est. 1878             |',
-            ' |__________________________|',
-            ' |  {_}                     |',
-            ' |  |*| <- lantern          |',
-            ' |  |_|                     |',
-            ' |__________________________|',
-            ' | |b||b||b||b||b||b||b||b| |',
-            ' | whiskey * bourbon * rye  |',
-            ' | ======================== |',
-            ' | |      THE BAR         | |',
-            ' | |______________________| |',
-            ' |__________________________|',
-            ' |[]      [DOOR]         [] |'
+            '    .----------------------------------------.',
+            '   /         THE LANTERN TAVERN             /|',
+            '  /----------------------------------------/ |',
+            ' |   {_}                         Est. 1878 |  |',
+            ' |   |*|    fiddles   cards   hot stew     |  |',
+            ' |   |_|                                   |  |',
+            ' |----------------------------------------|  |',
+            ' | |b||b||b||b||b||b||b||b||b||b|         |  |',
+            ' | whiskey   rye   coffee   one bed left  | /',
+            ' |_________________________________________|/',
+            ' | []                                  []  |',
+            ' |____________ MUSIC AFTER DARK _________ _|'
         ].join('\n')
     };
 
@@ -501,28 +525,20 @@
     // =========================================================
 
     var titleArt = [
-        '          _/|     ||\\_',
-        '        _/ ||     || \\_',
-        '       /  _||_   _||_  \\',
-        '      / _/ || \\_/ || \\_ \\',
-        '     |_/   ||     ||   \\_|',
-        '    /      ||     ||      \\',
-        '   / /|    ||  M  ||    |\\ \\',
-        '  / / |   _|| A  _||   | \\ \\',
-        ' | |  |  / || R / ||  |  | |',
-        ' | |  | |  || V|  ||  |  | |',
-        ' | |  | |  || E|  ||  |  | |',
-        ' | |  | |  || L|  ||  |  | |',
-        '  \\ \\ | |  ||  |  || | / /',
-        '   \\_\\| |__|| C||__| |/_/',
-        '     \\_/ __|| A||__ \\_/',
-        '      | |  || V||  | |',
-        '      | |  || E||  | |',
-        '      |_|__||__||__|_|',
-        '     /________________\\',
-        '    THE MARVEL CAVE',
-        '    MINING  COMPANY',
-        '      ~ 1884 ~'
+        '        .-----------------------------------------------.',
+        '       /            MARVEL CAVE MINING CO.             /|',
+        '      /-----------------------------------------------/ |',
+        '     |            ___            ___                  |  |',
+        '     |          _/   \\__      __/   \\_               |  |',
+        '     |         /  /\\    \\____/    /\\  \\              |  |',
+        '     |        /__/  \\    M A R V E L  /              |  |',
+        '     |        \\  \\  /      C A V E   /               |  |',
+        '     |         \\__\\/________________/                |  |',
+        '     |             \\    DEN BELOW  /                 |  |',
+        '     |              \\_____________/                  |  |',
+        '     |-----------------------------------------------|  |',
+        '     |      twenty days under stone for your cut     | /',
+        '     |_______________________________________________|/'
     ].join('\n');
 
     // =========================================================
@@ -564,6 +580,19 @@
             '      |           |',
             '      |___________|',
             '     //_____||_____\\\\'
+        ].join('\n'),
+
+        ledger: [
+            '      ______________________',
+            '     /  COMPANY LEDGER     /|',
+            '    /---------------------/ |',
+            '   |  CONTRACT CLOSED     | |',
+            '   |  yard cleared        | |',
+            '   |  books settled       | |',
+            '   |  line hauled clear   | |',
+            '   |----------------------| |',
+            '   |  MARMAROS, 1884      | /',
+            '   |______________________|/'
         ].join('\n')
     };
 
@@ -825,191 +854,127 @@
     //  AMBIENT TEXT POOLS
     // =========================================================
 
-    var ambientGeneral = [
-        'Water drips in the distance, counting seconds the cave has no use for...',
-        'A bat flutters past your lantern, close enough to feel the wind off its wings...',
-        'The air smells of sulfur and wet limestone and the slow patience of geological time...',
-        'Your footsteps echo off the chamber walls and come back changed, as if the cave is learning your gait...',
-        'Something scurries in the darkness ahead. Something that lives here. You do not...',
-        'Your lantern casts dancing shadows that move in ways the flame does not explain...',
-        'A cool breeze drifts from somewhere deeper. The cave is breathing. It breathes out when the barometric pressure drops...',
-        'Minerals glitter in the lamplight like a fortune that cannot be spent...',
-        'A distant low rumble. The mountain settling. Or something else. The cave does not clarify...',
-        'The walls are slick with mineral seepage. The limestone weeps. It has been weeping for ten thousand years...',
-        'Silence presses in like a physical thing with weight and intention...',
-        'Your breath makes small clouds in the fifty-eight-degree air. The only warm thing down here is you...',
-        'The smell of ancient stone. Three hundred million years of Mississippian limestone. You are a footnote in its history...',
-        'A pebble falls somewhere in the dark. Gravity is the cave\'s only law and it enforces it without mercy...',
-        'The weight of the earth above is palpable. Hundreds of feet of Ozark ridge balanced on the stone around you...',
-        'The candle flame leans toward a draft you cannot feel. The cave has currents you do not understand...',
-        'Old pick marks on the wall. Someone was here before you. They did not leave their name...',
-        'A mineral deposit on the wall catches the light and for one moment looks exactly like a handprint...'
-    ];
+    var ambientGeneral = [];
 
     var ambientByChamberId = {
         marmaros: [
-            'Wagons creak along the dirt road. Marmaros: twenty-eight souls and a hole in the ground worth fighting over...',
-            'A dog barks from behind the general store. It has learned to bark at miners. There are so many miners...',
-            'Jebediah Colt\'s hammer rings out across town. Steel on steel. The sound of a man who trusts metal more than men...',
-            'Locals eye you from the tavern porch. Stone County folk do not trust outsiders. The Bald Knobbers taught them that...',
-            'Woodsmoke and the faint ammonia stink that clings to everything within a mile of the sinkhole...',
-            'A rooster crows from a nearby farm. The sound is jarringly normal. You had forgotten what normal sounds like...',
-            'Fiddle music drifts from the Lantern Tavern. Someone is playing "Barbara Allen." The miners hum along without knowing they are doing it...',
-            'The sinkhole exhales cold air into the warm Ozark afternoon. The locals say the cave breathes. They are not wrong...'
+            'Wagon wheels complain on the ridge road and everybody in town hears it.',
+            'Forge sparks jump somewhere past the hotel porch.',
+            'Woodsmoke, mule sweat, and the faint sting of guano money hang together in the air.',
+            'Somebody on a porch stops talking when your boots hit the boards.',
+            'The sinkhole breathes cold against a warm Ozark afternoon.'
         ],
         cathedral_entrance: [
-            'Sunlight filters down from the cave mouth ninety-four feet above. It will be the last sunlight you see for a while...',
-            'The temperature drops thirty degrees in ten steps. The cave sets its own terms...',
-            'Swallows nest in the crevices near the entrance. They know when to leave. You should learn from them...',
-            'The cave exhales cold stale air like a sleeping animal. The Osage said it was the Devil breathing...',
-            'Daylight behind you. Darkness ahead. The boundary is sharper than a knife...',
-            'V-shaped marks cut deep into the limestone near the entrance. Osage warnings. Centuries old. Still legible. Still relevant...',
-            'Old rope burns scar the entrance rocks. How many crews have lowered themselves into this? How many climbed back out?...',
-            'A notched pine log leans against the wall -- a fragment of the Spanish ladders from 1541. Three hundred years old and still standing...'
+            'Daylight hangs behind you like something already spent.',
+            'The air turns cave-cold in the space of a few careful steps.',
+            'Rope burns score the entrance stone where other crews paid their way down.',
+            'The mouth takes light and gives back stale breath.',
+            'A swallow cuts across the opening and leaves you to the dark.'
+        ],
+        the_sentinel: [
+            'The Sentinel stands tall enough to make hats come off without anyone saying why.',
+            'A pinch of old tobacco dust sits near the base of the stone.',
+            'The side crevice by the Sentinel looks too small until you need it badly.',
+            'The room changes its tone here and the crew feels it.',
+            'Even your lamp seems to hold steadier beside the column.'
         ],
         cathedral_floor: [
-            'The ceiling vanishes two hundred feet above into a darkness your lantern cannot reach. You could stand the Statue of Liberty in here...',
-            'Bats swirl in vast spirals overhead, a living tornado of forty thousand wings. The sound is not of this world...',
-            'Your voice echoes back a dozen times, each repetition fainter and stranger, as if the cave is learning to speak...',
-            'The Liberty Bell stalagmite towers fifty-five feet, hollow, with a crack that mirrors the real one. Coincidence. Probably...',
-            'The Underground Mountain -- 124 feet of debris that fell through the sinkhole over millennia. Bones mixed with guano mixed with time...',
-            'Strange markings scratched into the wall at knee height. Not pick marks. Something deliberate. Something old...',
-            'Tool cuts in the limestone that predate the mining company by centuries. The Spaniards were here. Or someone was...',
-            'In 1963, a man will fly a hot air balloon in this room. That fact would make no sense to you. It barely makes sense now...'
+            'Bat-noise rolls under the roof and never quite lands.',
+            'The room is too big for your lantern and knows it.',
+            'Loose guano gives under every step like wet grain.',
+            'The main haul route looks obvious until you remember how many men still got lost here.',
+            'The hidden fork near the Sentinel waits for tired crews.'
         ],
-        sentinel_chamber: [
-            'The Sentinel stands thirty feet tall, a calcite column where stalactite met stalagmite and fused. It looks like something keeping watch...',
-            'The passage narrows around The Sentinel. Guides tell tourists it holds up the ceiling. The tourists believe them. So does your crew...',
-            'Tobacco offerings sit at the base of The Sentinel. Osage, some say. Miners, say others. No one claims to have left them...',
-            'The Sentinel has stood here for millennia. Drip by drip. Patient as the mountain that made it. It will outlast you and everything you know...',
-            'Behind The Sentinel, a crevice most men walk past. The Spring Room is through there. Orange walls. Hidden waterfalls. The Spaniards thought it was the Fountain of Youth...',
-            'Your crew tips their hats as they pass The Sentinel. A habit no one remembers starting. No one wants to be the first to stop...'
+        serpentine_passage: [
+            'The passage twists hard enough to make every load feel heavier.',
+            'Old pick marks show where other crews tried to argue with the walls.',
+            'A sack catches here if you give it half a chance.',
+            'Your shoulder finds stone at nearly every turn.',
+            'The route feels more like work than the mining does.'
         ],
-        crystal_alcove: [
-            'Crystals catch your lantern light and scatter it into a hundred tiny fires. Beautiful. Worthless. Priceless...',
-            'The formations here are delicate as lace and older than civilization. One careless elbow and ten thousand years of work is gone...',
-            'A faint chiming as air moves over crystal edges. Music the cave makes for no audience...',
-            'Dog-tooth spar crystals line the walls. Calcium carbonate. The same stuff in your bones, arranged by water and patience...',
-            'Your light reveals colors in the crystal -- amber, rose, pale violet -- that have never been seen. You are the first eyes...',
-            'Someone has scratched a cross into the wall near the crystals. Spanish. The cross is small and precise and very, very old...'
-        ],
-        upper_passage: [
-            'Old rope burns scar the walls. Decades of crews hauling guano sacks through this passage, one at a time, fifty pounds each...',
-            'Others have passed this way. Their boot prints are fossilized in the clay floor like a record of the desperate and the brave...',
-            'The passage twists like something alive. Scalloped walls carved by pressurized water a million years before you were born...',
-            'You trace your hand along the rough wall and feel the teeth marks of a thousand pickaxes. The limestone always wins. But slowly...',
-            'A miner\'s graffiti: "T. MILLER 1883" scratched at shoulder height. You wonder if T. Miller made it home...',
-            'The air moves here in unpredictable drafts. The cave breathes through passages you cannot see...'
-        ],
-        echo_hall: [
-            'Every sound returns threefold and distorted. The cave speaks your words back in a voice that is not yours...',
-            'The chamber swallows your voice and returns it changed. Syllables rearranged. Meaning shifted...',
-            'You clap your hands and hear it echo for seven full seconds. The silence after is louder than the clap...',
-            'The acoustics are disorienting. Sound comes from everywhere and nowhere. Your crew instinctively moves closer together...',
-            'An old miner\'s trick: shout a number into the echo hall. Count the echoes. That\'s how many days you have left. Nobody does this twice...',
-            'Something in the echo does not match. A sound returns that you did not make. Probably your imagination. Probably...'
-        ],
-        bat_colony: [
-            'Thousands of gray bats hang overhead like dark fruit. Each one will eat its weight in insects tonight...',
-            'The stench of guano is a physical force. Ammonia so thick you can taste it. Your eyes stream. Your lungs rebel...',
-            'A few bats take flight as you approach, launching themselves with a sound like wet leather snapping...',
-            'Centuries of guano on the floor. Nitrogen-rich. Worth seven hundred dollars a ton. Also full of a fungus that eats lungs...',
-            'Wings rustle overhead like dry leaves in wind. Forty thousand bats. They were here before the Osage. They will be here after you...',
-            'The bats are federally endangered gray bats -- Myotis grisescens. Science will protect them someday. Today they are just in the way...',
-            'At dusk the colony pours from the sinkhole in a spiraling vortex that takes twenty minutes to pass. Twenty-four million insects die nightly...'
-        ],
-        the_narrows: [
-            'The walls close in. Four feet seven inches of headroom. Seven feet of passage. The Ozarks pressing on your spine...',
-            'You turn sideways and empty your lungs. The stone scrapes your chest and back simultaneously. Inch by inch...',
-            'A three-hundred-pound man got wedged here once. They greased him with lard and hauled him out with rope. He never went underground again...',
-            'Panic rises like water. The passage does not care about your fear. It was this narrow before you came and it will be this narrow after...',
-            'Your ribs compress. Your lantern scrapes the ceiling. The sound of stone on glass is the sound of your life being negotiated...',
-            'Beyond this point, the cave does not let go easily. Check your nerve. Check your rope. Check your reasons for being here...'
+        egyptian_room: [
+            'Smooth stone throws your light back in a flatter, colder way.',
+            'Old room names cling here longer than reason does.',
+            'It is the kind of chamber that makes tired men stare upward too long.',
+            'The cave looks dressed up here and you do not trust it.',
+            'Boot noise comes back cleaner than it should.'
         ],
         gulf_of_doom: [
-            'Drop a stone. Listen. Keep listening. The silence where the impact should be is worse than any sound...',
-            'The void breathes. A cold updraft from a depth your lantern cannot reach. Three miners fell here. They were not found...',
-            'Vertigo seizes you at the edge. Your body knows things your mind has not yet calculated...',
-            'The richest guano deposits in the cave crust the ledges around this rim. The cave puts its treasure at the edge of the abyss...',
-            'One wrong step. One wet boot. One moment of inattention. The Gulf of Doom does not offer second chances...',
-            'Early explorers called this pit bottomless. The scientific explanation: clay-and-guano slurry absorbs all sound. The practical explanation: it does not matter. You are still dead...',
-            'A tarnished glint in a crevice near the rim. Probably mineral deposits. Probably not a Spanish coin from 1743. Probably...'
+            'Cold air rises from the drop and cuts through the guano stink.',
+            'The ledge looks wide until you stand on it.',
+            'Pebbles leave the rim fast and never bother reporting back.',
+            'The best dirt sits where a bad step becomes history.',
+            'Everybody checks footing twice here and still does not feel wise.'
         ],
-        lost_river: [
-            'The underground river rushes past, ice cold...',
-            'The current looks deceptively strong...',
-            'Where does this water go? Nobody knows...',
-            'The river carved this passage over ages...',
-            'Mist rises from the churning water...',
-            'Pebbles rattle along the current like teeth...',
-            'Your lantern throws broken light across black water...',
-            'A surge upstream changes the river\'s pitch...',
-            'Wet stone sweats against your palms...',
-            'Every splash sounds closer than it is...'
-        ],
-        spanish_passage: [
-            'Old Spanish carvings mark these walls...',
-            'Who were the Spaniards who came here in 1541?...',
-            'A carved cross marks an old resting point...',
-            'The markings are worn but still legible...',
-            'Conquistadors once stood where you stand now...',
-            'Soot smears mark where old torches once burned...',
-            'A crude arrow is scratched toward deeper dark...',
-            'The limestone here bears old boot scuffs...',
-            'You find initials in fading charcoal...',
-            'The passage holds old prayers in newer dust...'
-        ],
-        deep_descent: [
-            'The drop-off ahead is steep and treacherous...',
-            'Loose scree shifts under your boots...',
-            'You lower yourself carefully, rope in hand...',
-            'The deeper you go, the colder it gets...'
-        ],
-        blondies_throne: [
-            'Massive formations rise like frozen thrones...',
-            'The chamber opens into a grand gallery...',
-            'Flowstone cascades down the walls like curtains...',
-            'This room feels like a cathedral of stone...',
-            'You feel very small in this grand chamber...'
-        ],
-        cloud_room: [
-            'Thick mist obscures everything beyond arm\'s reach...',
-            'The vapor tastes of minerals and time...',
-            'You can barely see your own hand...',
-            'Something moves in the fog - or did it?...',
-            'The mist swirls around your lantern light...'
-        ],
-        lake_chamber: [
-            'The still water reflects your light perfectly...',
-            'The lake is dark and impossibly still...',
-            'You cannot see the bottom of this lake...',
-            'Your reflection stares back from black water...',
-            'A single ripple crosses the mirror surface...'
-        ],
-        waterfall_room: [
-            'The roar of falling water fills the chamber...',
-            'Spray from the waterfall soaks your clothes...',
-            'The waterfall plunges from a crack high above...',
-            'This is the deepest point: 700 feet below...',
-            'The water pools before draining into cracks...',
-            'You have reached the heart of Marvel Cave...',
-            'A rusted tin tucked in a niche looks like it has been here for years...',
-            'Someone once camped here; the marks are too neat to be natural...'
+        fat_mans_misery: [
+            'Stone presses your ribs from both sides at once.',
+            'Breathing wrong in here feels like using up space you do not own.',
+            'Your lamp scrapes rock close enough to make glass sound dangerous.',
+            'Nobody hurries through this squeeze no matter what they claim later.',
+            'The passage wants patience and takes skin.'
         ],
         the_dungeon: [
-            'Iron-stained walls glisten like dried blood in your lantern glow...',
-            'The passage narrows and every sound feels close and heavy...',
-            'A loose stone in the wall looks like it has been pried out before...'
+            'Rust stains run down the wall like something still fresh in bad light.',
+            'The low roof makes every shoulder feel too broad.',
+            'Air sits heavy here before it turns cruel.',
+            'Loose stone remembers being moved once already.',
+            'The room punishes carelessness faster than most.'
         ],
         spring_room: [
-            'Hidden water trickles behind calcite curtains, loud as rainfall...',
-            'You find old initials carved beside the spring, half-faded with time...',
-            'The orange walls shimmer as if someone polished them by hand...'
+            'Water talks softly behind calcite curtains.',
+            'Orange stone catches light like banked coals.',
+            'The chamber smells cleaner than the rest of the cave and everybody notices.',
+            'Old initials fade in the damp along the wall by the pool.',
+            'Men arrive here sore and leave quieter.'
+        ],
+        blondies_throne: [
+            'Flowstone rises in folds too grand for workaday men.',
+            'The room invites whispering and nobody argues with it.',
+            'Guano lies thick around the base of the stone seat.',
+            'Every lantern shadow in here looks ceremonial by accident.',
+            'The chamber feels less mined than visited.'
+        ],
+        cloud_room: [
+            'Low vapor carries the worst of the room straight into your throat.',
+            'Your lamp cuts only a short yellow wound through the haze.',
+            'The guano is rich enough to keep you here too long.',
+            'Every breath tastes like the room is keeping score.',
+            'Mist beads on lashes and makes the whole chamber feel closer.'
+        ],
+        mammoth_room: [
+            'The bats own the ceiling in numbers your mind quits counting.',
+            'Wing-rustle turns the dark overhead into weather.',
+            'The room sounds alive even when nobody speaks.',
+            'Droppings fall often enough to make you stop looking up.',
+            'Every man in the crew wants through this one quickly.'
+        ],
+        lost_river: [
+            'Black water runs beside the route with more speed than light.',
+            'The river changes pitch before it changes anything else.',
+            'Broken reflections jump in the current and vanish.',
+            'Wet stone keeps no promises under a boot heel.',
+            'The water sounds close enough to touch and farther than courage likes.'
         ],
         lake_genevieve: [
-            'Your lantern reveals pale ripples beneath the glassy surface...',
-            'Tiny shapes move in the dark water where no sunlight has ever reached...',
-            'The still lake suddenly stirs with nearly invisible life...'
+            'Still water holds your lamp in one clean line.',
+            'The lake is quiet enough to make your heartbeat feel rude.',
+            'Something pale stirs below the surface and is gone again.',
+            'The far edge of the chamber hides in its own reflection.',
+            'No one talks loudly beside this water.'
+        ],
+        lake_miriam: [
+            'The second lake feels deeper before you even see all of it.',
+            'Silence settles harder here than in the first chamber.',
+            'Your light floats on the surface and never reaches whatever keeps the bottom.',
+            'Even careful footsteps sound too sharp around this water.',
+            'The room makes men wonder who first stood here and why they stayed.'
+        ],
+        waterfall_room: [
+            'The roar starts before the room appears.',
+            'Cold spray reaches you before the fall does.',
+            'Mist hangs in the air and slicks every tool handle.',
+            'The chamber is loud enough to swallow second thoughts.',
+            'This deep, even rich dirt feels earned at gunpoint.'
         ]
     };
 
@@ -1057,6 +1022,10 @@
                 return shopArt[shopId];
             }
             return '';
+        },
+
+        getTownArt: function() {
+            return townHeroArt;
         },
 
         /**
@@ -1119,23 +1088,15 @@
         },
 
         /**
-         * Returns a random atmospheric flavor string appropriate
-         * for the given chamber. Falls back to the general pool
-         * if no chamber-specific text exists.
+         * Returns a chamber-specific atmospheric line.
          * @param {string} chamberId
          * @returns {string}
          */
         getAmbientText: function(chamberId) {
-            var pool = [];
-
-            // Build a combined pool: chamber-specific + general
             if (chamberId && ambientByChamberId.hasOwnProperty(chamberId)) {
-                pool = ambientByChamberId[chamberId].concat(ambientGeneral);
-            } else {
-                pool = ambientGeneral;
+                return randomFrom(ambientByChamberId[chamberId]);
             }
-
-            return randomFrom(pool);
+            return randomFrom(ambientGeneral);
         }
     };
 

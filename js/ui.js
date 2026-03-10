@@ -35,12 +35,33 @@
     }
   }
 
+  function setKeyHandler(handler) {
+    clearKeyHandler();
+    if (!handler) return;
+    currentKeyHandler = handler;
+    document.addEventListener('keydown', handler);
+  }
+
   // Render HTML content to screen element
   function render(content) {
     var el = getScreen();
     clearKeyHandler();
+    var notes = document.querySelectorAll('.notification');
+    for (var i = 0; i < notes.length; i++) {
+      if (notes[i] && notes[i].parentNode) notes[i].parentNode.removeChild(notes[i]);
+    }
+    el.classList.remove('screen-fade-out', 'screen-fade-in', 'crt-boot');
+    el.style.opacity = '1';
+    el.style.filter = 'none';
+    el.style.animation = 'none';
+    var staleWipes = document.querySelectorAll('.scanline-wipe, .pixel-dissolve-overlay');
+    for (var j = 0; j < staleWipes.length; j++) {
+      if (staleWipes[j] && staleWipes[j].parentNode) staleWipes[j].parentNode.removeChild(staleWipes[j]);
+    }
     el.innerHTML = content;
     el.scrollTop = 0;
+    void el.offsetWidth;
+    el.style.animation = '';
   }
 
   // Append HTML to screen without clearing
@@ -64,8 +85,8 @@
 
   function renderSurfaceBar(bar, state) {
     bar.classList.remove('underground');
-    var duration = state.gameDuration || 30;
-    var dayNum = Math.min(state.totalDays + 1, duration);
+    var duration = state.gameDuration || 20;
+    var dayNum = window.GameState && window.GameState.getDisplayDayNumber ? window.GameState.getDisplayDayNumber(state) : Math.min(Math.floor((state.totalDays || 0)) + 1, duration);
     var partyCount = getPartyCount(state);
 
     bar.innerHTML =
@@ -73,13 +94,13 @@
       sbItem('', 'Marmaros') +
       sbItem('Crew', partyCount + '/' + (state.crew.length + 1)) +
       sbItem('$', state.cash.toFixed(0)) +
-      sbItem('Guano', state.guanoShipped.toFixed(1) + '/' + state.contractTarget + 't');
+      sbItem('Guano', state.guanoMined.toFixed(1) + 't');
   }
 
   function renderUndergroundBar(bar, state) {
     bar.classList.add('underground');
-    var duration = state.gameDuration || 30;
-    var dayNum = Math.min(state.totalDays + 1, duration);
+    var duration = state.gameDuration || 20;
+    var dayNum = window.GameState && window.GameState.getDisplayDayNumber ? window.GameState.getDisplayDayNumber(state) : Math.min(Math.floor((state.totalDays || 0)) + 1, duration);
     var partyCount = getPartyCount(state);
 
     // Location
@@ -94,7 +115,7 @@
       sbItem('', loc) +
       sbItem('Crew', partyCount + '/' + (state.crew.length + 1)) +
       sbItem('$', state.cash.toFixed(0)) +
-      sbItem('Guano', state.guanoShipped.toFixed(1) + '/' + state.contractTarget + 't');
+      sbItem('Guano', state.guanoMined.toFixed(1) + 't');
   }
 
   function getPartyCount(state) {
@@ -171,8 +192,7 @@
         callback(keyMap[pressed]);
       }
     }
-    currentKeyHandler = handler;
-    document.addEventListener('keydown', handler);
+    setKeyHandler(handler);
   }
 
   function hideActionBar() {
@@ -235,26 +255,115 @@
     });
   }
 
-  // Show numbered menu choices with arrow navigation + OK button
-  function promptChoice(options, callback) {
-    clearKeyHandler();
-    var selectedIdx = 0;
+  function renderChoiceBadges(badges) {
+    if (!badges || !badges.length) return '';
+    var html = '<div class="menu-option-badges">';
+    for (var i = 0; i < badges.length; i++) {
+      var badge = badges[i];
+      var text = '';
+      var tone = '';
+      if (typeof badge === 'string') {
+        text = badge;
+      } else if (badge) {
+        text = badge.text || '';
+        tone = badge.tone || '';
+      }
+      if (!text) continue;
+      html += '<span class="menu-option-badge' + (tone ? ' menu-option-badge--' + escapeHtml(tone) : '') + '">' + escapeHtml(text) + '</span>';
+    }
+    html += '</div>';
+    return html;
+  }
 
-    var html = '<div class="menu-options" id="menu-choices">';
+  function renderChoiceDetail(opt) {
+    if (!opt) return '';
+    var html = '';
+    if (opt.detailTitle) html += '<div class="menu-choice-detail-title">' + escapeHtml(opt.detailTitle) + '</div>';
+    if (opt.detailLead) html += '<div class="menu-choice-detail-lead">' + escapeHtml(opt.detailLead) + '</div>';
+    if (opt.detailBody) html += '<div class="menu-choice-detail-body">' + escapeHtml(opt.detailBody) + '</div>';
+    if (opt.detailBullets && opt.detailBullets.length) {
+      html += '<div class="menu-choice-detail-bullets">';
+      for (var i = 0; i < opt.detailBullets.length; i++) {
+        html += '<div class="menu-choice-detail-bullet">' + escapeHtml(opt.detailBullets[i]) + '</div>';
+      }
+      html += '</div>';
+    }
+    return html;
+  }
+
+  // Show numbered menu choices with arrow navigation + optional detail panel
+  function promptChoice(options, callback, opts) {
+    clearKeyHandler();
+    opts = opts || {};
+    var selectedIdx = 0;
+    var foundSelectable = false;
+    var hasDetail = false;
+    var hasChoiceDetail = false;
+    var currentGroup = '';
+
+    for (var x = 0; x < options.length; x++) {
+      if (options[x].description || options[x].meta || (options[x].badges && options[x].badges.length)) {
+        hasDetail = true;
+      }
+      if (options[x].detailTitle || options[x].detailLead || options[x].detailBody || (options[x].detailBullets && options[x].detailBullets.length)) {
+        hasChoiceDetail = true;
+      }
+      if (!options[x].disabled && !foundSelectable) {
+        selectedIdx = x;
+        foundSelectable = true;
+      }
+    }
+
+    if (options[selectedIdx] && options[selectedIdx].disabled) {
+      for (var s = 0; s < options.length; s++) {
+        if (!options[s].disabled) {
+          selectedIdx = s;
+          break;
+        }
+      }
+    }
+
+    var html = '<div class="menu-options' + (hasDetail ? ' has-detail' : '') + (opts.cardGrid ? ' menu-options--cards' : '') + (opts.compact ? ' menu-options--compact' : '') + '" id="menu-choices">';
     for (var i = 0; i < options.length; i++) {
       var opt = options[i];
       var key = opt.key || String(i + 1);
-      html += '<div class="menu-option' + (i === 0 ? ' selected' : '') + '" data-key="' + key + '" data-idx="' + i + '">';
-      html += '  <span class="key">' + key + '</span>. ' + escapeHtml(opt.label);
+      var metaText = Array.isArray(opt.meta) ? opt.meta.join(' • ') : opt.meta;
+      if (!opts.hideGroups && opt.group && opt.group !== currentGroup) {
+        currentGroup = opt.group;
+        html += '<div class="menu-group-heading">' + escapeHtml(opt.group) + '</div>';
+      }
+      html += '<div class="menu-option' +
+        (i === selectedIdx ? ' selected' : '') +
+        (opt.disabled ? ' is-disabled' : '') +
+        (opt.tone ? ' menu-option--' + escapeHtml(opt.tone) : '') +
+        '" data-key="' + key + '" data-idx="' + i + '" role="button" tabindex="0" aria-disabled="' + (opt.disabled ? 'true' : 'false') + '">';
+      html += '  <span class="key">' + key + '</span>';
+      if (opt.badge) html += '  <span class="menu-option-side-badge">' + escapeHtml(opt.badge) + '</span>';
+      html += '  <div class="menu-option-copy">';
+      html += '    <div class="menu-option-label">' + escapeHtml(opt.label) + '</div>';
+      html += renderChoiceBadges(opt.badges || []);
+      if (opt.description) html += '    <div class="menu-option-description">' + escapeHtml(opt.description) + '</div>';
+      if (metaText) html += '    <div class="menu-option-meta">' + escapeHtml(metaText) + '</div>';
+      html += '  </div>';
       html += '</div>';
     }
     html += '</div>';
 
-    // Arrow nav buttons + OK
-    html += '<div class="nav-buttons">';
-    html += '<button class="nav-btn" id="nav-up" aria-label="Previous"><span class="nav-arrow">&#9650;</span></button>';
-    html += '<button class="nav-btn nav-ok" id="nav-ok">OK</button>';
-    html += '<button class="nav-btn" id="nav-down" aria-label="Next"><span class="nav-arrow">&#9660;</span></button>';
+    if (opts.detailPanel || hasChoiceDetail) {
+      html += '<div class="menu-choice-detail-panel" id="menu-choice-detail"></div>';
+    }
+
+    var navClass = 'nav-buttons';
+    if (opts.hideNav && !opts.selectButtonLabel) navClass += ' nav-buttons--hidden';
+    if (opts.selectButtonLabel) navClass += ' nav-buttons--select-only';
+    html += '<div class="' + navClass + '">';
+    if (!opts.selectButtonLabel) {
+      html += '<button class="nav-btn" id="nav-up" aria-label="Previous"><span class="nav-arrow">&#9650;</span></button>';
+    }
+    html += '<button class="nav-btn nav-ok" id="nav-ok">' + escapeHtml(opts.selectButtonLabel || 'OK') + '</button>';
+    if (!opts.selectButtonLabel) {
+      html += '<button class="nav-btn" id="nav-down" aria-label="Next"><span class="nav-arrow">&#9660;</span></button>';
+    }
     html += '</div>';
     append(html);
 
@@ -265,72 +374,89 @@
     var keyList = [];
     for (var j = 0; j < options.length; j++) {
       var k = options[j].key || String(j + 1);
-      keyMap[k.toLowerCase()] = options[j].value !== undefined ? options[j].value : j;
-      keyList.push(k.toLowerCase());
+      keyMap[String(k).toLowerCase()] = options[j].value !== undefined ? options[j].value : j;
+      keyList.push(String(k).toLowerCase());
     }
 
+    var extraKeys = opts.extraKeys || {};
     var menuOptions = el.querySelectorAll('#menu-choices .menu-option');
+    var detailPanel = document.getElementById('menu-choice-detail');
 
     function updateHighlight() {
       for (var m = 0; m < menuOptions.length; m++) {
         menuOptions[m].classList.toggle('selected', m === selectedIdx);
       }
-      // Scroll selected into view
+      if (detailPanel) {
+        detailPanel.innerHTML = renderChoiceDetail(options[selectedIdx]);
+        detailPanel.classList.toggle('is-empty', !detailPanel.innerHTML);
+      }
       if (menuOptions[selectedIdx]) {
         menuOptions[selectedIdx].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       }
     }
 
+    function showDisabled(opt) {
+      showNotification(opt.disabledLabel || 'Not available', 1200);
+    }
+
     function confirmSelection() {
+      var chosen = options[selectedIdx];
+      if (!chosen) return;
+      if (chosen.disabled) {
+        showDisabled(chosen);
+        return;
+      }
       var chosenKey = keyList[selectedIdx];
       if (keyMap.hasOwnProperty(chosenKey)) {
         clearKeyHandler();
-        callback(keyMap[chosenKey]);
+        callback(keyMap[chosenKey], chosen, selectedIdx);
       }
     }
 
-    // Click/tap on options
-    menuOptions.forEach(function (optEl) {
+    function selectIndex(nextIdx, shouldConfirm) {
+      selectedIdx = (nextIdx + options.length) % options.length;
+      updateHighlight();
+      if (shouldConfirm && (options[selectedIdx].confirmOnClick !== false) && opts.confirmOnClick !== false) {
+        confirmSelection();
+      }
+    }
+
+    Array.prototype.forEach.call(menuOptions, function (optEl) {
       optEl.addEventListener('click', function () {
         var clickIdx = parseInt(this.getAttribute('data-idx'), 10);
-        selectedIdx = clickIdx;
-        updateHighlight();
-        confirmSelection();
+        selectIndex(clickIdx, true);
       });
     });
 
-    // Nav button handlers
     var upBtn = document.getElementById('nav-up');
     var downBtn = document.getElementById('nav-down');
     var okBtn = document.getElementById('nav-ok');
 
     if (upBtn) upBtn.addEventListener('click', function (e) {
       e.preventDefault();
-      selectedIdx = (selectedIdx - 1 + options.length) % options.length;
-      updateHighlight();
+      selectIndex(selectedIdx - 1, false);
     });
     if (downBtn) downBtn.addEventListener('click', function (e) {
       e.preventDefault();
-      selectedIdx = (selectedIdx + 1) % options.length;
-      updateHighlight();
+      selectIndex(selectedIdx + 1, false);
     });
     if (okBtn) okBtn.addEventListener('click', function (e) {
       e.preventDefault();
       confirmSelection();
     });
 
+    updateHighlight();
+
     function handler(e) {
       var pressed = e.key;
       if (pressed === 'ArrowUp' || pressed === 'Up') {
         e.preventDefault();
-        selectedIdx = (selectedIdx - 1 + options.length) % options.length;
-        updateHighlight();
+        selectIndex(selectedIdx - 1, false);
         return;
       }
       if (pressed === 'ArrowDown' || pressed === 'Down') {
         e.preventDefault();
-        selectedIdx = (selectedIdx + 1) % options.length;
-        updateHighlight();
+        selectIndex(selectedIdx + 1, false);
         return;
       }
       if (pressed === 'Enter') {
@@ -338,17 +464,26 @@
         confirmSelection();
         return;
       }
-      // Direct key press still works
+
       var lp = pressed.toLowerCase();
+      if (extraKeys.hasOwnProperty(lp)) {
+        e.preventDefault();
+        extraKeys[lp]();
+        return;
+      }
+
       if (keyMap.hasOwnProperty(lp)) {
         e.preventDefault();
-        clearKeyHandler();
-        callback(keyMap[lp]);
+        for (var i = 0; i < options.length; i++) {
+          if (String(options[i].key || (i + 1)).toLowerCase() === lp) {
+            selectIndex(i, opts.confirmOnClick !== false);
+            return;
+          }
+        }
       }
     }
 
-    currentKeyHandler = handler;
-    document.addEventListener('keydown', handler);
+    setKeyHandler(handler);
   }
 
   // Text input prompt with submit button
@@ -400,8 +535,7 @@
         }
       }
 
-      currentKeyHandler = handler;
-      document.addEventListener('keydown', handler);
+      setKeyHandler(handler);
     }
   }
 
@@ -457,9 +591,167 @@
         }
       }
 
-      currentKeyHandler = handler;
-      document.addEventListener('keydown', handler);
+      setKeyHandler(handler);
     }
+  }
+
+  function promptQuantity(config, callback) {
+    clearKeyHandler();
+    config = config || {};
+    var min = typeof config.min === 'number' ? config.min : 0;
+    var max = typeof config.max === 'number' ? config.max : 9999;
+    var value = typeof config.defaultValue === 'number' ? config.defaultValue : parseInt(config.defaultValue, 10);
+    var baseStep = typeof config.step === 'number' ? config.step : 1;
+    var pricePerUnit = typeof config.pricePerUnit === 'number' ? config.pricePerUnit : 0;
+    var startingCash = typeof config.startingCash === 'number' ? config.startingCash : 0;
+    var currentCartTotal = typeof config.currentCartTotal === 'number' ? config.currentCartTotal : 0;
+    var currentInCart = typeof config.currentInCart === 'number' ? config.currentInCart : 0;
+    var presets = config.presets || [];
+    if (isNaN(value)) value = min;
+    if (value < min) value = min;
+    if (value > max) value = max;
+
+    var html = '<div class="quantity-picker" id="quantity-picker">';
+    var showCurrentInCart = !config.hideCurrentInCart;
+    if (config.description) html += '<div class="quantity-picker-description">' + escapeHtml(config.description) + '</div>';
+    if (config.recommendationText) html += '<div class="quantity-picker-recommendation">' + escapeHtml(config.recommendationText) + '</div>';
+    html += '<div class="quantity-hero"><div class="quantity-hero-value" id="quantity-hero-value"></div><div class="quantity-hero-unit">' + escapeHtml(config.unit || '') + '</div></div>';
+    if (presets.length) {
+      html += '<div class="quantity-picker-presets">';
+      for (var i = 0; i < presets.length; i++) {
+        html += '<button class="quantity-preset" data-value="' + presets[i].value + '">' + escapeHtml(presets[i].label) + '</button>';
+      }
+      html += '</div>';
+    }
+    html += '<div class="quantity-input-row">';
+    html += '<input type="text" class="quantity-input" inputmode="numeric" value="' + value + '" aria-label="' + escapeHtml(config.label || 'Quantity') + '">';
+    html += '<button class="submit-btn quantity-confirm" id="quantity-confirm">Pack This</button>';
+    html += '</div>';
+    html += '<div class="quantity-summary">';
+    html += '<div class="quantity-summary-item"><span class="quantity-summary-label">Cost</span><span class="quantity-summary-value" id="quantity-cost"></span></div>';
+    html += '<div class="quantity-summary-item"><span class="quantity-summary-label">Cash left</span><span class="quantity-summary-value" id="quantity-cash-left"></span></div>';
+    if (showCurrentInCart) {
+      html += '<div class="quantity-summary-item"><span class="quantity-summary-label">In cart</span><span class="quantity-summary-value" id="quantity-in-cart"></span></div>';
+    }
+    html += '</div>';
+    html += '</div>';
+    append(html);
+
+    var picker = document.getElementById('quantity-picker');
+    var input = picker ? picker.querySelector('.quantity-input') : null;
+    var confirmBtn = document.getElementById('quantity-confirm');
+    var presetEls = picker ? picker.querySelectorAll('.quantity-preset') : [];
+    var focusables = [];
+    Array.prototype.push.apply(focusables, Array.prototype.slice.call(presetEls));
+    if (input) focusables.push(input);
+    if (confirmBtn) focusables.push(confirmBtn);
+    var focusIdx = focusables.length ? Math.max(0, focusables.indexOf(input)) : 0;
+
+    function clampValue(next) {
+      if (next < min) next = min;
+      if (next > max) next = max;
+      return next;
+    }
+
+    function updateSummary() {
+      if (!input) return;
+      input.value = value;
+      var totalCost = Math.round((value * pricePerUnit) * 100) / 100;
+      var cashLeft = Math.round((startingCash - currentCartTotal - totalCost) * 100) / 100;
+      var costEl = document.getElementById('quantity-cost');
+      var cashEl = document.getElementById('quantity-cash-left');
+      var cartEl = document.getElementById('quantity-in-cart');
+      var heroEl = document.getElementById('quantity-hero-value');
+      if (costEl) costEl.textContent = formatMoney(totalCost);
+      if (cashEl) cashEl.textContent = formatMoney(cashLeft);
+      if (cartEl) cartEl.textContent = currentInCart + ' ' + (config.unit || '');
+      if (heroEl) heroEl.textContent = String(value);
+      for (var i = 0; i < focusables.length; i++) {
+        if (focusables[i] && focusables[i].classList) {
+          focusables[i].classList.toggle('is-focused', i === focusIdx);
+        }
+      }
+    }
+
+    function setValue(next) {
+      value = clampValue(next);
+      updateSummary();
+    }
+
+    function adjustValue(delta) {
+      setValue(value + delta);
+    }
+
+    function confirm() {
+      clearKeyHandler();
+      if (input) input.disabled = true;
+      if (confirmBtn) confirmBtn.disabled = true;
+      callback(value);
+    }
+
+    Array.prototype.forEach.call(presetEls, function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        setValue(parseInt(btn.getAttribute('data-value'), 10) || 0);
+      });
+    });
+
+    if (input) {
+      input.addEventListener('input', function () {
+        var digits = input.value.replace(/[^\d]/g, '');
+        setValue(digits ? parseInt(digits, 10) : 0);
+      });
+    }
+
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        confirm();
+      });
+    }
+
+    updateSummary();
+    if (input) setTimeout(function () { input.focus(); }, 50);
+
+    setKeyHandler(function (e) {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        if (focusables.length) {
+          focusIdx = (focusIdx - 1 + focusables.length) % focusables.length;
+          if (focusables[focusIdx] && focusables[focusIdx].focus) focusables[focusIdx].focus();
+          updateSummary();
+        }
+        return;
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        if (focusables.length) {
+          focusIdx = (focusIdx + 1) % focusables.length;
+          if (focusables[focusIdx] && focusables[focusIdx].focus) focusables[focusIdx].focus();
+          updateSummary();
+        }
+        return;
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        adjustValue(baseStep);
+        return;
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        adjustValue(-baseStep);
+        return;
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (focusables[focusIdx] && focusables[focusIdx].classList && focusables[focusIdx].classList.contains('quantity-preset')) {
+          setValue(parseInt(focusables[focusIdx].getAttribute('data-value'), 10) || 0);
+          return;
+        }
+        confirm();
+        return;
+      }
+    });
   }
 
   // Show a temporary notification overlay
@@ -518,12 +810,8 @@
       el.classList.remove('screen-fade-out');
       stopAllAnimations();
       callback();
-      el.classList.add('screen-fade-in');
-      setTimeout(function () {
-        el.classList.remove('screen-fade-in');
-        transitioning = false;
-      }, 300);
-    }, 300);
+      transitioning = false;
+    }, 220);
   }
 
   // Pixel dissolve transition
@@ -624,14 +912,7 @@
 
   // Context-aware transition wrapper - randomly picks a style
   function transition(callback) {
-    var roll = Math.random();
-    if (roll < 0.35) {
-      pixelDissolveTransition(callback);
-    } else if (roll < 0.65) {
-      scanlineWipeTransition(callback);
-    } else {
-      fadeTransition(callback);
-    }
+    fadeTransition(callback);
   }
 
   // Bat animation on title screen
@@ -678,8 +959,7 @@
         fire();
       }
     }
-    currentKeyHandler = handler;
-    document.addEventListener('keydown', handler);
+    setKeyHandler(handler);
   }
 
   // Wait for any key - prominent tappable button
@@ -706,8 +986,7 @@
       e.preventDefault();
       fire();
     }
-    currentKeyHandler = handler;
-    document.addEventListener('keydown', handler);
+    setKeyHandler(handler);
   }
 
   // --- Helpers ---
@@ -762,6 +1041,7 @@
     promptChoice: promptChoice,
     promptText: promptText,
     promptNumber: promptNumber,
+    promptQuantity: promptQuantity,
     showNotification: showNotification,
     drawBox: drawBox,
     fadeTransition: fadeTransition,
@@ -772,6 +1052,7 @@
     pressEnter: pressEnter,
     pressAnyKey: pressAnyKey,
     clearKeyHandler: clearKeyHandler,
+    setKeyHandler: setKeyHandler,
     escapeHtml: escapeHtml,
     formatMoney: formatMoney,
     healthLabel: healthLabel,

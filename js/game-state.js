@@ -3,22 +3,17 @@
 
 window.GameState = {
   defaults: {
-    foreman: { name: 'Player', health: 0, alive: true },
+    foreman: { name: 'Expedition Lead', health: 0, alive: true },
     crew: [
-      { name: 'Miner 1', health: 0, alive: true, role: 'ropeman' },
-      { name: 'Miner 2', health: 0, alive: true, role: 'lampkeeper' },
-      { name: 'Miner 3', health: 0, alive: true, role: 'blastman' },
-      { name: 'Miner 4', health: 0, alive: true, role: 'cartdriver' }
+      { name: 'Rope Hand', health: 0, alive: true, role: 'ropeman' },
+      { name: 'Lamp Keeper', health: 0, alive: true, role: 'lampkeeper' }
     ],
-    donkeys: { count: 2, health: 0 },
 
-    // Resources (flat) — balanced for 30-day game
-    food: 100,
-    lanternOil: 8,
-    rope: 150,
-    timber: 30,
-    dynamite: 10,
-    cash: 120,
+    // Core resources for the shorter contract
+    food: 0,
+    lanternOil: 0,
+    rope: 0,
+    cash: 24,
 
     // Progress
     currentZone: 'surface',
@@ -26,10 +21,9 @@ window.GameState = {
     guanoMined: 0,
     guanoStockpile: 0,
     guanoShipped: 0,
-    contractTarget: 4,
 
-    // Time — 30-day fixed contract
-    gameDuration: 30,
+    // Time — 20-day fixed contract
+    gameDuration: 20,
     date: null, // set in init
     startDate: null,
     daysUnderground: 0,
@@ -37,6 +31,7 @@ window.GameState = {
     totalDays: 0,
     workPace: 'steady',
     rationLevel: 'full',
+    foodShortageDays: 0,
     season: 'summer',
     profession: 'mine_foreman',
     scoreMultiplier: 1,
@@ -60,6 +55,10 @@ window.GameState = {
     totalExpenses: 0,
     contracts: [],
     inflationRate: 1.0,
+    companyName: 'Marvel Cave Mining Co.',
+    companySalePrice: 700,
+    contractShareRate: 0.10,
+    companyGrossSales: 0,
 
     // Morale & Equipment
     morale: 50,
@@ -86,10 +85,30 @@ window.GameState = {
     gameOverReason: '',
     score: 0,
     isUnderground: false,
+    restingDay: false,
+    completedRun: false,
+    finalSettlement: null,
+    bestShipmentTons: 0,
+    story: {
+      cast: {
+        jedStage: 0,
+        shadStage: 0,
+        juneStage: 0,
+        lynchStage: 0,
+        lynchKnown: false,
+        shadProjectStage: 0,
+        lastJuneCrewMention: '',
+        lastJedConcernBeat: '',
+        lastTownSpeakerByLocation: {}
+      },
+      fieldNotes: {
+        readPages: {},
+        lastPage: 0
+      }
+    },
 
     // Expanded gameplay systems
     visitedChambers: {},
-    crewAssignment: 'mining',
     marketPrice: 700,
     marketHistory: [],
     miningChoice: 'main_vein',
@@ -100,6 +119,7 @@ window.GameState = {
 
   init: function(options) {
     this.state = JSON.parse(JSON.stringify(this.defaults));
+    this.deleteSave();
 
     // Default to June 1884
     var startMonth = 5; // June (0-indexed)
@@ -116,6 +136,7 @@ window.GameState = {
     this.state.discoveredChambers = ['marmaros'];
 
     if (options) {
+      if (options.runId) this.state.runId = options.runId;
       if (options.foremanName) this.state.foreman.name = options.foremanName;
       if (options.profession) {
         this.state.profession = options.profession;
@@ -123,8 +144,8 @@ window.GameState = {
         var profData = window.CaveData && window.CaveData.PROFESSIONS[options.profession];
         if (profData) {
           this.state.cash = profData.startingMoney;
-          this.state.contractTarget = profData.contractTarget;
           this.state.scoreMultiplier = profData.scoreMultiplier;
+          this.state.contractShareRate = 0.10;
           // Adjust crew count based on profession
           var targetCrew = profData.startingCrew;
           while (this.state.crew.length > targetCrew) {
@@ -140,6 +161,19 @@ window.GameState = {
       if (options.season) this.state.season = options.season;
     }
 
+    if (window.Expedition && window.Expedition.ensureState) {
+      window.Expedition.ensureState(this.state);
+      window.Expedition.syncCrewRoster(this.state);
+    }
+
+    if (window.NarrativeCast && window.NarrativeCast.ensureState) {
+      window.NarrativeCast.ensureState(this.state);
+    }
+
+    if (window.Characters && window.Characters.applyDraftToState) {
+      window.Characters.applyDraftToState(this.state);
+    }
+
     return this.state;
   },
 
@@ -151,12 +185,31 @@ window.GameState = {
     return 'winter';
   },
 
-  advanceDate: function() {
+  roundQuarterDay: function(value) {
+    return Math.round(value * 4) / 4;
+  },
+
+  getElapsedDays: function(state) {
+    var s = state || this.state;
+    return s && typeof s.totalDays === 'number' ? s.totalDays : 0;
+  },
+
+  getDisplayDayNumber: function(state) {
+    var s = state || this.state;
+    if (!s) return 1;
+    var duration = s.gameDuration || 20;
+    return Math.min(Math.floor(this.getElapsedDays(s)) + 1, duration);
+  },
+
+  advanceDate: function(dayAmount) {
     var s = this.state;
-    s.date = new Date(s.date.getTime() + 86400000);
-    s.totalDays++;
-    if (s.isUnderground) s.daysUnderground++;
-    else s.daysOnSurface++;
+    dayAmount = typeof dayAmount === 'number' ? dayAmount : 1;
+    if (dayAmount < 0) dayAmount = 0;
+
+    s.date = new Date(s.date.getTime() + (86400000 * dayAmount));
+    s.totalDays = this.roundQuarterDay((s.totalDays || 0) + dayAmount);
+    if (s.isUnderground) s.daysUnderground = this.roundQuarterDay((s.daysUnderground || 0) + dayAmount);
+    else s.daysOnSurface = this.roundQuarterDay((s.daysOnSurface || 0) + dayAmount);
     s.season = this.getSeason(s.date);
   },
 
@@ -200,63 +253,19 @@ window.GameState = {
   },
 
   save: function() {
-    try {
-      var saveData = JSON.parse(JSON.stringify(this.state));
-      saveData.date = this.state.date.getTime();
-      saveData.startDate = this.state.startDate.getTime();
-      for (var i = 0; i < saveData.pendingPayments.length; i++) {
-        if (saveData.pendingPayments[i].dueDate instanceof Date) {
-          saveData.pendingPayments[i].dueDate = saveData.pendingPayments[i].dueDate.getTime();
-        }
-      }
-      localStorage.setItem('marvelCaveSave', JSON.stringify(saveData));
-      return true;
-    } catch (e) { return false; }
+    return false;
   },
 
   load: function() {
-    try {
-      var raw = localStorage.getItem('marvelCaveSave');
-      if (!raw) return false;
-      var saveData = JSON.parse(raw);
-      saveData.date = new Date(saveData.date);
-      saveData.startDate = new Date(saveData.startDate);
-      for (var i = 0; i < saveData.pendingPayments.length; i++) {
-        if (typeof saveData.pendingPayments[i].dueDate === 'number') {
-          saveData.pendingPayments[i].dueDate = new Date(saveData.pendingPayments[i].dueDate);
-        }
-      }
-      // Migration: consolidate old equipment/items
-      if (saveData.equipment) {
-        if (saveData.equipment.pickaxeUpgrade || saveData.equipment.timberHandles) {
-          saveData.equipment.toolUpgrade = true;
-        }
-        if (saveData.equipment.beltKnife && !saveData.equipment.huntingKnife) {
-          saveData.equipment.huntingKnife = true;
-        }
-        delete saveData.equipment.pickaxeUpgrade;
-        delete saveData.equipment.lanternRepair;
-        delete saveData.equipment.beltKnife;
-        delete saveData.equipment.timberHandles;
-      }
-      if (saveData.hardCandy !== undefined) delete saveData.hardCandy;
-      if (saveData.whiskey !== undefined) delete saveData.whiskey;
-      if (saveData.candles !== undefined) delete saveData.candles;
-      if (saveData.clothing !== undefined) delete saveData.clothing;
-      if (!Array.isArray(saveData.discoveredChambers)) saveData.discoveredChambers = [];
-      if (saveData.discoveredChambers.indexOf('marmaros') === -1) saveData.discoveredChambers.unshift('marmaros');
-      if (!saveData.visitedChambers || typeof saveData.visitedChambers !== 'object') saveData.visitedChambers = {};
-      if (!saveData.crewAssignment) saveData.crewAssignment = 'mining';
-      if (typeof saveData.marketPrice !== 'number') saveData.marketPrice = 700;
-      if (!Array.isArray(saveData.marketHistory)) saveData.marketHistory = [];
-      if (!saveData.miningChoice) saveData.miningChoice = 'main_vein';
-      if (typeof saveData.lastMilestoneShown !== 'number') saveData.lastMilestoneShown = 0;
-
-      this.state = saveData;
-      return true;
-    } catch (e) { return false; }
+    return false;
   },
 
-  hasSave: function() { return localStorage.getItem('marvelCaveSave') !== null; },
-  deleteSave: function() { localStorage.removeItem('marvelCaveSave'); }
+  hasSave: function() { return false; },
+  deleteSave: function() {
+    try {
+      localStorage.removeItem('marvelCaveSave');
+    } catch (e) {
+      // ignore storage failure
+    }
+  }
 };

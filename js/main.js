@@ -14,6 +14,7 @@
     PROFESSION: 'profession',
     CREW: 'crew',
     SEASON: 'season',
+    DOCTRINE: 'doctrine',
     STORE: 'store',
     GAMEPLAY: 'gameplay',
     EVENT: 'event',
@@ -28,6 +29,10 @@
   function init() {
     if (initialized) return;
     initialized = true;
+
+    if (window.GameState && window.GameState.deleteSave) {
+      window.GameState.deleteSave();
+    }
 
     // Verify critical elements exist
     var screen = document.getElementById('screen');
@@ -65,6 +70,9 @@
         break;
       case FLOW.SEASON:
         UI.transition(function () { Screens.season(); });
+        break;
+      case FLOW.DOCTRINE:
+        UI.transition(function () { Screens.doctrine(); });
         break;
       case FLOW.STORE:
         UI.transition(function () { Screens.store(); });

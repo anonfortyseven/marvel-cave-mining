@@ -9,11 +9,10 @@ window.Engine = {
     'grueling': 1.5
   },
 
-  // Base guano mining rate per worker per day (tons)
-  BASE_MINING_RATE: 0.05,
+  TRAVEL_DAY_COST: 0.25,
 
-  // Donkey hauling bonus (multiplier per donkey)
-  DONKEY_HAULING_BONUS: 0.15,
+  // Base guano mining rate per worker per day (tons)
+  BASE_MINING_RATE: 0.06,
 
   // Track the results of the last processed day
   lastDayResults: null,
@@ -23,11 +22,13 @@ window.Engine = {
     var state = window.GameState.state;
     if (!state || state.gameOver) return null;
 
-    var results = this.processDay(state);
+    var timeCost = this.getTimeCost(state);
+    var results = this.processDay(state, timeCost);
+    results.timeCost = timeCost;
     this.lastDayResults = results;
 
     // Advance the calendar
-    window.GameState.advanceDate();
+    window.GameState.advanceDate(timeCost);
 
     // Check game over conditions
     this.checkGameOver(state);
@@ -35,11 +36,29 @@ window.Engine = {
     return results;
   },
 
+  getTimeCost: function(state) {
+    if (!state) return 1;
+    if (state.travelDay === 'descend' || state.travelDay === 'ascend' || state.travelDay === 'surface_ascent') {
+      return this.TRAVEL_DAY_COST;
+    }
+    return 1;
+  },
+
   // Process all daily updates - returns a results object
-  processDay: function(state) {
+  processDay: function(state, timeCost) {
+    timeCost = typeof timeCost === 'number' ? timeCost : 1;
+    if (window.Expedition && window.Expedition.prepareDay) {
+      window.Expedition.prepareDay(state);
+    }
+
+    var travelDay = state.travelDay || '';
+    var restingDay = !!state.restingDay;
+
     var results = {
       date: new Date(state.date.getTime()),
-      day: state.totalDays + 1,
+      day: window.GameState && window.GameState.getDisplayDayNumber ? window.GameState.getDisplayDayNumber(state) : Math.floor((state.totalDays || 0)) + 1,
+      travelDay: travelDay,
+      restingDay: restingDay,
       messages: [],
       healthResults: [],
       resourcesConsumed: null,
@@ -51,7 +70,7 @@ window.Engine = {
     };
 
     // 1. Update inflation
-    window.Economy.updateInflation(state);
+    window.Economy.updateInflation(state, timeCost);
 
     // 2. Process pending payments
     var payments = window.Economy.processPendingPayments(state);
@@ -63,32 +82,40 @@ window.Engine = {
     }
 
     // 3. Consume daily resources
-    var consumption = window.Economy.consumeDailyResources(state);
+    var consumption = window.Economy.consumeDailyResources(state, timeCost);
     results.resourcesConsumed = consumption;
     if (consumption.shortages.length > 0) {
       for (var s = 0; s < consumption.shortages.length; s++) {
-        results.messages.push('SHORTAGE: Out of ' + consumption.shortages[s] + '!');
+        var shortageLabel = consumption.shortages[s] === 'food' ? 'food and water' : consumption.shortages[s];
+        results.messages.push('SHORTAGE: Out of ' + shortageLabel + '!');
       }
     }
 
     // 4. Update crew health
-    var healthResults = window.HealthSystem.updatePartyHealth(state);
+    var originalPace = state.workPace;
+    if (travelDay) {
+      state.workPace = 'careful';
+    }
+    var healthResults = window.HealthSystem.updatePartyHealth(state, timeCost);
+    state.workPace = originalPace;
     results.healthResults = healthResults;
     for (var h = 0; h < healthResults.length; h++) {
       if (healthResults[h].died) {
-        results.messages.push(healthResults[h].name + ' has died.');
+        results.messages.push(healthResults[h].name + ' nearly goes under and has to be dragged clear.');
         results.deaths.push(healthResults[h].name);
       }
     }
 
-    // 5. Update donkey health
-    var donkeyDied = window.HealthSystem.updateDonkeyHealth(state.donkeys, state);
-    if (donkeyDied) {
-      results.messages.push('A donkey has died! ' + state.donkeys.count + ' remaining.');
+    if (restingDay) {
+      results.messages.push('No picks swing today. The crew stays down and truly rests.');
     }
 
-    // 6. Calculate work output (if underground and working)
-    if (state.isUnderground) {
+    if ((state.foodShortageDays || 0) > 0 && (state.foodShortageDays || 0) < 2) {
+      results.messages.push('The line is running dry on food and water.');
+    }
+
+    // 5. Calculate work output (if underground and working)
+    if (state.isUnderground && !travelDay && !restingDay) {
       var mined = this.calculateWorkOutput(state);
       if (mined > 0) {
         state.guanoMined += mined;
@@ -96,42 +123,11 @@ window.Engine = {
         results.guanoMinedToday = mined;
         results.messages.push('Mined ' + mined.toFixed(3) + ' tons of guano today.');
 
-        // Milestone markers for UI celebration art
-        var pct = state.contractTarget > 0 ? (state.guanoShipped + state.guanoStockpile) / state.contractTarget : 0;
-        if (pct >= 0.75 && state.lastMilestoneShown < 75) { state.lastMilestoneShown = 75; results.messages.push('MILESTONE_75'); }
-        else if (pct >= 0.50 && state.lastMilestoneShown < 50) { state.lastMilestoneShown = 50; results.messages.push('MILESTONE_50'); }
-        else if (pct >= 0.25 && state.lastMilestoneShown < 25) { state.lastMilestoneShown = 25; results.messages.push('MILESTONE_25'); }
       }
     }
 
-    // 6b. Mining method risks
-    if (state.isUnderground && state.miningChoice === 'side_passage' && Math.random() < 0.2) {
-      results.messages.push('A side tunnel slumps and nearly buries the lead team.');
-      var livingSide = window.GameState.getLivingParty();
-      if (livingSide.length > 0) {
-        var sideVictim = livingSide[Math.floor(Math.random() * livingSide.length)];
-        window.HealthSystem.applyDamage(sideVictim, 18 + Math.floor(Math.random() * 12));
-        results.messages.push(sideVictim.name + ' is bruised by a cave-in while scouting the side passage.');
-      }
-    }
-    if (state.isUnderground && state.miningChoice === 'blasting') {
-      if (state.dynamite > 0) state.dynamite -= 1;
-      if (Math.random() < 0.15) {
-        var livingBlast = window.GameState.getLivingParty();
-        if (livingBlast.length > 0) {
-          var blastVictim = livingBlast[Math.floor(Math.random() * livingBlast.length)];
-          var blastDied = window.HealthSystem.applyDamage(blastVictim, 25 + Math.floor(Math.random() * 20));
-          results.messages.push('Powder flash! ' + blastVictim.name + ' catches flying stone.');
-          if (blastDied) {
-            results.messages.push(blastVictim.name + ' was killed in the blast.');
-            results.deaths.push(blastVictim.name);
-          }
-        }
-      }
-    }
-
-    // 7. Roll for random events
-    var events = window.EventSystem.rollForEvents(state);
+    // 6. Roll for random events
+    var events = restingDay ? [] : window.EventSystem.rollForEvents(state, timeCost);
     results.eventsTriggered = events;
     for (var e = 0; e < events.length; e++) {
       results.messages.push('--- ' + events[e].eventName + ' ---');
@@ -146,34 +142,21 @@ window.Engine = {
       }
     }
 
-    // 8. Tick event cooldowns
-    window.EventSystem.tickCooldowns(state);
+    // 7. Tick event cooldowns
+    window.EventSystem.tickCooldowns(state, timeCost);
 
-    // 8b. Tick temporary state flags (tavern scenes, etc.)
-    this.tickTemporaryFlags(state);
+    // 7b. Tick temporary state flags (tavern scenes, etc.)
+    this.tickTemporaryFlags(state, timeCost);
 
-    // 9. Check contracts
-    var contractResults = window.Economy.checkContracts(state);
-    for (var c = 0; c < contractResults.length; c++) {
-      results.messages.push(contractResults[c].message);
+    // 8. Morale updates
+    this.updateMorale(state, results, timeCost);
+
+    if (window.Expedition && window.Expedition.finishDay) {
+      window.Expedition.finishDay(state, results);
     }
 
-    // 9b. Crew scouting can reveal adjacent chambers without travel
-    if (state.isUnderground && state.crewAssignment === 'scouting' && window.CaveData) {
-      var current = window.CaveData.getChamber(state.currentChamber);
-      if (current && current.connectedTo) {
-        for (var sc = 0; sc < current.connectedTo.length; sc++) {
-          var cid = current.connectedTo[sc];
-          if (state.discoveredChambers.indexOf(cid) === -1) {
-            state.discoveredChambers.push(cid);
-            results.messages.push('Scouts map a new adjacent chamber: ' + (window.CaveData.getChamber(cid).name || cid) + '.');
-          }
-        }
-      }
-    }
-
-    // 10. Morale updates
-    this.updateMorale(state, results);
+    state.travelDay = '';
+    state.restingDay = false;
 
     return results;
   },
@@ -211,9 +194,10 @@ window.Engine = {
     var paceMultiplier = this.PACE_MULTIPLIER[state.workPace] || 1.0;
     output *= paceMultiplier;
 
-    // Donkey hauling bonus
-    if (state.donkeys.count > 0) {
-      output *= (1 + state.donkeys.count * this.DONKEY_HAULING_BONUS);
+    // Lead profession bonus
+    var profession = window.CaveData && window.CaveData.PROFESSIONS ? window.CaveData.PROFESSIONS[state.profession] : null;
+    if (profession && profession.miningBonus) {
+      output *= (1 + profession.miningBonus);
     }
 
     // Chamber yield modifier (if cave data is available)
@@ -225,30 +209,9 @@ window.Engine = {
       }
     }
 
-    // Crew assignment impact
-    if (state.crewAssignment === 'scouting') output *= 0.8;
-    if (state.crewAssignment === 'guarding') output *= 0.9;
-
-    // Mining method impact
-    if (state.miningChoice === 'side_passage') {
-      var sideRoll = Math.random();
-      if (sideRoll < 0.3) {
-        output *= 1.5;
-      } else if (sideRoll < 0.5) {
-        output *= 0.2;
-      }
-    } else if (state.miningChoice === 'blasting') {
-      output *= 2.0;
-    }
-
     // Rope check - need rope to haul effectively
     if (state.rope < 20) {
       output *= 0.5; // halved without adequate rope
-    }
-
-    // Dynamite bonus for breaking through hard rock
-    if (state.dynamite > 0) {
-      output *= 1.1; // 10% bonus
     }
 
     // Equipment bonuses
@@ -261,37 +224,34 @@ window.Engine = {
     var moraleMod = 0.8 + (morale / 250); // range 0.8 (morale=0) to 1.2 (morale=100)
     output *= moraleMod;
 
+    if (window.Expedition && window.Expedition.modifyOutput) {
+      output = window.Expedition.modifyOutput(state, output);
+    }
+
     return Math.round(output * 1000) / 1000;
   },
 
   // Check game over conditions
   checkGameOver: function(state) {
-    // Foreman dead
-    if (!state.foreman.alive) {
+    if ((state.foodShortageDays || 0) >= 2) {
       state.gameOver = true;
-      state.gameOverReason = 'The foreman is dead. Without him the crew scatters like quail.';
+      state.gameOverReason = 'Two days without food and water force the line back to daylight under escort.';
       return true;
     }
 
-    // All crew dead
-    if (window.GameState.getLivingCrewCount() === 0) {
-      state.gameOver = true;
-      state.gameOverReason = 'Every last man is dead. The cave keeps what it takes.';
-      return true;
-    }
-
-    // Ran out of time (30-day contract expired)
-    var duration = state.gameDuration || 30;
+    // Ran out of time
+    var duration = state.gameDuration || 20;
     if (state.totalDays >= duration) {
       state.gameOver = true;
-      state.gameOverReason = 'Thirty days gone. The contract is dust. Time to reckon what you\'ve earned and what you\'ve lost.';
+      state.completedRun = true;
+      state.gameOverReason = 'Twenty days are gone. The company clerk closes the books on whatever haul you got out.';
       return true;
     }
 
     // Broke and starving with no pending payments
     if (state.cash <= 0 && state.food <= 0 && state.pendingPayments.length === 0 && state.guanoStockpile <= 0) {
       state.gameOver = true;
-      state.gameOverReason = 'No food. No coin. No guano to sell. The mountain has beaten you hollow.';
+      state.gameOverReason = 'No food and water. No coin. No load in the yard. The contract breaks before you do.';
       return true;
     }
 
@@ -354,17 +314,18 @@ window.Engine = {
   },
 
   // Tick down short-lived state flags (used by town/tavern scenes)
-  tickTemporaryFlags: function(state) {
+  tickTemporaryFlags: function(state, timeCost) {
     if (!state) return;
+    var step = typeof timeCost === 'number' ? timeCost : 1;
 
-    if (state.calmFocusDays && state.calmFocusDays > 0) state.calmFocusDays--;
-    if (state.airAwareDays && state.airAwareDays > 0) state.airAwareDays--;
+    if (state.calmFocusDays && state.calmFocusDays > 0) state.calmFocusDays = Math.max(0, state.calmFocusDays - step);
+    if (state.airAwareDays && state.airAwareDays > 0) state.airAwareDays = Math.max(0, state.airAwareDays - step);
 
     // Per-chamber mapping timers
     if (state.mappedChambers && typeof state.mappedChambers === 'object') {
       for (var k in state.mappedChambers) {
         if (!state.mappedChambers.hasOwnProperty(k)) continue;
-        state.mappedChambers[k]--;
+        state.mappedChambers[k] -= step;
         if (state.mappedChambers[k] <= 0) delete state.mappedChambers[k];
       }
     }
@@ -373,30 +334,41 @@ window.Engine = {
     if (state.tavernSceneCooldowns && typeof state.tavernSceneCooldowns === 'object') {
       for (var id in state.tavernSceneCooldowns) {
         if (!state.tavernSceneCooldowns.hasOwnProperty(id)) continue;
-        state.tavernSceneCooldowns[id]--;
+        state.tavernSceneCooldowns[id] -= step;
         if (state.tavernSceneCooldowns[id] <= 0) delete state.tavernSceneCooldowns[id];
       }
     }
   },
 
   // Update morale for the day
-  updateMorale: function(state, results) {
+  updateMorale: function(state, results, timeCost) {
     if (state.morale === undefined) state.morale = 50;
     var old = state.morale;
+    var step = typeof timeCost === 'number' ? timeCost : 1;
+    var moraleDelta = 0;
 
     if (state.isUnderground) {
-      state.morale -= 1; // decay underground
-      if (state.workPace === 'grueling') state.morale -= 1;
+      moraleDelta -= 1; // decay underground
+      if (state.workPace === 'grueling') moraleDelta -= 1;
     } else {
-      state.morale += 2; // recover on surface
+      moraleDelta += 2; // recover on surface
     }
 
     // Low food penalty
-    if (state.food <= 0) state.morale -= 3;
-    else if (state.rationLevel === 'scraps') state.morale -= 1;
+    if (state.food <= 0) moraleDelta -= 3;
+    else if (state.rationLevel === 'scraps') moraleDelta -= 1;
+
+    if (window.Expedition && window.Expedition.getCrewData) {
+      var ropeProfile = state.crew[0] ? window.Expedition.getCrewData(state, state.crew[0]) : null;
+      var lampProfile = state.crew[1] ? window.Expedition.getCrewData(state, state.crew[1]) : null;
+      if (ropeProfile && ropeProfile.traitId === 'grim_joker' && state.isUnderground) moraleDelta += 1;
+      if (lampProfile && lampProfile.traitId === 'night_singer' && !state.isUnderground) moraleDelta += 1;
+    }
+
+    state.morale += moraleDelta * step;
 
     // Clamp
-    state.morale = Math.max(0, Math.min(100, state.morale));
+    state.morale = Math.max(0, Math.min(100, Math.round(state.morale * 100) / 100));
 
     // Mutiny warning
     if (state.morale < 20 && old >= 20) {

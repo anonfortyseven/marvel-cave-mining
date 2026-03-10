@@ -18,49 +18,29 @@ window.EventSystem = {
     ],
     lampkeeper: [
       'Hold still. I need this flame to stay true. Our lives are exactly as long as this wick.',
-      'If the light dies, we die with it. That is not poetry. That is arithmetic.',
+      'If the light dies, we are in a very bad way. That is not poetry. That is arithmetic.',
       'Bad air makes the lantern dance. When the flame dances, I do not dance with it. I leave.',
       'Stay in the glow. The dark out there is not empty. It is patient.',
       "Oil's low. I can stretch it but I cannot create it. We need to think about going up.",
       'That blue tinge on the flame? Methane. The cave is breathing something we should not be.',
-      "I have seen a man walk ten feet past his lantern's reach and never come back. Ten feet.",
+      "I have seen a man walk ten feet past his lantern's reach and come back changed. Ten feet.",
       "The flame tells you things if you watch it. Right now it is saying we should not be here."
-    ],
-    blastman: [
-      'Loose rock means loose graves. Mind your heads and mind your prayers.',
-      'I can break stone. I cannot mend a crushed skull. The order of operations matters.',
-      'Flood water and powder do not mix. If the water comes, leave the powder. Leave everything.',
-      'Hear that rumble? The cave is clearing its throat. When it speaks, we listen.',
-      "I have cracked open mountains. This cave is different. It pushes back.",
-      "That crack in the ceiling was not there yesterday. The limestone remembers every charge we set.",
-      "Dynamite is simple. Light the fuse, walk away. It is the walking away part men get wrong.",
-      "The rock here is Mississippian limestone. Three hundred million years old. It has opinions about being disturbed."
-    ],
-    cartdriver: [
-      'Keep the line moving. These donkeys spook easy and a spooked donkey in a cave is a disaster with hooves.',
-      'Track is slick as sin. Watch your footing or watch the donkey step on you.',
-      'We drop this load, we lose half a day. I do not have half a day to lose.',
-      'I can haul through this, but not at a dead run. The cart was not built for heroics.',
-      "The donkeys know something we don't. Look at their ears. They hear things in the rock.",
-      "I have driven carts through worse. Not much worse. But worse.",
-      "Fifty pounds a sack. Four sacks a load. Eight loads a day. The arithmetic of bat dung.",
-      "The mules on the surface have it easy. These poor donkeys got lowered down here by rope and they have not forgiven us."
     ]
   },
 
   getCrewQuipForEvent: function(state, eventId) {
     if (!state || !state.crew) return null;
     var roleForEvent = {
-      cave_in: 'blastman',
-      flooding: 'cartdriver',
+      cave_in: 'ropeman',
+      flooding: 'ropeman',
       bad_air: 'lampkeeper',
       bat_swarm: 'lampkeeper',
-      rockfall: 'blastman',
+      rockfall: 'ropeman',
       equipment_break: 'ropeman',
       snakebite: 'ropeman',
       bat_fever: 'lampkeeper',
-      lost: 'cartdriver',
-      exhaustion: 'cartdriver',
+      lost: 'ropeman',
+      exhaustion: 'ropeman',
       hypothermia: 'lampkeeper',
       lung_sickness: 'lampkeeper',
       broken_bone: 'ropeman'
@@ -100,16 +80,16 @@ window.EventSystem = {
         results.messages.push(victim.name + ' disappears under a wall of falling stone.');
         var died = window.HealthSystem.applyDamage(victim, damage);
         if (died) {
-          results.messages.push(victim.name + ' was buried. The cave keeps what it takes.');
+          results.messages.push(victim.name + ' vanishes under the fall and comes out half-carried, but alive.');
           results.deaths.push(victim.name);
         } else {
           results.messages.push(victim.name + ' crawls free, bloodied but breathing. Health: ' + window.HealthSystem.getHealthLabel(victim.health));
         }
-        // May lose timber
-        if (state.timber > 0) {
-          var lost = Math.min(state.timber, Math.floor(Math.random() * 5) + 1);
-          state.timber -= lost;
-          results.messages.push(lost + ' timber splintered like matchsticks in the collapse.');
+        // May lose rope in the scramble
+        if (state.rope > 20) {
+          var lost = Math.min(state.rope, (Math.floor(Math.random() * 4) + 1) * 10);
+          state.rope -= lost;
+          results.messages.push(lost + ' feet of rope vanished under the collapse.');
         }
         return results;
       }
@@ -160,7 +140,7 @@ window.EventSystem = {
           if (state.airAwareDays && state.airAwareDays > 0) damage = Math.floor(damage * 0.7);
           var died = window.HealthSystem.applyDamage(living[i], damage);
           if (died) {
-            results.messages.push(living[i].name + ' collapses. The coughing stops. That is worse than the coughing.');
+            results.messages.push(living[i].name + ' folds where they stand and has to be hauled toward cleaner air.');
             results.deaths.push(living[i].name);
           }
         }
@@ -208,7 +188,7 @@ window.EventSystem = {
         results.messages.push('A boulder the size of a whiskey barrel breaks free and tumbles onto ' + victim.name + '.');
         var died = window.HealthSystem.applyDamage(victim, damage);
         if (died) {
-          results.messages.push(victim.name + ' did not get up. The mountain shrugged and a man died.');
+          results.messages.push(victim.name + ' hits hard and needs the whole line to drag them clear.');
           results.deaths.push(victim.name);
         }
         return results;
@@ -226,8 +206,7 @@ window.EventSystem = {
         // Lose a random piece of equipment
         var options = [];
         if (state.rope > 20) options.push('rope');
-        if (state.timber > 3) options.push('timber');
-        if (state.dynamite > 2) options.push('dynamite');
+        if (state.lanternOil > 1) options.push('lanternOil');
         if (options.length === 0) {
           results.messages.push('Equipment is wearing down but nothing breaks.');
           return results;
@@ -239,15 +218,10 @@ window.EventSystem = {
             state.rope = Math.max(0, state.rope - lost);
             results.messages.push(lost + ' feet of rope snapped!');
             break;
-          case 'timber':
-            var lost2 = Math.floor(Math.random() * 5) + 1;
-            state.timber = Math.max(0, state.timber - lost2);
-            results.messages.push(lost2 + ' timber supports cracked!');
-            break;
-          case 'dynamite':
-            var lost3 = Math.floor(Math.random() * 3) + 1;
-            state.dynamite = Math.max(0, state.dynamite - lost3);
-            results.messages.push(lost3 + ' sticks of dynamite ruined by moisture!');
+          case 'lanternOil':
+            var lost2 = Math.min(state.lanternOil, 0.5 + Math.random());
+            state.lanternOil = Math.max(0, state.lanternOil - lost2);
+            results.messages.push(lost2.toFixed(1) + ' gallons of lantern oil leaked away.');
             break;
         }
         return results;
@@ -269,7 +243,7 @@ window.EventSystem = {
         results.messages.push(victim.name + ' was bitten by a timber rattler coiled in the rocks. It struck before anyone saw it.');
         var died = window.HealthSystem.applyDamage(victim, damage);
         if (died) {
-          results.messages.push(victim.name + ' died of the venom. The nearest doctor was in Forsyth. Two days away.');
+          results.messages.push(victim.name + ' goes gray from the venom, but the line gets them back to daylight in time.');
           results.deaths.push(victim.name);
         } else {
           results.messages.push(victim.name + '\'s arm swells black as a bruise. Rest is the only medicine that matters.');
@@ -372,13 +346,13 @@ window.EventSystem = {
         if (living.length === 0) return results;
         var victim = living[Math.floor(Math.random() * living.length)];
         var damage = 20 + Math.floor(Math.random() * 25);
-        results.messages.push(victim.name + ' doubles over with a racking cough that echoes off the walls like a death rattle.');
+        results.messages.push(victim.name + ' doubles over with a racking cough that strips the room of all its swagger.');
         var died = window.HealthSystem.applyDamage(victim, damage);
         if (died) {
-          results.messages.push(victim.name + '\'s cough went silent. That was not a good sign. It was the last sign.');
+          results.messages.push(victim.name + '\'s cough goes quiet and the others walk them out before it turns worse.');
           results.deaths.push(victim.name);
         } else {
-          results.messages.push(victim.name + ' will be breathing through a wet cloth for days. If breathing at all.');
+          results.messages.push(victim.name + ' will be breathing through a wet cloth for days.');
         }
         return results;
       }
@@ -417,13 +391,9 @@ window.EventSystem = {
       cooldown: 7,
       effect: function(state) {
         var results = { messages: [], deaths: [] };
-        if (state.crewAssignment === 'guarding') {
-          results.messages.push('Your guarding detail spots masked riders early and secures the camp. The Bald Knobbers move on.');
-          return results;
-        }
         results.messages.push('Flour-sack masks with cane-stalk horns. Hickory switches and revolvers. The Bald Knobbers have come calling.');
         // Steal cash and supplies
-        var cashStolen = Math.min(state.cash, Math.floor(Math.random() * 50) + 20);
+        var cashStolen = Math.min(state.cash, (Math.floor(Math.random() * 9) + 4) / 2);
         if (state.equipment && state.equipment.huntingKnife) {
           cashStolen = Math.floor(cashStolen * 0.5);
           results.messages.push('Your hunting knife deters the worst of the theft.');
@@ -498,10 +468,6 @@ window.EventSystem = {
       condition: function(state) { return state.guanoStockpile > 0.2; },
       effect: function(state) {
         var results = { messages: [], deaths: [] };
-        if (state.crewAssignment === 'guarding') {
-          results.messages.push('The guarding crew keeps tarps tight and sacks dry. No spoilage today.');
-          return results;
-        }
         var lost = Math.min(state.guanoStockpile, 0.1 + Math.random() * 0.25);
         state.guanoStockpile = Math.max(0, state.guanoStockpile - lost);
         results.messages.push('Rain and mold ruin ' + lost.toFixed(2) + ' tons of stored guano.');
@@ -550,10 +516,10 @@ window.EventSystem = {
         var foodLost = Math.min(state.food, Math.floor(Math.random() * 30) + 15);
         state.food -= foodLost;
         results.messages.push(foodLost + ' lbs of food destroyed.');
-        if (state.dynamite > 0 && Math.random() < 0.3) {
-          var dynLost = Math.min(state.dynamite, Math.floor(Math.random() * 5) + 1);
-          state.dynamite -= dynLost;
-          results.messages.push(dynLost + ' sticks of dynamite lost! (Carefully moved the rest.)');
+        if (state.rope > 20 && Math.random() < 0.35) {
+          var ropeLost = Math.min(state.rope, (Math.floor(Math.random() * 3) + 1) * 10);
+          state.rope -= ropeLost;
+          results.messages.push(ropeLost + ' feet of rope burned before you stamped it out.');
         }
         // Someone may get burned
         if (Math.random() < 0.4) {
@@ -570,7 +536,8 @@ window.EventSystem = {
   },
 
   // Roll for random events based on current state
-  rollForEvents: function(state) {
+  rollForEvents: function(state, timeScale) {
+    timeScale = typeof timeScale === 'number' ? timeScale : 1;
     var triggered = [];
     var events = state.isUnderground ? this.caveEvents : this.surfaceEvents;
 
@@ -594,6 +561,9 @@ window.EventSystem = {
 
       // Roll probability (with small dynamic modifiers)
       var prob = event.probability;
+      if (window.Expedition && window.Expedition.modifyEventProbability) {
+        prob = window.Expedition.modifyEventProbability(state, eventId, prob);
+      }
 
       // Tavern scene bonuses: make it less likely to get lost / bad air when prepared
       if (eventId === 'lost') {
@@ -605,7 +575,8 @@ window.EventSystem = {
       }
 
       // Roll probability
-      if (Math.random() < prob) {
+      var scaledProb = 1 - Math.pow(1 - prob, timeScale);
+      if (Math.random() < scaledProb) {
         // Event triggers!
         var result = event.effect(state);
         result.eventId = eventId;
@@ -624,10 +595,11 @@ window.EventSystem = {
   },
 
   // Decrease all cooldowns by 1 (call each day)
-  tickCooldowns: function(state) {
+  tickCooldowns: function(state, timeScale) {
+    timeScale = typeof timeScale === 'number' ? timeScale : 1;
     for (var eventId in state.eventCooldowns) {
       if (state.eventCooldowns[eventId] > 0) {
-        state.eventCooldowns[eventId]--;
+        state.eventCooldowns[eventId] -= timeScale;
       }
       if (state.eventCooldowns[eventId] <= 0) {
         delete state.eventCooldowns[eventId];
@@ -640,9 +612,9 @@ window.EventSystem = {
     {
       id: 'unstable_passage',
       title: 'Unstable Passage',
-      text: 'A cracked section groans ahead. Shore it or squeeze through?',
+      text: 'A cracked section groans ahead. Rig a line or squeeze through?',
       options: [
-        { key: '1', label: 'Shore it up (cost 2 timber, safe)', apply: function(state){ if(state.timber>=2){state.timber-=2; return ['You brace the ceiling with fresh timber and pass safely.'];} return ['Not enough timber. You squeeze through anyway.', 'Loose stone clips a shoulder.']; } },
+        { key: '1', label: 'Rig a safety line (cost 10 ft rope, safe)', apply: function(state){ if(state.rope>=10){state.rope-=10; return ['You rig a rope line and cross safely.'];} return ['Not enough rope. You edge through anyway.', 'Loose stone clips a shoulder.']; } },
         { key: '2', label: 'Squeeze through (risky)', apply: function(state){ var out=['You squeeze sideways through splintered rock.']; if(Math.random()<0.4){ var v=window.GameState.getLivingParty()[0]; if(v){window.HealthSystem.applyDamage(v,18); out.push(v.name+' is hurt by falling rubble.');}} else out.push('You clear it without incident.'); return out; } }
       ]
     },
@@ -661,7 +633,7 @@ window.EventSystem = {
       text: 'A crewman twists hard on wet stone.',
       options: [
         { key: '1', label: 'Rest him (lose a worker for 2 days)', apply: function(state){ state.injuredCrewDays=(state.injuredCrewDays||0)+2; return ['You set a splint and lighten his load for two days.']; } },
-        { key: '2', label: 'Push through (risk of death)', apply: function(state){ var out=['You keep the line moving.']; var v=window.GameState.getLivingParty()[0]; if(v&&Math.random()<0.15){v.alive=false; out.push(v.name+' collapses and does not rise.');} else if(v){window.HealthSystem.applyDamage(v,20); out.push(v.name+' soldiers on through pain.');} return out; } }
+        { key: '2', label: 'Push through (risk a collapse)', apply: function(state){ var out=['You keep the line moving.']; var v=window.GameState.getLivingParty()[0]; if(v&&Math.random()<0.15){window.HealthSystem.applyDamage(v,120); out.push(v.name+' folds up halfway through and the others half-carry the rest of the climb.');} else if(v){window.HealthSystem.applyDamage(v,20); out.push(v.name+' soldiers on through pain.');} return out; } }
       ]
     },
     {
@@ -678,7 +650,7 @@ window.EventSystem = {
       title: 'Passing Trader',
       text: 'A mule train offers emergency supplies at steep markup.',
       options: [
-        { key: '1', label: 'Buy emergency bundle ($8)', apply: function(state){ if(state.cash>=8){state.cash-=8; state.food+=12; state.lanternOil+=1; return ['You buy food and oil at a painful price.'];} return ['You cannot afford the trader\'s terms.']; } },
+        { key: '1', label: 'Buy emergency bundle ($1.25)', apply: function(state){ if(state.cash>=1.25){state.cash=Math.round((state.cash-1.25)*100)/100; state.food+=12; state.lanternOil+=1; return ['You buy food and oil at a painful price.'];} return ['You cannot afford the trader\'s terms.']; } },
         { key: '2', label: 'Refuse', apply: function(){ return ['You save your cash and trust your stores.']; } }
       ]
     },
@@ -694,7 +666,13 @@ window.EventSystem = {
   ],
 
   maybeGetChoiceEncounter: function(state) {
-    if (!state || Math.random() > 0.22) return null;
+    var chance = 0.12;
+    if (state && window.Expedition && window.Expedition.getBeatLabel) {
+      var beat = window.Expedition.getBeatLabel(state);
+      if (beat === 'Crisis' || beat === 'Wonder') chance = 0.18;
+      else if (beat === 'Calm') chance = 0.08;
+    }
+    if (!state || Math.random() > chance) return null;
     return this.choiceEvents[Math.floor(Math.random() * this.choiceEvents.length)];
   },
 

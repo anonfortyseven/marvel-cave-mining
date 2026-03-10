@@ -14,320 +14,108 @@
     marmaros: [
       'You have arrived at Marmaros.',
       '',
-      'Twenty-eight souls cling to this ridgetop like moss',
-      'on a headstone. A hotel that is mostly roof. A general',
-      'store that smells of lye and ambition. A shed where a',
-      'man will weigh your guano and lie about the scales.',
-      '',
-      'Mule teams stamp in the mud by the cave mouth, waiting',
-      'to drag another load of bat dung down to Branson. The',
-      'Greek word for marble -- that is what they named this',
-      'place, after the Blow expedition mistook limestone for',
-      'something worth having.',
-      '',
-      'The Bald Knobbers ride these hills after dark. Keep',
-      'your lantern lit and your business to yourself.'
+      'A ridge town built on ledgers, porches, and the hole',
+      'in the ground below it. Everybody here knows what the',
+      'cave pays. Everybody also knows what it takes.'
     ],
     cathedral_entrance: [
       'You stand at the mouth of the Devil\'s Den.',
       '',
-      'Forty feet across, the sinkhole yawns in the forest',
-      'floor like a wound that will not close. The Osage',
-      'carved warnings into the trees -- a sideways V that',
-      'meant: do not enter. They said a young brave fell',
-      'here chasing a bear and the earth swallowed him whole.',
-      '',
-      'Rope ladders and crude timber rigging descend into',
-      'a darkness so complete it seems to drink your lantern',
-      'light. The air rising from below is fifty-eight degrees',
-      'and smells of centuries.',
-      '',
-      'The drop is two hundred feet. The largest cave',
-      'entrance room in America waits at the bottom.',
-      'In 1541, Spanish conquistadors lowered themselves',
-      'on notched pine logs. Some came back up. Some did not.'
+      'Daylight ends here. Cold cave air rises up the shaft',
+      'and the rope line begins its long argument with the',
+      'dark.'
     ],
     the_sentinel: [
-      'Before you stands The Sentinel.',
+      'The Sentinel rises in the half-light.',
       '',
-      'Thirty feet of calcite risen from the cavern floor,',
-      'built one patient drip at a time over millennia. It',
-      'stands where stalactite met stalagmite and fused into',
-      'a column that looks, in the lantern-flicker, almost',
-      'like something keeping watch.',
-      '',
-      'The guides tell tourists it is the only thing holding',
-      'up the Cathedral Room ceiling. The tourists believe',
-      'them. Your crew tips their hats as they pass, a habit',
-      'no one remembers starting.',
-      '',
-      'Old tobacco offerings sit at its base. Osage, some',
-      'say. Others say the miners leave them. No one claims',
-      'to have seen who.'
+      'A stone column, a landmark, and the quiet mark that',
+      'you have reached the fork near the Spring Room.'
     ],
     cathedral_floor: [
-      'You stand on the floor of the Cathedral Room.',
+      'You stand on the Cathedral Room floor.',
       '',
-      'Two acres of darkness. The ceiling is two hundred',
-      'feet overhead and lost to shadow -- you could stand',
-      'the Statue of Liberty in here and she would not',
-      'scrape her torch. Your lantern is a candle in a',
-      'cathedral built by water and time.',
-      '',
-      'The guano lies thick in places. Centuries of it,',
-      'deposited by the gray bat colonies that spiral',
-      'from the sinkhole at dusk in a living tornado',
-      'that takes twenty minutes to pass. The smell hits',
-      'your throat like a fist.',
-      '',
-      'Atop the 124-foot debris pile called the Underground',
-      'Mountain, the bones of animals that fell through the',
-      'sinkhole over millennia lie mixed with the dung of',
-      'eighty thousand bats. This is what you came for.',
-      'God help you.'
+      'The roof is too high for your lamp to matter much.',
+      'The main haul runs on. The Spring Room waits off to',
+      'the side for crews wise enough to choose it.'
     ],
     serpentine_passage: [
       'You enter the Serpentine Passage.',
       '',
-      'The Cathedral Room releases you into a gut of stone',
-      'barely six feet high, twisting like something alive.',
-      'The walls are scalloped smooth by ancient pressurized',
-      'water that bored through this bedrock a million years',
-      'before you were born.',
-      '',
-      'Every sack of guano you harvest must come back',
-      'through here on a man\'s shoulders. One sack at a',
-      'time. Fifty pounds each. The passage does not care',
-      'about your schedule.',
-      '',
-      'The walls are scarred with pick marks from miners',
-      'who tried to widen it. The limestone won.'
+      'Every load out of the upper cave has to squeeze this',
+      'twisting throat of stone.'
     ],
     egyptian_room: [
       'You have entered the Egyptian Room.',
       '',
-      'The ceiling here is flat and polished like the sole',
-      'of a giant\'s boot. In 1869, the Blow expedition held',
-      'up their lanterns and declared it pure marble. It was',
-      'ordinary Mississippian limestone. But the mistake gave',
-      'this cave its name and its fortune.',
-      '',
-      'Miriam and Genevieve Lynch, daughters of the man who',
-      'bought the cave, named the formations: King Tut\'s',
-      'Sarcophagus. Cleopatra\'s Sandal. The Sphinx\'s Nose.',
-      'They were girls playing make-believe three hundred',
-      'feet underground. The names stuck.',
-      '',
-      'Lynch charged tourists fifty cents to see this room.',
-      'Then the guano trade paid better, and the tourists',
-      'stopped coming. Now you are here with a shovel instead',
-      'of a lantern tour.'
+      'Smooth ceiling, old names, and the strange feeling',
+      'that the cave once wanted to impress people here.'
     ],
     gulf_of_doom: [
       'You stand at the edge of the Gulf of Doom.',
       '',
-      'A hundred-foot vertical shaft drops beneath the heel',
-      'of the Egyptian Room into nothing. Drop a stone and',
-      'listen. You will not hear it land. The bottom is a',
-      'deep slurry of cavern clay and nitrogen-rich guano',
-      'that swallows everything without sound.',
-      '',
-      'The richest deposits in the cave crust the ledges',
-      'around the rim. Three miners have fallen here. Their',
-      'lanterns were found. The men were not.',
-      '',
-      'Early explorers called this pit bottomless, and they',
-      'were not entirely wrong. Some depths are not meant',
-      'to be measured.'
+      'The ledge is mean, the drop is black, and the rich',
+      'dirt sits exactly where you would least like it to.'
     ],
     fat_mans_misery: [
       'You have reached Fat Man\'s Misery.',
       '',
-      'Four feet seven inches of headroom. Seven feet of',
-      'passage. You must turn sideways, empty your lungs,',
-      'and shuffle through an inch at a time while the',
-      'Ozarks press against your chest and spine.',
-      '',
-      'They say a three-hundred-pound man got wedged here',
-      'so tight his crew greased him with lard and hauled',
-      'him out with rope. They say he never went underground',
-      'again. They say a lot of things in Marmaros.',
-      '',
-      'Beyond this point, the cave does not let go easily.',
-      'Check your oil. Check your rope. Check your nerve.'
+      'Turn sideways. Empty your lungs. Move slow. The cave',
+      'has no special fondness for broad shoulders.'
     ],
     the_dungeon: [
       'You have entered The Dungeon.',
       '',
-      'The ceiling drops to four feet. Iron oxide leaches',
-      'through the limestone in thick rust-colored streaks',
-      'that look, in your lantern light, exactly like dried',
-      'blood running down the walls.',
-      '',
-      'Cave guides told tourists this was a Spanish torture',
-      'chamber. It was not. It is just stone bleeding iron,',
-      'the way stone does when water has ten thousand years',
-      'to work. But the ammonia is real, and the air burns',
-      'your eyes and throat.',
-      '',
-      'A guttering candle flame means bad air. If it goes',
-      'out, you leave. There is no negotiating with carbon',
-      'dioxide. It pools in low places and waits.'
+      'Low roof, rust-streaked walls, and the kind of air',
+      'that makes every flame worth watching.'
     ],
     spring_room: [
       'You have found the Spring Room.',
       '',
-      'Hidden behind The Sentinel through a crevice most men',
-      'walk past without seeing, the walls here blaze with',
-      'orange calcite so vivid it looks painted. Concealed',
-      'waterfalls cascade over terraced stone, filling the',
-      'chamber with a sound like heavy rain.',
-      '',
-      'Sixteenth-century Spaniards heard this water and saw',
-      'these glowing walls and believed they had found the',
-      'Fountain of Youth. They had not. But you can see how',
-      'a man might think so.',
-      '',
-      'The water is fifty-six degrees, clear as glass, and',
-      'safe to drink. Miners have carved their names here.',
-      'Some of the names are very old. Some are in languages',
-      'you do not recognize.'
+      'Bright water and orange stone off the main line.',
+      'Nobody comes here by accident. Tired crews come here',
+      'on purpose.'
     ],
     blondies_throne: [
       'You have reached Blondie\'s Throne.',
       '',
-      'A massive flowstone formation rises from the chamber',
-      'floor in undulating tiers, shaped like a high-backed',
-      'chair designed by a patient god. Thick guano deposits',
-      'surround it on all sides.',
-      '',
-      'They named it for young Charles "Blondie" Smallwood,',
-      'who got separated from his tour group and was found',
-      'hours later fast asleep in the flowstone\'s embrace,',
-      'blonde hair dusty with calcite, dreaming whatever',
-      'children dream three hundred feet underground.',
-      '',
-      'The guano here is rich. The bats thick. The air foul.',
-      'But there is something about this room that makes men',
-      'speak in whispers, as if someone is still sleeping.'
+      'A great seat of flowstone rises out of the chamber.',
+      'The room feels less worked than visited.'
     ],
     cloud_room: [
       'You have entered the Cloud Room.',
       '',
-      'The ceiling changes here. The smooth limestone gives',
-      'way to porous dolomite, pocked and undulating like a',
-      'bank of storm clouds frozen in stone. Below this false',
-      'sky, the richest guano deposits in the upper cave',
-      'lie several feet deep.',
-      '',
-      'The ammonia is a living thing in this room. It fills',
-      'your skull and burns your lungs. Without a cloth over',
-      'your face you can endure maybe thirty minutes before',
-      'the coughing starts. A year from now, some of these',
-      'men will have a cough that never leaves.',
-      '',
-      'They will call it bat fever. The disease is really',
-      'histoplasmosis -- a fungus that lives in the guano',
-      'dust. No one will identify it for another sixty years.'
+      'Mist hangs low, the guano is strong, and the room',
+      'tests whether profit can make a man ignore his lungs.'
     ],
     mammoth_room: [
       'You have entered the Mammoth Room.',
       '',
-      'The shrieking hits you first. Forty thousand gray bats',
-      'packed shoulder to shoulder on the ceiling, every one',
-      'of them screaming. The sound is not of this world. It',
-      'fills the enormous unlit chamber with a vibration you',
-      'feel in your teeth.',
-      '',
-      'This room is deliberately left dark. No permanent',
-      'lights. The bats are federally endangered and this is',
-      'their hibernaculum. At dusk they pour from the sinkhole',
-      'in a spiraling vortex that devours twenty-four million',
-      'insects a night.',
-      '',
-      'It was here, in 1869, that the Blow expedition found',
-      'the Spanish ladders -- notched pine logs left by',
-      'conquistadors three centuries earlier. Still standing.',
-      'Still holding. The wood remembers what the men forgot.'
+      'Bats pack the darkness above you in numbers that turn',
+      'the ceiling into weather.'
     ],
     lost_river: [
-      'You have discovered the Lost River.',
+      'You have found the Lost River.',
       '',
-      'It surfaces from a crack in the rock like a secret',
-      'told under duress, flows fifty feet through open air,',
-      'and plunges back into the stone without explanation.',
-      'No one knows where it comes from. No one knows where',
-      'it goes. Dye tests have failed.',
-      '',
-      'The water level rises without warning. A change in',
-      'the sound -- deeper, more resonant -- means a surge',
-      'is coming from upstream. When the surface rains, the',
-      'water percolates through the karst and this river',
-      'becomes a fury that fills passages to the ceiling.',
-      '',
-      'Respect the river. It was here before the cave had',
-      'a name, and it will be here after the name is forgotten.'
+      'Black water runs beside the route and keeps its own',
+      'counsel.'
     ],
     lake_genevieve: [
-      'You have reached Lake Genevieve.',
+      'You stand beside Lake Genevieve.',
       '',
-      'A perfectly still underground lake, thirty-four feet',
-      'deep, reflects your lantern like a black mirror. The',
-      'water is so clear and so motionless that you cannot',
-      'tell where air ends and water begins until your boot',
-      'breaks the surface.',
-      '',
-      'William Henry Lynch named it for his daughter. Sub-',
-      'aquatic surveys have mapped passages plunging to a',
-      'hundred and ten feet below the surface. Most remain',
-      'unexplored. The silt-outs are too dangerous.',
-      '',
-      'Coins dropped by early tourists still glint on the',
-      'ledges below. Sometimes, in the stillness, something',
-      'pale and eyeless moves beneath the surface. It is',
-      'only the cavefish. Probably.'
+      'Still black water fills the chamber and reflects more',
+      'light than comfort.'
     ],
     lake_miriam: [
-      'You have discovered Lake Miriam.',
+      'You stand beside Lake Miriam.',
       '',
-      'The passage to reach it requires wading chest-deep',
-      'through fifty-six-degree water for thirty yards in',
-      'absolute darkness. Most men turn back. The ones who',
-      'do not find a chamber so silent that their own pulse',
-      'sounds like drumming.',
-      '',
-      'Lynch named this one for his other daughter. Miriam',
-      'never saw it. Neither did Genevieve. The names were',
-      'given from the surface, by a father who loved his',
-      'children more than he understood the dark.',
-      '',
-      'Few miners come this far. Those who do sit for a',
-      'while in the silence and then leave without speaking.',
-      'Some say the weight of the earth above squeezes all',
-      'urgency from the world. Others say the cave is',
-      'listening, and they do not want to be heard.'
+      'Deeper water. Less echo. The kind of chamber that',
+      'makes men lower their voices without deciding to.'
     ],
     waterfall_room: [
       'You have reached the Waterfall Room.',
       '',
-      'Five hundred and five feet below the surface. The',
-      'deepest accessible point. A fifty-foot waterfall fed',
-      'by the Lost River plunges into a mist-shrouded pool',
-      'with a roar that fills your chest like a second heart.',
-      '',
-      'Everything is slick. Every surface treacherous. The',
-      'mist soaks through your clothes in minutes and the',
-      'fifty-eight-degree air begins its patient work on',
-      'your body heat.',
-      '',
-      'The guano here is the richest in the cave and the',
-      'most dangerous to reach. Only the bravest or most',
-      'desperate miners worked this room. The premium they',
-      'earned was paid in broken bones and ruined lungs.',
-      '',
-      'Somewhere behind the falls, the rock is marked with',
-      'symbols that do not match any known alphabet. They',
-      'are very old. They may be older than the cave itself.'
+      'Cold spray, loud stone, and the deepest rich dirt on',
+      'the line.'
     ]
   };
 
@@ -736,7 +524,7 @@
         outcome: { guanoLoss: 0, healthLoss: 5, timeLoss: 2, reputationChange: 0 }
       }
     ],
-    historical_note: 'The Bald Knobbers of Taney County, Missouri, were a vigilante group formed in 1883 by Captain Nat Kinney. Originally organized to combat lawlessness in the Ozarks after the Civil War, the group grew to over 1,000 members before splintering into factions. Some became little better than the criminals they opposed, engaging in arson, whippings, and murder. The group was finally broken up after the public hanging of two Knobbers in Ozark, Missouri, in 1889.'
+    historical_note: ''
   };
 
   // ─── Bat Swarm Decision Text ─────────────────────────────────────
@@ -789,44 +577,41 @@
   // ─── Store / Shopkeeper Dialogue ─────────────────────────────────
   var SHOPKEEPER_DIALOGUE = {
     greeting: [
-      '"Marmaros Outfitters. Herschel Barnes, proprietor.',
-      'I stock everything a man needs to go underground',
-      'and most of what he needs to come back up. I don\'t',
-      'extend credit and I don\'t accept excuses."'
+      '"Jed Campbell, company office.',
+      'Take what keeps the line standing and',
+      'bring the ledger back clean."'
     ],
     browse: [
-      '"Look around. Take your time. But the cave is open',
-      'right now and it don\'t care what you forgot. Better',
-      'to spend a dollar today than wish you had tomorrow',
-      'from inside a limestone coffin."'
+      '"Oil, food, rope.',
+      'The cave will sort out your priorities',
+      'if you do not."'
     ],
     low_funds: [
-      '"Light purse. That\'s a hard way to start. Get oil',
-      'first. Then food. Then rope. Everything else is a',
-      'luxury, and luxuries don\'t survive the first day',
-      'underground."'
+      '"Thin purse.',
+      'Buy light first, food second, rope third.',
+      'Nothing below is cheaper than caution."'
     ],
     farewell: [
-      '"Watch yourself down there. I mean that. I\'ve sold',
-      'provisions to men who didn\'t come back to buy more.',
-      'Don\'t be one of those men."'
+      '"Bring the sacks back heavy.',
+      'Bring the crew back breathing.',
+      'The company notices both."'
     ],
     buy_response: [
-      '"Good choice. That\'ll earn its keep below."',
-      '"Smart purchase. The cave respects preparation."',
-      '"I\'ll have that loaded. Take care of it and it\'ll take care of you."',
-      '"Solid. You\'ll be glad you bought that when the dark starts pressing in."'
+      '"That belongs on the manifest."',
+      '"Sensibly done."',
+      '"The company can work with prepared men."',
+      '"Good. One less foolish omission."'
     ],
     haggle_response: [
-      '"My prices are fair and final. There ain\'t another store in Marmaros."',
-      '"You\'re welcome to shop at the competition. There ain\'t any."',
-      '"I got two daughters to feed and a mule that eats like a horse. Price stands."'
+      '"The rate stands."',
+      '"The company is not a debating society."',
+      '"No reduction. Sign or step aside."'
     ],
     item_descriptions: {
       lantern_oil: '"Whale oil. Your lantern is your life down there. When the oil goes, you go with it."',
       candles: '"Tallow candles. Backup light. But more important: a candle that shrinks means the air has gone bad. When it dims, you leave. Don\'t think. Leave."',
       rope: '"Hemp rope. Fifty-foot coils. You\'ll want at least two unless you plan to fly."',
-      timber: '"Shoring timber. Heavy as a guilty conscience but it\'s the difference between a mine and a mass grave."',
+      timber: '"Shoring timber. Heavy as a guilty conscience but it\'s the difference between a mine and a bad afternoon."',
       food: '"Salt pork, hardtack, dried beans, coffee. Enough to keep a man swinging a pick for a week. It ain\'t fancy. Neither is starvation."',
       water: '"Clean water from Roark Creek. The spring below helps, but the spring is at the spring and you ain\'t always at the spring."',
       blasting_powder: '"Black powder. You treat this like it\'s what it is, which is the difference between you and a hole in the ground."',
@@ -944,25 +729,24 @@
   // ─── Final Decision Text (3 Endings) ─────────────────────────────
   var FINAL_DECISIONS = {
     intro: [
-      'Your mining season draws to a close. You have hauled',
-      '{guano_amount} pounds of guano to the surface and your',
+      'Twenty contract days are gone.',
+      '{guano_amount} pounds reached the surface and your',
       'crew is {crew_status}.',
       '',
-      'The cave waits below. The road waits above.',
-      'You face a final choice.'
+      'The cave is still there. So is the road.',
+      'You choose what kind of story this becomes.'
     ],
     options: [
       {
         id: 'sell_and_leave',
         title: 'Sell Your Guano and Leave',
         description: [
-          'Take your earnings. Tip your hat to Marmaros.',
-          'Ride the stagecoach back to a world with daylight',
-          'and horizons. The money is modest but certain.',
+          'Take your share and leave with daylight still',
+          'meaning something. The work was real. So was',
+          'the danger. You do not owe the cave another day.',
           '',
-          'You survived the Devil\'s Den. That is not nothing.',
-          'Some men in that cemetery above the cave would',
-          'have taken this deal.'
+          'Marmaros will keep going without you for as long',
+          'as it can, which is how most towns survive.'
         ],
         scoreMultiplier: 1.0
       },
@@ -970,16 +754,12 @@
         id: 'one_more_run',
         title: 'One More Run Into the Deep',
         description: [
-          'The Waterfall Room still holds the richest deposits.',
-          'Five hundred feet down. One more trip could double',
-          'your haul. Your crew is tired, your supplies thin,',
-          'your rope frayed.',
+          'Go back once more for the deepest haul on the line.',
+          'The room is rich. The crew is tired. That is the',
+          'old bargain and it has not improved with age.',
           '',
-          'The cave has been patient with you. Patient does',
-          'not mean kind. But the guano is there, and a man',
-          'who has come this far does not stop at the edge.',
-          '',
-          'High risk. High reward. The cave\'s oldest bargain.'
+          'If there is one more great load in the dark, this',
+          'is where you go to earn it.'
         ],
         scoreMultiplier: 1.5
       },
@@ -987,18 +767,13 @@
         id: 'invest_in_cave',
         title: 'Invest in the Cave\'s Future',
         description: [
-          'You have seen what this cave could become. Not a',
-          'mine. A wonder. Better ladders. Walkways. Lighting.',
-          'Charge the tourists a dollar a head and let them',
-          'see what you have seen.',
+          'You have spent twenty days looking at the cave the',
+          'wrong way around. Not as a thing to strip, but as',
+          'a thing people might one day pay simply to witness.',
           '',
-          'In 1889, William Lynch will begin giving tours.',
-          'In 1950, the Herschends will build Silver Dollar',
-          'City around this very hole in the ground. You are',
-          'fifty years ahead of your time.',
-          '',
-          'The cave is the treasure. The guano was just the',
-          'introduction.'
+          'Maybe the guano was never the real treasure. Maybe',
+          'it was only the first rough way this town learned',
+          'to look at the dark and call it valuable.'
         ],
         scoreMultiplier: 2.0
       }
@@ -1007,26 +782,14 @@
 
   // ─── Traveler News / Historical Flavor Text ──────────────────────
   var TRAVELER_NEWS = [
-    'A drummer from St. Louis says guano fertilizer prices have jumped. Farmers out East can\'t get enough of it.',
-    'Word from Springfield: cholera in the water supply. Best stay in the hills.',
-    'A circuit preacher passed through. He says the railroad will reach Branson within five years. Nobody believes him.',
-    'Travelers say Nat Kinney and his Bald Knobbers hung a man near Forsyth last week. No trial. Just rope.',
-    'A mule skinner reports the Branson road is washed out. Guano shipments delayed.',
-    'News from Jefferson City: the legislature is debating mining safety laws. The miners laugh bitterly.',
-    'A patent medicine man claims his tonic cures bat fever. He does not look healthy himself.',
-    'An old Osage man passed through Marmaros. He left tobacco at the cave entrance and said nothing to anyone.',
-    'A geologist from the state university measured the Cathedral Room. Says it could hold the Statue of Liberty.',
-    'A bear was spotted near the sinkhole entrance. The donkeys are restless and so is your crew.',
-    'A Kansas City newspaper says bat guano is being tested for explosives. The military is interested.',
-    'Silver discovered near Joplin. Half the miners in Stone County have gone to stake claims. Your competition just got thinner.',
-    'A photographer from New York wants to take pictures inside the cave. He has never been underground. This should be interesting.',
-    'The temperance league has closed three saloons in Forsyth. The miners\' morale has taken a corresponding hit.',
-    'Two miners from the Granby lead operation arrived today. They say working conditions here are worse. That takes some doing.',
-    'A letter from home reports crops are good this year. The news tastes like clean water.',
-    'The stagecoach driver swears he saw lights moving inside the cave at midnight. Nobody was underground. Nobody will admit to it.',
-    'A traveling fortune-teller read the cards for your foreman. She went pale and asked for her money back.',
-    'Word is that William Henry Lynch himself is coming to inspect the operation. The crew cleans up. The cave does not.',
-    'An old-timer in the tavern says the Spaniards left more than ladders in this cave. He won\'t say what. He won\'t stop drinking, either.'
+    'Jed Campbell says the company road cannot stay this soft all season and still turn a decent profit.',
+    'Shad Heller says three things matter in Marmaros: dry rope, straight steel, and whether the town can outlast the guano.',
+    'June Ward printed that the ridge has started listening whenever the cave wagons come through quiet.',
+    'The well-dressed stranger at the hotel porch asked what tourists pay for wonders in other states. Nobody liked the question. Nobody forgot it.',
+    'A mule skinner reports the Branson road is cut to ruts and any load sent late will pay for it twice.',
+    'An old Osage man left tobacco by the entrance again and said nothing to anybody in town.',
+    'A photographer from St. Louis wants to take plates below ground and has not yet understood what that means.',
+    'Travelers say Nat Kinney\'s riders were seen on the road again, keeping order the hard way.'
   ];
 
   // ─── Easter Egg Text ─────────────────────────────────────────────
@@ -1179,8 +942,8 @@
       good: 'Your crew is holding up. Some aches and bruises.',
       fair: 'Several men are coughing. The cave is wearing on them.',
       poor: 'Your crew is in rough shape. Injuries and illness taking hold.',
-      critical: 'The crew can barely stand. Without rest or medicine, you will start burying men.',
-      dying: 'Your crew is dying. This is not a metaphor.'
+      critical: 'The crew can barely stand. Without real rest, the next scare will fold them up.',
+      dying: 'The crew is one hard shake from collapse. Turn this run around now.'
     },
     morale: {
       high: 'Morale is high. The crew works like men who believe in something.',
@@ -1210,13 +973,14 @@
       'THE MARVEL CAVE MINING COMPANY',
       '==============================',
       '',
-      'The year is 1884. You are a guano miner in Stone',
-      'County, Missouri, in the Ozark Mountains.',
+      'The year is 1884. Marvel Cave Mining Co. has hired',
+      'you on a twenty-day guano contract in Stone County,',
+      'Missouri, in the Ozark Mountains.',
       '',
       'Marvel Cave -- the Devil\'s Den -- drops five hundred',
-      'feet into the earth. It is full of bat guano worth',
-      '$700 a ton as fertilizer and gunpowder. Your job is',
-      'to go down, dig it up, and come back alive.',
+      'feet into the earth. The company can sell prime',
+      'guano for roughly $700 a ton. You work on percentage.',
+      'Your job is to go down, dig it up, and come back alive.',
       '',
       'The cave has opinions about this plan. Cave-ins.',
       'Flooding. Bad air. Bat swarms. The Gulf of Doom.',
@@ -1303,10 +1067,10 @@
     confirm_mine: 'Set up mining operations here?',
     confirm_rest: 'Rest here and tend to the crew?',
     confirm_quit: 'Abandon the operation and climb for the surface?',
-    no_oil: 'Out of oil. Turn back now or die in the dark. Those are your options.',
-    no_food: 'Out of food. Your crew grows weak. Hunger is patient but thorough.',
+    no_oil: 'Out of oil. Turn back now or lose the line in the dark. Those are your options.',
+    no_food: 'Out of food and water. Your crew starts failing fast.',
     no_rope: 'Out of rope. You cannot safely descend. The cave charges admission.',
-    crew_dead: 'Your last crew member is dead. You are alone in five hundred feet of darkness.',
+    crew_dead: 'Your last crew member is down hard. You are alone in five hundred feet of darkness.',
     game_over: 'Your mining operation has come to an end.',
     press_continue: 'Press any key to continue...',
     loading: 'Loading...',
@@ -1330,7 +1094,7 @@
       { minScore: 500, title: 'Working Miner', description: 'You earned your keep and your scars.' },
       { minScore: 1000, title: 'Experienced Miner', description: 'You know the dark. The dark knows you.' },
       { minScore: 2000, title: 'Master Miner', description: 'The cave respects you. That is the highest compliment it gives.' },
-      { minScore: 3500, title: 'Cave Legend', description: 'Red Sullivan will tell your story. He will embellish it. You will deserve it.' },
+      { minScore: 3500, title: 'Cave Legend', description: 'Marmaros will keep your name moving from porch to porch long after the ledger closes.' },
       { minScore: 5000, title: 'King of the Mountain', description: 'Five hundred feet of darkness and you conquered every inch. Blondie Putnam would tip his hat.' }
     ]
   };
@@ -1365,6 +1129,7 @@
   }
 
   function getShopkeeperLine(category) {
+    if (!category) category = 'greeting';
     var lines = SHOPKEEPER_DIALOGUE[category];
     if (!lines) return '';
     if (typeof lines === 'string') return lines;

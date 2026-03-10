@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1280" role="img" aria-labelledby="logoTitle logoDesc">
+  <title id="logoTitle">Marvel Mining Company badge</title>
+  <desc id="logoDesc">A code-drawn oxblood badge with arched Marvel and Cave lettering and a central Mining Co. bar.</desc>
+
+  <defs>
+    <path id="topArc" d="M 266 572 A 374 374 0 0 1 1014 572" />
+    <g id="cornerMark">
+      <path d="M0 0 h46" fill="none" stroke="#5c0b12" stroke-width="12" stroke-linecap="round"/>
+      <path d="M12 -18 h18 l-12 -12" fill="none" stroke="#5c0b12" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 18 h18 l-12 12" fill="none" stroke="#5c0b12" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </defs>
+
+  <circle cx="640" cy="640" r="548" fill="#5c0b12"/>
+  <circle cx="640" cy="640" r="286" fill="#f4eee1"/>
+
+  <rect x="72" y="486" width="1136" height="304" fill="#f4eee1"/>
+  <rect x="64" y="474" width="1152" height="14" fill="#5c0b12"/>
+  <rect x="64" y="790" width="1152" height="14" fill="#5c0b12"/>
+
+  <text fill="#f4eee1" font-family="Georgia, 'Times New Roman', serif" font-size="154" font-weight="700" letter-spacing="7">
+    <textPath href="#topArc" startOffset="50%" text-anchor="middle">MARVEL</textPath>
+  </text>
+
+  <g fill="#5c0b12" font-family="Georgia, 'Times New Roman', serif" font-weight="700">
+    <text x="640" y="688" font-size="214" text-anchor="middle" textLength="942" lengthAdjust="spacingAndGlyphs">Mining Co.</text>
+  </g>
+
+  <g fill="#f4eee1" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="144">
+    <text x="468" y="1005" transform="rotate(-20 468 1005)">C</text>
+    <text x="587" y="1080" transform="rotate(-7 587 1080)">A</text>
+    <text x="717" y="1072" transform="rotate(8 717 1072)">V</text>
+    <text x="836" y="1000" transform="rotate(22 836 1000)">E</text>
+  </g>
+
+  <circle cx="350" cy="914" r="22" fill="#f4eee1"/>
+  <circle cx="930" cy="914" r="22" fill="#f4eee1"/>
+
+  <g transform="translate(74 448)">
+    <use href="#cornerMark"/>
+  </g>
+  <g transform="translate(1206 448) scale(-1 1)">
+    <use href="#cornerMark"/>
+  </g>
+  <g transform="translate(74 846)">
+    <use href="#cornerMark"/>
+  </g>
+  <g transform="translate(1206 846) scale(-1 1)">
+    <use href="#cornerMark"/>
+  </g>
+</svg>

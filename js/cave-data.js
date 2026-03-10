@@ -87,7 +87,7 @@
       hazardModifiers: { fall: 0.05 },
       description: 'Ninety-four feet of nothing between the lip and the dark. Wind moans up from below like something breathing.',
       historicalFeature: 'The Osage carved warning marks into the oaks — a sideways V meaning do not enter. They say a young brave chased a bear over the edge and the earth swallowed them both. In 1541 the Spanish came looking for gold and eternal youth. They found neither but left their pine ladders three hundred feet down, where they rotted for three centuries undisturbed.',
-      connectedTo: ['marmaros', 'the_sentinel'],
+      connectedTo: ['marmaros', 'cathedral_floor'],
       isOptional: false,
       canMine: false,
       canRest: false,
@@ -99,15 +99,15 @@
       id: 'the_sentinel',
       name: 'The Sentinel',
       zone: 'zone1',
-      depth: 230,
-      guanoYield: 'low',
+      depth: 234,
+      guanoYield: 'none',
       primaryHazard: 'rockfall',
       hazardModifiers: { rockfall: 0.03 },
-      description: 'A limestone pillar thick as a granary silo, standing alone in the void like it was put there on purpose. Maybe it was.',
+      description: 'A limestone pillar thick as a granary silo, standing near the Cathedral floor like something left on watch.',
       historicalFeature: 'Stalactite met stalagmite and fused across millennia into this single column. It guards the crevice to the Spring Room. Tour guides will later joke that if the Sentinel falls, the entire Cathedral dome comes down — two hundred four feet of mountain crashing into the void. Nobody laughs very hard.',
-      connectedTo: ['cathedral_entrance', 'cathedral_floor'],
-      isOptional: false,
-      canMine: true,
+      connectedTo: ['cathedral_entrance', 'cathedral_floor', 'spring_room'],
+      isOptional: true,
+      canMine: false,
       canRest: false,
       canResupply: false,
       discoveryPoints: 15
@@ -122,8 +122,8 @@
       primaryHazard: 'bat_swarm',
       hazardModifiers: { bat_swarm: 0.10, bad_air: 0.05 },
       description: 'The Underground Mountain — a cone of debris a hundred and twenty-four feet high, built from everything that ever fell through the Den. Bones included.',
-      historicalFeature: 'Millennia of soil, stone, and unlucky animals tumbled through the sinkhole to build this hill inside a hill. The Cathedral Room could swallow the Statue of Liberty whole. Nearby stands the Liberty Bell — a fifty-five-foot hollow stalagmite split by a crack that mirrors the real one in Philadelphia. Whether God has a sense of humor or the earth does, the effect is the same.',
-      connectedTo: ['the_sentinel', 'serpentine_passage'],
+      historicalFeature: 'Millennia of soil, stone, and unlucky animals tumbled through the sinkhole to build this hill inside a hill. The Cathedral Room could swallow the Statue of Liberty whole. Nearby the Sentinel rises off the floor beside a narrow crevice that slips toward the hidden Spring Room. Most men keep to the main haul route and pass it by. The smart ones remember it is there.',
+      connectedTo: ['cathedral_entrance', 'spring_room', 'serpentine_passage'],
       isOptional: false,
       canMine: true,
       canRest: false,
@@ -176,7 +176,7 @@
       guanoYield: 'very_high',
       primaryHazard: 'fall',
       hazardModifiers: { fall: 0.20, cave_in: 0.10, bad_air: 0.08 },
-      description: 'A hundred feet of vertical nothing. Drop a rock and you won\'t hear it land. The guano on these ledges is worth dying for. Some did.',
+      description: 'A hundred feet of vertical nothing. Drop a rock and you won\'t hear it land. The guano on these ledges is rich enough to make men take foolish chances.',
       historicalFeature: 'They called it bottomless because thrown stones made no sound. The truth is worse — the floor is a soup of clay and ancient guano so thick it swallows everything without a trace. Three miners went into the Gulf in the \'80s. Their lamps were found on the ledges. The men were not. The Osage had a name for this place too but nobody alive remembers it.',
       connectedTo: ['serpentine_passage'],
       isOptional: true,
@@ -215,7 +215,7 @@
       hazardModifiers: { bad_air: 0.15, flooding: 0.05, cave_in: 0.06 },
       description: 'Iron oxide bleeds through the limestone in dark red streaks. The walls look like something was butchered here. The smell doesn\'t help.',
       historicalFeature: 'Rust-colored mineral stains run down the rock like dried blood — vivid enough that later guides will spin tales of Spanish torture chambers and Osage sacrifice. It\'s just iron leaching through the stone. But in the lamplight, alone, with the ammonia burning your eyes, knowing the geology doesn\'t make it any less unnerving.',
-      connectedTo: ['fat_mans_misery', 'spring_room'],
+      connectedTo: ['fat_mans_misery', 'blondies_throne'],
       isOptional: false,
       canMine: true,
       canRest: false,
@@ -226,15 +226,15 @@
     spring_room: {
       id: 'spring_room',
       name: 'Spring Room',
-      zone: 'zone3',
-      depth: 360,
+      zone: 'zone1',
+      depth: 242,
       guanoYield: 'none',
       primaryHazard: null,
-      hazardModifiers: { flooding: 0.03 },
+      hazardModifiers: { flooding: 0.02 },
       description: 'Orange calcite blazes on every surface. Hidden waterfalls murmur behind the stone. It sounds like rain in a place that has never seen the sky.',
       historicalFeature: 'Tucked behind the Sentinel through a crevice most men walk past without seeing. The orange calcite catches lamplight and throws it back warm as sunset. The cascading water sounds like a summer storm. Small wonder the conquistadors believed they\'d found the Fountain of Youth — this room feels like it belongs to a different world than the one above.',
-      connectedTo: ['the_dungeon', 'blondies_throne'],
-      isOptional: false,
+      connectedTo: ['cathedral_floor'],
+      isOptional: true,
       canMine: false,
       canRest: true,
       canResupply: false,
@@ -251,7 +251,7 @@
       hazardModifiers: { bat_swarm: 0.15, bad_air: 0.10 },
       description: 'A throne of flowstone rising in pale tiers from the guano-crusted floor. Something about its shape makes men lower their voices.',
       historicalFeature: 'Named for young Charles "Blondie" Smallwood, a tow-headed boy who wandered from his tour group and was found hours later, fast asleep in the flowstone\'s lap like a child in a chair. The guides named the formation on the spot. The Osage left offerings here — small stones arranged in patterns that don\'t occur in nature. Whether Blondie\'s throne or something older, the place has a pull to it.',
-      connectedTo: ['spring_room', 'cloud_room'],
+      connectedTo: ['the_dungeon', 'cloud_room'],
       isOptional: false,
       canMine: true,
       canRest: false,
@@ -270,7 +270,7 @@
       hazardModifiers: { bad_air: 0.18, bat_swarm: 0.12, cave_in: 0.06 },
       description: 'The ceiling goes from smooth stone to pitted dolomite — pocked and rolling like thunderheads frozen in rock. Guano cakes the floor inches thick.',
       historicalFeature: 'The geology shifts here without warning. Polished limestone gives way to dolomite so porous it looks like petrified storm clouds pressing down on you. The floor holds the richest guano deposits in the upper system — centuries of accumulation from the colony above. Miners call this the money room. Work fast. The air is poison.',
-      connectedTo: ['blondies_throne', 'mammoth_room', 'lost_river'],
+      connectedTo: ['blondies_throne', 'mammoth_room'],
       isOptional: false,
       canMine: true,
       canRest: false,
@@ -288,7 +288,7 @@
       hazardModifiers: { bat_swarm: 0.25, bad_air: 0.15, disease: 0.10 },
       description: 'The shrieking hits you before the smell does. Forty thousand gray bats hang from the ceiling like a living carpet. Their eyes catch the lamplight in pairs.',
       historicalFeature: 'No lamp has ever been permanently mounted here and none ever will. This is the bats\' cathedral. Eighty thousand once roosted on these walls — forty thousand remain, each one eating its weight in insects every night, pouring from the Den at dusk in a vortex visible for miles. It was here Blow\'s men found the Spanish ladders in \'69 — notched pine trunks three centuries old, left by conquistadors who climbed down and, by all evidence, climbed back up in a hurry.',
-      connectedTo: ['cloud_room', 'waterfall_room'],
+      connectedTo: ['cloud_room', 'lost_river'],
       isOptional: false,
       canMine: true,
       canRest: false,
@@ -307,8 +307,8 @@
       hazardModifiers: { flooding: 0.20, fall: 0.08 },
       description: 'Black water surfaces from the bedrock, flows thirty feet through open air, and plunges back into the stone. Where it comes from or goes, no man knows.',
       historicalFeature: 'The Lost River appears and vanishes like something that doesn\'t want to be followed. Its source is unmapped. Its destination is unmapped. When rain falls heavy on Roark Mountain the karst funnels it down and the river swells from a trickle to a torrent in minutes, filling passages to the ceiling. Men who\'ve seen it say the water rises faster than a man can run.',
-      connectedTo: ['cloud_room', 'lake_genevieve'],
-      isOptional: true,
+      connectedTo: ['mammoth_room', 'waterfall_room', 'lake_genevieve'],
+      isOptional: false,
       canMine: true,
       canRest: false,
       canResupply: false,
@@ -468,20 +468,25 @@
   var MAIN_ROUTE = [
     'marmaros',
     'cathedral_entrance',
-    'the_sentinel',
     'cathedral_floor',
     'serpentine_passage',
     'egyptian_room',
     'fat_mans_misery',
     'the_dungeon',
-    'spring_room',
     'blondies_throne',
     'cloud_room',
     'mammoth_room',
+    'lost_river',
     'waterfall_room'
   ];
 
   var OPTIONAL_BRANCHES = {
+    spring_room: {
+      branchFrom: 'cathedral_floor',
+      chambers: ['spring_room'],
+      isDeadEnd: true,
+      riskLevel: 'low'
+    },
     gulf_of_doom: {
       branchFrom: 'serpentine_passage',
       chambers: ['gulf_of_doom'],
@@ -489,8 +494,8 @@
       riskLevel: 'extreme'
     },
     underground_lakes: {
-      branchFrom: 'cloud_room',
-      chambers: ['lost_river', 'lake_genevieve', 'lake_miriam'],
+      branchFrom: 'lost_river',
+      chambers: ['lake_genevieve', 'lake_miriam'],
       isDeadEnd: true,
       riskLevel: 'high'
     }
@@ -514,13 +519,13 @@
       floodingMod: 0.6,
       batActivity: 0.8,
       temperature: 'cool',
-      description: 'The colony settles into torpor. The cave goes quiet as a graveyard. Best working season there is.'
+      description: 'The colony settles into torpor. The cave goes still and workable. Best season there is.'
     },
     winter: {
       floodingMod: 0.4,
       batActivity: 0.3,
       temperature: 'cold',
-      description: 'Ice seals the Den. Prices double in Marmaros. Inside the cave it\'s fifty-eight degrees same as always, but getting there might kill you.'
+      description: 'Ice seals the Den. Prices double in Marmaros. Inside the cave it\'s fifty-eight degrees same as always, but getting there can turn you right back around.'
     }
   };
 
@@ -540,7 +545,7 @@
       unit: 'box of 12',
       basePrice: 0.40,
       weight: 2,
-      description: 'Tallow and wick. When the flame turns blue, the air is killing you. When it goes out, you\'re already dead.'
+      description: 'Tallow and wick. When the flame turns blue, the air has gone bad. When it goes out, you had better be climbing.'
     },
     rope: {
       id: 'rope',
@@ -548,7 +553,7 @@
       unit: '50-foot coil',
       basePrice: 2.00,
       weight: 15,
-      description: 'Manila hemp. Fifty feet per coil. Essential for every descent, every haul, every life saved or lost.'
+      description: 'Manila hemp. Fifty feet per coil. Essential for every descent, every haul, and every close call.'
     },
     timber: {
       id: 'timber',
@@ -629,50 +634,46 @@
     mine_foreman: {
       id: 'mine_foreman',
       name: 'Mine Foreman',
-      startingMoney: 120,
-      startingCrew: 4,
-      contractTarget: 4,
+      startingMoney: 24,
+      startingCrew: 2,
       miningBonus: 0,
       tradeBonus: 0.10,
       healthBonus: 0,
       scoreMultiplier: 1.0,
-      description: 'Hired by Jones himself out of the Joplin lead fields. You know mines. You know men. You know what the dark does to both.'
+      description: 'Hired by Marvel Cave Mining Co. out of the Joplin lead fields. You know crews, tempers, and how to bring a line home.'
     },
     geologist: {
       id: 'geologist',
       name: 'Geologist',
-      startingMoney: 90,
-      startingCrew: 3,
-      contractTarget: 6,
+      startingMoney: 20,
+      startingCrew: 2,
       miningBonus: 0.15,
       tradeBonus: 0,
       healthBonus: 0,
       scoreMultiplier: 1.25,
-      description: 'Sent by Barton County money men to assay the deposits. You read stone like scripture but the men don\'t trust a man who\'d rather study a rock than dig it.'
+      description: 'The company wants a reader of stone who can spot the rich chambers fast. Investors trust your hammer more than rumor.'
     },
     farmer: {
       id: 'farmer',
       name: 'Farmer Turned Miner',
-      startingMoney: 60,
-      startingCrew: 4,
-      contractTarget: 8,
+      startingMoney: 18,
+      startingCrew: 2,
       miningBonus: 0,
       tradeBonus: 0,
       healthBonus: 0.10,
       scoreMultiplier: 1.5,
-      description: 'The corn failed. The hogs died. Then you heard bat shit sells for $700 a ton and you sold the mule to buy a pick.'
+      description: 'The crop failed, so you signed a twenty-day company contract and took your chances under Roark Mountain.'
     },
     drifter: {
       id: 'drifter',
       name: 'Drifter',
-      startingMoney: 30,
+      startingMoney: 14,
       startingCrew: 2,
-      contractTarget: 10,
       miningBonus: 0,
       tradeBonus: 0,
       healthBonus: 0,
       scoreMultiplier: 2.0,
-      description: 'No history. No references. No money. You walked into Marmaros with thirty dollars and a willingness to go where other men won\'t.'
+      description: 'No history. No references. Just enough cash for the company clerk to take a chance on you and a hard job nobody else wants.'
     }
   };
 
@@ -733,6 +734,101 @@
     return MAIN_ROUTE.indexOf(chamberId) !== -1;
   }
 
+  function getOptionalBranch(chamberId) {
+    for (var branchId in OPTIONAL_BRANCHES) {
+      if (!OPTIONAL_BRANCHES.hasOwnProperty(branchId)) continue;
+      var branch = OPTIONAL_BRANCHES[branchId];
+      if ((branch.chambers || []).indexOf(chamberId) !== -1) {
+        return {
+          id: branchId,
+          branchFrom: branch.branchFrom,
+          chambers: branch.chambers.slice(),
+          isDeadEnd: !!branch.isDeadEnd,
+          riskLevel: branch.riskLevel || 'low'
+        };
+      }
+    }
+    return null;
+  }
+
+  function getOptionalBranchesFrom(chamberId) {
+    var results = [];
+    for (var branchId in OPTIONAL_BRANCHES) {
+      if (!OPTIONAL_BRANCHES.hasOwnProperty(branchId)) continue;
+      var branch = OPTIONAL_BRANCHES[branchId];
+      if (branch.branchFrom !== chamberId) continue;
+      results.push({
+        id: branchId,
+        branchFrom: branch.branchFrom,
+        chambers: branch.chambers.slice(),
+        isDeadEnd: !!branch.isDeadEnd,
+        riskLevel: branch.riskLevel || 'low'
+      });
+    }
+    return results;
+  }
+
+  function getDescendTargets(chamberId) {
+    var chamber = CHAMBERS[chamberId];
+    if (!chamber) return [];
+
+    var results = [];
+    var seen = {};
+
+    function pushTarget(targetId, routeKind, branchId) {
+      if (!targetId || seen[targetId] || !CHAMBERS[targetId]) return;
+      seen[targetId] = true;
+      results.push({
+        id: targetId,
+        chamber: CHAMBERS[targetId],
+        routeKind: routeKind,
+        branchId: branchId || ''
+      });
+    }
+
+    var branch = getOptionalBranch(chamberId);
+    if (branch) {
+      var branchIdx = branch.chambers.indexOf(chamberId);
+      if (branchIdx !== -1 && branchIdx < branch.chambers.length - 1) {
+        pushTarget(branch.chambers[branchIdx + 1], 'branch', branch.id);
+      }
+
+      var mainNextFromFork = getNextMainChamber(branch.branchFrom);
+      if (mainNextFromFork) {
+        pushTarget(mainNextFromFork.id, 'main', branch.id);
+      }
+
+      return results;
+    }
+
+    var mainNext = getNextMainChamber(chamberId);
+    if (mainNext) {
+      pushTarget(mainNext.id, 'main');
+    }
+
+    var optionalBranches = getOptionalBranchesFrom(chamberId);
+    for (var i = 0; i < optionalBranches.length; i++) {
+      if (optionalBranches[i].chambers && optionalBranches[i].chambers[0]) {
+        pushTarget(optionalBranches[i].chambers[0], 'branch', optionalBranches[i].id);
+      }
+    }
+
+    return results;
+  }
+
+  function getAscendTarget(chamberId) {
+    var branch = getOptionalBranch(chamberId);
+    if (branch) {
+      var branchIdx = branch.chambers.indexOf(chamberId);
+      if (branchIdx > 0) {
+        return CHAMBERS[branch.chambers[branchIdx - 1]] || null;
+      }
+      return CHAMBERS[branch.branchFrom] || null;
+    }
+
+    return getPrevMainChamber(chamberId);
+  }
+
   function getGuanoMultiplier(yieldLevel) {
     return GUANO_YIELDS[yieldLevel] || 0;
   }
@@ -758,6 +854,10 @@
     getNextMainChamber: getNextMainChamber,
     getPrevMainChamber: getPrevMainChamber,
     isOnMainRoute: isOnMainRoute,
+    getOptionalBranch: getOptionalBranch,
+    getOptionalBranchesFrom: getOptionalBranchesFrom,
+    getDescendTargets: getDescendTargets,
+    getAscendTarget: getAscendTarget,
     getGuanoMultiplier: getGuanoMultiplier
   };
 })();

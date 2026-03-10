@@ -13,6 +13,8 @@
   var fadeInterval = null;
   var userHasInteracted = false;
   var pendingTrack = null;
+  var DEFAULT_FADE_IN_MS = 900;
+  var DEFAULT_FADE_OUT_MS = 500;
 
   // Track mappings
   var TRACKS = {
@@ -74,7 +76,7 @@
     if (currentAudio && !currentAudio.paused) {
       fadeOut(currentAudio, function () {
         startTrack(trackName);
-      });
+      }, DEFAULT_FADE_OUT_MS);
     } else {
       startTrack(trackName);
     }
@@ -101,7 +103,7 @@
         userHasInteracted = true;
         pendingTrack = null;
         removeGlobalListeners();
-        fadeIn(audio);
+        fadeIn(audio, DEFAULT_FADE_IN_MS);
       }).catch(function () {
         // Still blocked - keep pending
         pendingTrack = trackName;
@@ -110,49 +112,68 @@
       });
     } else {
       // Old browser, no promise - assume it worked
-      fadeIn(audio);
+      fadeIn(audio, DEFAULT_FADE_IN_MS);
     }
   }
 
-  function fadeIn(audio) {
+  function clearFade() {
     if (fadeInterval) clearInterval(fadeInterval);
-    var target = volume;
-    fadeInterval = setInterval(function () {
-      var v = audio.volume + 0.03;
-      if (v >= target) {
-        audio.volume = target;
-        clearInterval(fadeInterval);
-        fadeInterval = null;
-      } else {
-        audio.volume = v;
-      }
-    }, 40);
+    fadeInterval = null;
   }
 
-  function fadeOut(audio, callback) {
-    if (fadeInterval) clearInterval(fadeInterval);
+  function animateVolume(audio, toVolume, durationMs, callback) {
+    if (!audio) {
+      if (callback) callback();
+      return;
+    }
+    clearFade();
+    var start = audio.volume;
+    var target = Math.max(0, Math.min(1, toVolume));
+    var duration = Math.max(80, durationMs || DEFAULT_FADE_OUT_MS);
+    var stepMs = 40;
+    var steps = Math.max(1, Math.round(duration / stepMs));
+    var delta = (target - start) / steps;
+
     fadeInterval = setInterval(function () {
-      var v = audio.volume - 0.04;
-      if (v <= 0) {
-        audio.volume = 0;
-        audio.pause();
-        clearInterval(fadeInterval);
-        fadeInterval = null;
+      var next = audio.volume + delta;
+      var done = delta >= 0 ? next >= target : next <= target;
+      if (done) {
+        audio.volume = target;
+        clearFade();
         if (callback) callback();
       } else {
-        audio.volume = v;
+        audio.volume = Math.max(0, Math.min(1, next));
       }
-    }, 30);
+    }, stepMs);
   }
 
-  function stop() {
+  function fadeIn(audio, durationMs) {
+    animateVolume(audio, volume, durationMs || DEFAULT_FADE_IN_MS);
+  }
+
+  function fadeOut(audio, callback, durationMs) {
+    animateVolume(audio, 0, durationMs || DEFAULT_FADE_OUT_MS, function () {
+      audio.pause();
+      if (audio === currentAudio) {
+        currentAudio = null;
+      }
+      if (callback) callback();
+    });
+  }
+
+  function stop(durationMs, callback) {
+    pendingTrack = null;
+    currentTrack = null;
     if (currentAudio && !currentAudio.paused) {
-      fadeOut(currentAudio);
+      fadeOut(currentAudio, callback, durationMs || DEFAULT_FADE_OUT_MS);
     } else if (currentAudio) {
       currentAudio.pause();
+      currentAudio.volume = 0;
+      currentAudio = null;
+      if (callback) callback();
+    } else if (callback) {
+      callback();
     }
-    currentTrack = null;
-    pendingTrack = null;
   }
 
   function toggle() {

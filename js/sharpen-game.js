@@ -148,6 +148,11 @@
   }
 
   function onKeyDown(e) {
+    if (e.code === 'Escape') {
+      e.preventDefault();
+      abortGame();
+      return;
+    }
     if (e.code === 'Space' || e.code === 'Enter') {
       e.preventDefault();
       onStrike();
@@ -245,6 +250,30 @@
     setTimeout(function () {
       if (callback) callback({ cash: reward.cash, morale: reward.morale, items: {} });
     }, 1000);
+  }
+
+  function abortGame() {
+    gameRunning = false;
+    if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+
+    document.removeEventListener('keydown', boundKeyDown);
+    canvas.removeEventListener('touchstart', boundTouchStart);
+
+    canvas.classList.add('hidden');
+    var screen = document.getElementById('screen');
+    if (screen) screen.classList.remove('hidden');
+
+    setTimeout(function () {
+      if (callback) callback(null);
+    }, 90);
+  }
+
+  function drawEscHint() {
+    ctx.fillStyle = CLR.dim;
+    ctx.font = (8 * scale) + 'px "Press Start 2P", monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText('ESC EXIT', 610 * scale, 390 * scale);
+    ctx.textAlign = 'left';
   }
 
   // -------- RENDERING --------
@@ -437,11 +466,13 @@
 
     if (gamePhase === 'countdown') {
       drawCountdown();
+      drawEscHint();
       return;
     }
 
     if (gamePhase === 'results') {
       drawResults();
+      drawEscHint();
       return;
     }
 
@@ -461,6 +492,7 @@
     drawSparks();
     drawFlash();
     drawHUD();
+    drawEscHint();
   }
 
   // -------- GAME LOOP --------

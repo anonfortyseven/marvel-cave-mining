@@ -41,6 +41,11 @@
     '   ////////////////////////'
   ].join('\n');
 
+  var FIELD_NOTES_MEMORY = {
+    readPages: {},
+    lastPage: 0
+  };
+
   function gs() {
     return window.GameState && window.GameState.state ? window.GameState.state : null;
   }
@@ -56,7 +61,7 @@
     if (val <= 69) return '<span class="health-fair">Fair</span>';
     if (val <= 104) return '<span class="health-poor">Poor</span>';
     if (val <= 139) return '<span class="health-bad">Very Poor</span>';
-    return '<span class="health-bad">Dead</span>';
+    return '<span class="health-bad">Critical</span>';
   }
 
   function padCenter(str, width) {
@@ -82,9 +87,32 @@
     return null;
   }
 
+  function buildGenericCaveArt(chamberId) {
+    var chamber = getChamberData(chamberId);
+    var label = chamber ? chamber.name.toUpperCase() : 'UNMAPPED STONE';
+    label = label.substring(0, 23);
+    return [
+      '        .      .     .        ',
+      '     .      ________      .   ',
+      '          /          \\        ',
+      '         /            \\       ',
+      '        | ' + padCenter(label, 23) + ' |',
+      '        |     CAVE CHAMBER    |',
+      '         \\                  / ',
+      '          \\________________/  '
+    ].join('\n');
+  }
+
   function getArt(chamberId) {
-    if (window.AsciiArt && window.AsciiArt.getChamberArt) return window.AsciiArt.getChamberArt(chamberId);
-    return '';
+    if (window.AsciiArt && window.AsciiArt.getChamberArt) {
+      var art = window.AsciiArt.getChamberArt(chamberId);
+      if (art) {
+        return art
+          .replace(/-?\d+\s*ft\.?-?/gi, '')
+          .replace(/-?\d+ft-?/gi, '');
+      }
+    }
+    return buildGenericCaveArt(chamberId);
   }
 
   function getAmbient(chamberId) {
@@ -95,52 +123,199 @@
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
   var TEXT_VARIANTS = {
     mining: [
-      'Shovel after shovel, your crew drags fresh guano into sacks.',
-      'Picks ring against limestone as the bags fill by lantern light.',
-      'You work the seam in silence, broken only by grunts and scraping steel.',
-      'The chamber gives up another day\'s filthy fortune.',
-      'Dust rises, shoulders burn, and the stockpile grows.',
-      'A hard day\'s dig leaves every man reeking and richer.'
+      'Steel rings. Sacks fill.',
+      'Dust lifts. The haul grows.',
+      'You scrape profit out of stink and stone.',
+      'Another filthy shift. Another heavier pile.',
+      'Lanterns sway. The work does not stop.',
+      'The chamber gives up a little more.'
     ],
     descend: [
-      'You feed rope through gloved hands and ease into deeper dark.',
-      'The ladder creaks while the chamber above shrinks to a coin of light.',
-      'One careful step at a time, the earth closes around you.',
-      'You descend with lamps low and nerves tight.',
-      'The air turns colder as you drop beneath the known passages.',
-      'Boots scrape slick stone on the way down.'
+      'Rope pays out into colder dark.',
+      'The light above shrinks fast.',
+      'Down you go, one careful rung at a time.',
+      'The cave pulls you deeper.',
+      'Boots slide. Hands hold.',
+      'Every step down feels earned.'
     ],
     ascend: [
-      'You climb hand over hand toward thinner darkness.',
-      'The rope burns your palms as you haul yourself upward.',
-      'Each rung buys a little more air and a little less dread.',
-      'The chamber below falls away while your shoulders scream.',
-      'You grind upward through mud and limestone grit.',
-      'At last, the way up feels possible.'
+      'You haul toward thinner dark.',
+      'The rope bites back, but you keep climbing.',
+      'Every rung buys better air.',
+      'Upward at last.',
+      'The chamber falls away beneath your boots.',
+      'Shoulders burn. The exit does not move.'
     ],
     restSurface: [
-      'A quiet day in Marmaros steadies everyone.', 'You rest on the surface and breathe like humans again.',
-      'No picks today—just food, sleep, and daylight.', 'Boots dry by the fire while tempers cool.',
-      'You take a full day to mend gear and nerves.', 'The crew spends the day aboveground, grateful for open sky.'
+      'Open air steadies the crew.',
+      'One quiet day above ground.',
+      'Daylight and dry boots do some good.',
+      'No picks today. Just recovery.',
+      'The ridge gives you one calm day.',
+      'Surface air feels almost medicinal.'
     ],
     restUnderground: [
-      'Bedrolls hit stone and the cave watches you sleep.', 'The crew dozes in shifts by a wavering lantern.',
-      'No digging today—just coughing, coffee, and quiet.', 'You camp in the dark and let bruises settle.',
-      'A rest day underground feels less like comfort and more like survival.', 'Picks stay down while lungs and hands recover.'
+      'Boots off. Lamps low. Breathe slow.',
+      'The cave watches while you sleep.',
+      'No digging. Just low voices and sore hands.',
+      'One still day beneath the mountain.',
+      'You rest, if this counts as rest.',
+      'The crew lies down before the dark.'
     ],
     dayAdvance: [
-      'Another day scratched off the contract ledger.', 'Daylight turns over whether you see it or not.',
-      'The calendar advances. The cave does not care.', 'A new day begins with the same old mountain.',
-      'Time moves forward, with or without your consent.', 'One more day spent bargaining with stone.'
+      'The ledger moves one day forward.',
+      'Another day spent bargaining with stone.',
+      'Time passes. The mountain does not.',
+      'One more day off the contract.',
+      'The calendar turns underground.',
+      'The work keeps its count.'
     ]
   };
 
   var RETURN_CHAMBER_TEXT = {
-    cathedral_entrance: ['Back at the Den mouth, cold air pours up from below.', 'The entrance yawns wide, waiting.', 'Rope anchors still hold at the lip.', 'Same sinkhole, same bad feeling.'],
-    cathedral_floor: ['The giant chamber swallows your lantern again.', 'You return to the Cathedral floor and its endless echo.', 'Bat-noise rolls overhead as you step back in.', 'The Underground Mountain looms in the half-light.'],
-    serpentine_passage: ['You re-enter the twisting throat of stone.', 'The Serpentine winds on, familiar and unfriendly.', 'Old pick marks guide your hands forward.', 'The narrow passage takes you back in.'],
-    cloud_room: ['Mist and guano stench welcome you back.', 'The Cloud Room hangs low and heavy.', 'Your lantern struggles in the vapor again.', 'Back in the richest and foulest room around.']
+    cathedral_entrance: ['Back at the Den mouth. Cold air climbs out.', 'Same sinkhole. Same pull downward.'],
+    cathedral_floor: ['Back under the huge roof and the bat-noise.', 'The Cathedral opens around you again.'],
+    serpentine_passage: ['Back in the narrow haul throat.', 'The passage twists and expects you to follow.'],
+    cloud_room: ['Mist, stink, and money again.', 'The Cloud Room comes back at your lungs first.']
   };
+
+  var SCENE_SUMMARIES = {
+    marmaros: ['Marmaros above the Den.', ''],
+    cathedral_entrance: ['The Devil\'s Den opens under the trees.', 'Cold air rises. Daylight does not.'],
+    the_sentinel: ['The Sentinel stands where men get quiet.', 'The stone keeps the fork.'],
+    cathedral_floor: ['The Cathedral Room spreads wide beneath the bats.', 'Forward for haul. Sideways for the Spring Room.'],
+    serpentine_passage: ['The haul route pinches into twisting stone.', 'Every sack fights this passage twice.'],
+    egyptian_room: ['Smooth stone and old naming games.', 'The room looks grander than the work in it.'],
+    gulf_of_doom: ['A black drop opens at the ledge.', 'Rich dirt. Bad footing.'],
+    fat_mans_misery: ['Stone closes in until breathing becomes strategy.', 'Turn sideways and keep moving.'],
+    the_dungeon: ['Low ceiling. Rust streaks. Mean air.', 'The room punishes tired crews.'],
+    spring_room: ['Orange stone and clear water off the main line.', ''],
+    blondies_throne: ['Flowstone rises like a seat no man earned.', 'Even miners lower their voices here.'],
+    cloud_room: ['Low vapor hangs over the upper-cave money room.', 'Good guano. Bad lungs.'],
+    mammoth_room: ['The bats own the roof above you.', 'The sound gets into your teeth.'],
+    lost_river: ['Black water runs beside the route.', 'Nobody on the surface can answer where it goes.'],
+    lake_genevieve: ['A still lake stops the room cold.', 'Every ripple feels too loud.'],
+    lake_miriam: ['Deeper water keeps its own silence.', 'Even the echoes pull back.'],
+    waterfall_room: ['A white fall tears through the dark.', 'This is the deep prize and it knows it.']
+  };
+
+  var STATUS_TAGLINES = {
+    marmaros: 'Town above. Contract ticking.',
+    cathedral_entrance: 'Cold air. Long rope.',
+    the_sentinel: 'The fork waits here.',
+    cathedral_floor: 'Main haul or side mercy.',
+    serpentine_passage: 'Tight path. Slow loads.',
+    egyptian_room: 'Grand room. Hard work.',
+    gulf_of_doom: 'Mind the ledge.',
+    fat_mans_misery: 'Breathe out. Slide through.',
+    the_dungeon: 'Low roof. Bitter air.',
+    spring_room: 'Clear water. Full-day healing.',
+    blondies_throne: 'Quiet room. Good dirt.',
+    cloud_room: 'Rich haul. Poison air.',
+    mammoth_room: 'Bat empire overhead.',
+    lost_river: 'Black water beside the route.',
+    lake_genevieve: 'Still water. Hidden depth.',
+    lake_miriam: 'Deep quiet.',
+    waterfall_room: 'Thunder and the deepest haul.'
+  };
+
+  var PROFESSION_PITCHES = {
+    mine_foreman: 'Most forgiving start. Best balance of money and stamina.',
+    geologist: 'Sharper extraction, tighter margins, less trust from the crew.',
+    farmer: 'Hardier body, thinner purse, rougher start.',
+    drifter: 'Almost no cushion. Highest score if you survive.'
+  };
+
+  var SEASON_PITCHES = {
+    spring: 'Fast water. Bad floods.',
+    summer: 'Bad air. Steady access.',
+    fall: 'Best season.',
+    winter: 'Cold. Costly. Mean.'
+  };
+
+  function getCharacterDraft() {
+    return window.Characters && window.Characters.getDraft ? window.Characters.getDraft() : null;
+  }
+
+  function getCharacterMeta(candidate) {
+    return candidate && candidate.effects ? candidate.effects.slice(0, 2).join(' • ') : '';
+  }
+
+  function getCharacterBadges(candidate) {
+    if (!candidate) return [];
+    var badges = [];
+    if (candidate.effects && candidate.effects[0]) {
+      badges.push({ text: candidate.effects[0], tone: 'primary' });
+    }
+    if (candidate.effects && candidate.effects[1]) {
+      badges.push({ text: candidate.effects[1], tone: 'secondary' });
+    }
+    return badges;
+  }
+
+  function getDoctrineDetailBullets(doctrine) {
+    if (!doctrine) return [];
+    var haul = 'Balanced haul.';
+    if (doctrine.id === 'crew_first') haul = 'Lighter haul, steadier crew.';
+    else if (doctrine.id === 'profit_first') haul = 'Heavier haul if the line holds.';
+    else if (doctrine.id === 'deep_chase') haul = 'Best for deeper chambers and rare finds.';
+    var strain = 'Crew strain stays manageable.';
+    if (doctrine.id === 'crew_first') strain = 'Lowest crew strain of the four.';
+    else if (doctrine.id === 'profit_first') strain = 'Highest strain and shortest tempers.';
+    else if (doctrine.id === 'deep_chase') strain = 'Moderate strain, worse when you linger deep.';
+    var supply = 'Normal supply burn.';
+    if (doctrine.id === 'crew_first') supply = 'Food runs longer, oil matters less.';
+    else if (doctrine.id === 'profit_first') supply = 'Food and rope run hot.';
+    else if (doctrine.id === 'deep_chase') supply = 'Rope and oil matter most.';
+    return [haul, strain, supply];
+  }
+
+  function getDoctrineCardMeta(doctrine) {
+    if (!doctrine) return '';
+    var bits = [];
+    if (doctrine.id === 'steady_contract') bits = ['Even haul', 'Normal supply'];
+    else if (doctrine.id === 'crew_first') bits = ['Low strain', 'Food lasts longer'];
+    else if (doctrine.id === 'profit_first') bits = ['Big haul', 'Runs hot'];
+    else if (doctrine.id === 'deep_chase') bits = ['Deeper route', 'Oil & rope'];
+    return bits.join(' • ');
+  }
+
+  function getMaxDepthReached(state) {
+    var maxDepth = state && state.expedition && state.expedition.moments ? (state.expedition.moments.maxDepth || 0) : 0;
+    if (!state || !window.CaveData) return maxDepth;
+    if (state.currentChamber) {
+      var current = getChamberData(state.currentChamber);
+      if (current) maxDepth = Math.max(maxDepth, current.depth || 0);
+    }
+    var seen = state.discoveredChambers || [];
+    for (var i = 0; i < seen.length; i++) {
+      var chamber = getChamberData(seen[i]);
+      if (chamber) maxDepth = Math.max(maxDepth, chamber.depth || 0);
+    }
+    return maxDepth;
+  }
+
+  function getFieldNotesState() {
+    var state = gs();
+    if (state && state.story) {
+      if (!state.story.fieldNotes) state.story.fieldNotes = { readPages: {}, lastPage: 0 };
+      if (!state.story.fieldNotes.readPages) state.story.fieldNotes.readPages = {};
+      if (typeof state.story.fieldNotes.lastPage !== 'number') state.story.fieldNotes.lastPage = 0;
+      return state.story.fieldNotes;
+    }
+    return FIELD_NOTES_MEMORY;
+  }
+
+  function getScoreDetails(state) {
+    var details = { profession: state && state.profession ? state.profession : '' };
+    if (window.Characters && window.Characters.buildScoreDetails) {
+      var extra = window.Characters.buildScoreDetails(state);
+      for (var key in extra) {
+        if (extra.hasOwnProperty(key)) details[key] = extra[key];
+      }
+    }
+    return details;
+  }
 
   function getCrewByRole(state, roleId) {
     if (!state || !state.crew) return null;
@@ -152,16 +327,670 @@
 
   function getRandomCrewCampQuote(state) {
     var pool = [
-      { role: 'ropeman', lines: ['Rope held today. Might hold tomorrow. Might not.', 'I check every knot twice. The dead ones didn\'t.'] },
-      { role: 'lampkeeper', lines: ['I\'ll trim the wicks. We ain\'t dyin in the dark. Not tonight.', 'Oil\'s thin but I can stretch it. Done worse with less.'] },
-      { role: 'blastman', lines: ['Limestone don\'t argue with black powder. Never has.', 'I dream of fuses sometimes. Wake up counting seconds.'] },
-      { role: 'cartdriver', lines: ['Donkeys is calm. They know the way better than we do now.', 'Hauled near a ton today. Shoulders say so even if the scale don\'t.'] }
+      { role: 'ropeman', lines: ['Rope held today. Might hold tomorrow. Might not.', 'I check every knot twice. The unlucky ones didn\'t.'] },
+      { role: 'lampkeeper', lines: ['I\'ll trim the wicks. We ain\'t losing the line in the dark. Not tonight.', 'Oil\'s thin but I can stretch it. Done worse with less.'] }
     ];
     var pick = pool[Math.floor(Math.random() * pool.length)];
     var crew = getCrewByRole(state, pick.role);
     var speaker = crew ? crew.name : 'A crewman';
     var line = pick.lines[Math.floor(Math.random() * pick.lines.length)];
     return speaker + ' says, "' + line + '"';
+  }
+
+  function getSceneSummary(chamberId) {
+    return SCENE_SUMMARIES[chamberId] || ['Fresh stone ahead.', 'The cave gives nothing freely.'];
+  }
+
+  function getStatusTagline(chamberId, chamber) {
+    if (STATUS_TAGLINES[chamberId]) return STATUS_TAGLINES[chamberId];
+    if (chamber && chamber.description) return chamber.description;
+    return 'Keep the crew fed, the lamps full, and the rope dry.';
+  }
+
+  function trimStoryLine(text, maxLen) {
+    if (!text) return '';
+    var clean = String(text).replace(/\s+/g, ' ').trim();
+    if (clean.length <= maxLen) return clean;
+    return clean.slice(0, maxLen - 1).replace(/\s+\S*$/, '') + '…';
+  }
+
+  function renderReadablePanel(title, lead, opts) {
+    opts = opts || {};
+    var classes = 'readable-screen' + (opts.narrow ? ' readable-screen--narrow' : '');
+    var html = '<div class="' + classes + '">';
+    html += '<div class="readable-frame">';
+    if (opts.brand) {
+      html += '<div class="readable-brand">Marvel Cave Mining Co.</div>';
+    }
+    html += '<div class="readable-header">';
+    if (opts.kicker) html += '<div class="readable-kicker">' + UI.escapeHtml(opts.kicker) + '</div>';
+    html += '<div class="readable-title text-glow">' + UI.escapeHtml(title) + '</div>';
+    html += '<hr class="' + (opts.doubleRule === false ? 'separator' : 'separator-double') + '">';
+    if (lead) html += '<div class="readable-lead">' + UI.escapeHtml(lead) + '</div>';
+    if (opts.meta && opts.meta.length) {
+      html += '<div class="selection-meta-row">';
+      for (var i = 0; i < opts.meta.length; i++) {
+        html += '<div class="selection-meta-pill">' + UI.escapeHtml(opts.meta[i]) + '</div>';
+      }
+      html += '</div>';
+    }
+    if (opts.note) html += '<div class="readable-note">' + UI.escapeHtml(opts.note) + '</div>';
+    html += '</div>';
+    if (opts.bodyHtml) html += '<div class="readable-body' + (opts.bodyClass ? ' ' + opts.bodyClass : '') + '">' + opts.bodyHtml + '</div>';
+    html += '</div>';
+    html += '</div>';
+    return html;
+  }
+
+  function clampPct(value) {
+    return Math.max(0, Math.min(100, Math.round(value)));
+  }
+
+  function formatStateLabel(value) {
+    if (!value) return '';
+    if (value === 'full') return 'Full Rations';
+    if (value === 'half') return 'Half Rations';
+    if (value === 'scraps') return 'Scraps';
+    if (value === 'none') return 'No Rations';
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  }
+
+  function getToneFromPct(pct) {
+    if (pct >= 70) return 'good';
+    if (pct >= 40) return 'warn';
+    return 'danger';
+  }
+
+  function getHealthPct(member) {
+    var max = window.HealthSystem ? window.HealthSystem.DEATH_THRESHOLD : 140;
+    if (!member || !member.alive) return 0;
+    return clampPct((1 - (member.health / max)) * 100);
+  }
+
+  function buildMeter(pct, tone) {
+    return '<div class="dash-meter"><div class="dash-meter-fill meter-' + tone + '" style="width:' + clampPct(pct) + '%"></div></div>';
+  }
+
+  function buildMetricCard(label, value, pct, meta) {
+    var tone = getToneFromPct(pct);
+    var html = '<div class="metric-card metric-card-' + tone + '">';
+    html += '<div class="metric-label">' + UI.escapeHtml(label) + '</div>';
+    html += '<div class="metric-value">' + UI.escapeHtml(value) + '</div>';
+    html += buildMeter(pct, tone);
+    if (meta) html += '<div class="metric-meta">' + UI.escapeHtml(meta) + '</div>';
+    html += '</div>';
+    return html;
+  }
+
+  function buildInfoChip(label, value) {
+    return '<div class="info-chip"><span class="info-chip-label">' + UI.escapeHtml(label) + '</span><span class="info-chip-value">' + UI.escapeHtml(value) + '</span></div>';
+  }
+
+  function getCrewRoleLabel(member, isForeman) {
+    if (isForeman) return 'Lead';
+    if (!member || !member.role) return 'Miner';
+    if (member.role === 'ropeman') return 'Rope';
+    if (member.role === 'lampkeeper') return 'Lamp';
+    if (member.role === 'blastman') return 'Blast';
+    if (member.role === 'cartdriver') return 'Cart';
+    return 'Miner';
+  }
+
+  function buildCrewCard(member, isForeman) {
+    var pct = getHealthPct(member);
+    var tone = member && member.alive ? getToneFromPct(pct) : 'danger';
+    var label = member && member.alive && window.HealthSystem ? window.HealthSystem.getHealthLabel(member.health) : 'Lost';
+    var html = '<div class="crew-card crew-card-' + tone + (member && !member.alive ? ' crew-card-dead' : '') + '">';
+    html += '<div class="crew-card-head"><div class="crew-name">' + UI.escapeHtml(member ? member.name : 'Unknown') + '</div>';
+    html += '<div class="crew-role">' + UI.escapeHtml(getCrewRoleLabel(member, isForeman)) + '</div></div>';
+    html += '<div class="crew-meter-line">' + buildMeter(pct, tone) + '<span class="crew-health-label">' + UI.escapeHtml(label) + '</span></div>';
+    html += '</div>';
+    return html;
+  }
+
+  function buildDetailCard(label, value, note, tone) {
+    var cls = 'detail-card' + (tone ? ' detail-card-' + tone : '');
+    var html = '<div class="' + cls + '">';
+    html += '<div class="detail-card-label">' + UI.escapeHtml(label) + '</div>';
+    html += '<div class="detail-card-value">' + UI.escapeHtml(value) + '</div>';
+    if (note) html += '<div class="detail-card-note">' + UI.escapeHtml(note) + '</div>';
+    html += '</div>';
+    return html;
+  }
+
+  function buildCrewBadge(label, tone) {
+    return '<span class="roll-call-badge roll-call-badge-' + (tone || 'warn') + '">' + UI.escapeHtml(label) + '</span>';
+  }
+
+  function buildCrewConditionCard(member, isForeman, state) {
+    var pct = getHealthPct(member);
+    var tone = member && member.alive ? getToneFromPct(pct) : 'danger';
+    var roleLabel = getCrewRoleLabel(member, isForeman);
+    var profile = window.Expedition && window.Expedition.getCrewData ? window.Expedition.getCrewData(state, member) : null;
+    var traitName = profile && profile.traitName ? profile.traitName : 'Steady Soul';
+    var moodLabel = member && member.alive && window.Expedition && window.Expedition.getCrewMoodLabel
+      ? window.Expedition.getCrewMoodLabel(profile)
+      : (member && member.alive ? 'Steady' : 'Lost');
+    var moodTone = member && member.alive && window.Expedition && window.Expedition.getCrewMoodTone
+      ? window.Expedition.getCrewMoodTone(profile)
+      : tone;
+    var healthLabel = member && member.alive && window.HealthSystem
+      ? window.HealthSystem.getHealthLabel(member.health)
+      : 'Dead';
+    var meterValue = member && member.alive ? (pct + '% ready') : 'Lost';
+
+    var html = '<div class="roll-call-card roll-call-card-' + tone + (member && !member.alive ? ' roll-call-card-dead' : '') + '">';
+    html += '<div class="roll-call-top">';
+    html += '<div class="roll-call-copy">';
+    html += '<div class="roll-call-name">' + UI.escapeHtml(member ? member.name : 'Unknown') + '</div>';
+    html += '<div class="roll-call-role">' + UI.escapeHtml(roleLabel) + '</div>';
+    html += '</div>';
+    html += '<div class="roll-call-status stat-tone-' + tone + '">' + UI.escapeHtml(healthLabel) + '</div>';
+    html += '</div>';
+    html += '<div class="roll-call-badges">';
+    html += buildCrewBadge(traitName, 'warn');
+    html += buildCrewBadge(moodLabel, moodTone);
+    html += '</div>';
+    html += '<div class="roll-call-healthline">';
+    html += '<span class="roll-call-healthcopy">Condition</span>';
+    html += '<span class="roll-call-healthcopy stat-tone-' + tone + '">' + UI.escapeHtml(meterValue) + '</span>';
+    html += '</div>';
+    html += buildMeter(member && member.alive ? pct : 0, tone);
+    html += '</div>';
+    return html;
+  }
+
+  function renderScenePanel(options) {
+    options = options || {};
+    var html = '<div class="scene-panel">';
+    if (options.imageHtml) html += options.imageHtml;
+    else if (options.art) html += '<pre class="' + UI.escapeHtml(options.artClass || 'title-art title-art--scene') + '">' + UI.escapeHtml(options.art) + '</pre>';
+    if (options.kicker) html += '<div class="scene-kicker">' + UI.escapeHtml(options.kicker) + '</div>';
+    if (options.headline) html += '<div class="scene-copy">' + UI.escapeHtml(options.headline) + '</div>';
+    if (options.subline) html += '<div class="scene-copy-sub">' + UI.escapeHtml(options.subline) + '</div>';
+    if (options.note) html += '<div class="scene-copy-note">' + UI.escapeHtml(options.note) + '</div>';
+    html += '</div>';
+    UI.render(html);
+  }
+
+  function summarizeMessages(messages, limit) {
+    var items = [];
+    if (!messages || !messages.length) return items;
+    for (var i = 0; i < messages.length; i++) {
+      if (items.indexOf(messages[i]) === -1) items.push(messages[i]);
+      if (items.length >= (limit || 3)) break;
+    }
+    return items;
+  }
+
+  function getWorstHealthValue(state) {
+    if (!state || !window.HealthSystem) return 0;
+    var members = [state.foreman].concat(state.crew || []);
+    var worst = 0;
+    for (var i = 0; i < members.length; i++) {
+      if (!members[i] || !members[i].alive) continue;
+      if (members[i].health > worst) worst = members[i].health;
+    }
+    return worst;
+  }
+
+  function getRecoveryShiftLine(beforeValue, afterValue) {
+    if (!window.HealthSystem) return '';
+    var beforeLabel = window.HealthSystem.getHealthLabel(beforeValue);
+    var afterLabel = window.HealthSystem.getHealthLabel(afterValue);
+    if (beforeLabel === afterLabel) {
+      return 'The crew comes back stronger.';
+    }
+    return 'Worst condition: ' + beforeLabel + ' -> ' + afterLabel + '.';
+  }
+
+  var HUD_DISPLAY_NAMES = {
+    cathedral_entrance: 'The Devil\'s Den'
+  };
+
+  function getHudChamberName(chamberId, chamber) {
+    if (HUD_DISPLAY_NAMES[chamberId]) return HUD_DISPLAY_NAMES[chamberId];
+    return chamber ? chamber.name : 'Unknown';
+  }
+
+  function getAverageHealthPct(state) {
+    if (!state) return 0;
+    var members = [state.foreman].concat(state.crew || []);
+    var total = 0;
+    var count = 0;
+    for (var i = 0; i < members.length; i++) {
+      if (members[i] && members[i].alive) {
+        total += getHealthPct(members[i]);
+        count++;
+      }
+    }
+    return count ? clampPct(total / count) : 0;
+  }
+
+  function buildHeartMeter(pct) {
+    var filled = Math.round(clampPct(pct) / 20);
+    var html = '<div class="hud-heart-row">';
+    for (var i = 0; i < 5; i++) {
+      html += '<span class="hud-heart' + (i < filled ? ' is-filled' : '') + '">&#9829;</span>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function buildHudBar(pct, tone) {
+    return '<div class="hud-bar"><div class="hud-bar-fill tone-' + tone + '" style="width:' + clampPct(pct) + '%"></div></div>';
+  }
+
+  function buildHudMeterSection(title, value, pct, tone, compact) {
+    var html = '<div class="' + (compact ? 'hud-readiness-item' : 'hud-section') + '">';
+    if (compact) {
+      html += '<div class="hud-readiness-head"><div class="hud-section-title">' + UI.escapeHtml(title) + '</div><div class="hud-meter-value">' + UI.escapeHtml(value) + '</div></div>';
+    } else {
+      html += '<div class="hud-section-title">' + UI.escapeHtml(title) + '</div>';
+      html += '<div class="hud-meter-head">';
+      html += '<div class="hud-meter-value">' + UI.escapeHtml(value) + '</div>';
+      html += '</div>';
+    }
+    html += buildHudBar(pct, tone);
+    html += '</div>';
+    return html;
+  }
+
+  function buildReadinessBlock(avgHealthPct, morale, foodDays, foodPct, oilDays, oilPct, ropeDrops, ropePct) {
+    var html = '<div class="hud-panel-block hud-readiness-block"><div class="hud-panel-title">Readiness</div>';
+    html += '<div class="hud-readiness-health"><div class="hud-section-title">Health</div>' + buildHeartMeter(avgHealthPct) + '</div>';
+    html += '<div class="hud-readiness-list">';
+    html += buildHudMeterSection('Morale', morale + '%', morale, getToneFromPct(morale), true);
+    html += buildHudMeterSection('Food & Water', foodDays + ' days', foodPct, getToneFromPct(foodPct), true);
+    html += buildHudMeterSection('Oil', oilDays + ' shifts', oilPct, getToneFromPct(oilPct), true);
+    html += buildHudMeterSection('Rope', ropeDrops + ' drops', ropePct, getToneFromPct(ropePct), true);
+    html += '</div></div>';
+    return html;
+  }
+
+  function buildHudStatRow(label, value, tone) {
+    return '<div class="hud-stat-row">' +
+      '<span class="hud-stat-label">' + UI.escapeHtml(label) + '</span>' +
+      '<span class="hud-stat-value stat-tone-' + UI.escapeHtml(tone || 'warn') + '">' + UI.escapeHtml(value) + '</span>' +
+      '</div>';
+  }
+
+  function getCashTone(cash) {
+    if (cash >= 60) return 'good';
+    if (cash >= 0) return 'warn';
+    return 'danger';
+  }
+
+  function buildLedgerCard(title, value, note, tone, valueClass) {
+    var html = '<div class="hud-ledger-card">';
+    html += '<div class="hud-ledger-copy">';
+    html += '<div class="hud-ledger-label">' + UI.escapeHtml(title) + '</div>';
+    html += '<div class="hud-ledger-value' + (valueClass || '') + ' stat-tone-' + tone + '">' + UI.escapeHtml(value) + '</div>';
+    html += '</div></div>';
+    return html;
+  }
+
+  function buildLedgerPanel(state, dayNum, duration) {
+    var shipped = state.guanoShipped || 0;
+    var stockpile = state.guanoStockpile || 0;
+    var mined = state.guanoMined || 0;
+    var cashTone = getCashTone(state.cash);
+    var guanoTone = mined >= 3 ? 'good' : (mined >= 1 ? 'warn' : 'danger');
+    var daysElapsed = Math.max(0, Math.min(duration, state.totalDays || 0));
+    var daysLeft = Math.max(0, duration - Math.floor(daysElapsed));
+    var timePct = clampPct((daysElapsed / Math.max(1, duration)) * 100);
+    var timeTone = daysLeft <= 3 ? 'danger' : (daysLeft <= 7 ? 'warn' : 'good');
+    var html = '<div class="hud-panel-block hud-ledger-block">';
+    html += '<div class="hud-panel-title">Ledger</div>';
+    html += '<div class="hud-ledger-grid">';
+    html += buildLedgerCard('Guano', mined.toFixed(1) + 't', '', guanoTone, ' hud-ledger-value--haul');
+    html += buildLedgerCard('Cash', UI.formatMoney(state.cash), '', cashTone, ' hud-ledger-value--money');
+    html += '</div>';
+    html += '<div class="hud-ledger-rows">';
+    html += buildHudStatRow('In Sacks', stockpile.toFixed(1) + 't', stockpile > 0 ? 'warn' : 'good');
+    html += buildHudStatRow('Turned In', shipped.toFixed(1) + 't', shipped > 0 ? 'good' : 'warn');
+    html += '</div>';
+    html += '<div class="hud-ledger-contract">';
+    html += '<div class="hud-ledger-contract-head"><span class="hud-ledger-contract-label">Day</span><span class="hud-ledger-contract-value stat-tone-' + timeTone + '">' + dayNum + '/' + duration + '</span></div>';
+    html += buildHudBar(timePct, timeTone);
+    html += '</div>';
+    html += '</div>';
+    return html;
+  }
+
+  function buildChoiceList(title, options, currentValue) {
+    var html = '<div class="hud-section hud-choice-section">';
+    html += '<div class="hud-section-title">' + UI.escapeHtml(title) + '</div>';
+    html += '<div class="hud-choice-list">';
+    for (var i = 0; i < options.length; i++) {
+      var active = options[i].value === currentValue;
+      html += '<span class="hud-choice-chip' + (active ? ' is-active' : '') + '">' + UI.escapeHtml(options[i].label) + '</span>';
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  function buildNoticeList(title, items) {
+    var html = '<div class="hud-section hud-choice-section">';
+    html += '<div class="hud-section-title">' + UI.escapeHtml(title) + '</div>';
+    html += '<div class="hud-notice-list">';
+    for (var i = 0; i < items.length; i++) {
+      html += '<div class="hud-notice-line">' + UI.escapeHtml(items[i]) + '</div>';
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  function maybeLaunchSurfaceSetPiece(state) {
+    if (!state || !window.Expedition || !window.Expedition.maybeGetSurfaceSetPiece) return false;
+    var setPiece = window.Expedition.maybeGetSurfaceSetPiece(state);
+    if (!setPiece) return false;
+    launchSurfaceSetPiece(state, setPiece);
+    return true;
+  }
+
+  function getFallbackFireInTheHoleResult() {
+    return {
+      label: 'Bucket Line Held',
+      summary: 'You get a few people clear, catch one ridiculous bundle, and keep the story alive for another night.',
+      cash: 2.5,
+      morale: 4,
+      items: {},
+      healthPenalty: 4,
+      citizensSaved: 1,
+      pantsBundles: 1,
+      redCaught: false,
+      redLine: 'Red is still yelling about the pants.'
+    };
+  }
+
+  function applyFireInTheHoleResult(state, result, options) {
+    options = options || {};
+    if (!state || !result) return;
+    var cashReward = result.cash || 0;
+    var moraleReward = result.morale || 0;
+    var itemsReward = result.items || {};
+    var healthPenalty = result.healthPenalty || 0;
+
+    if (options.trainingMode) {
+      cashReward = 0;
+      moraleReward = Math.max(2, Math.round(moraleReward * 0.5));
+      itemsReward = {};
+      healthPenalty = 0;
+    }
+
+    if (cashReward) state.cash += cashReward;
+    if (moraleReward) state.morale = Math.max(0, Math.min(100, (state.morale || 50) + moraleReward));
+    if (itemsReward) {
+      for (var k in itemsReward) {
+        if (itemsReward.hasOwnProperty(k)) state[k] = (state[k] || 0) + itemsReward[k];
+      }
+    }
+    if (healthPenalty && window.HealthSystem && state.foreman && state.foreman.alive) {
+      var collapsed = window.HealthSystem.applyDamage(state.foreman, healthPenalty);
+      if (window.Expedition && window.Expedition.ensureState) window.Expedition.ensureState(state);
+      if (collapsed && state.expedition && state.expedition.pendingNotices) state.expedition.pendingNotices.push('The foreman comes back singed and half-dragged, but still in the book.');
+    }
+    if (typeof state.baldKnobberThreat === 'number') {
+      state.baldKnobberThreat = Math.max(0, state.baldKnobberThreat - (result.citizensSaved >= 2 ? 2 : 1));
+    }
+    if (window.Expedition && window.Expedition.ensureState) {
+      window.Expedition.ensureState(state);
+      if (state.expedition && state.expedition.pendingNotices) {
+        if (result.redCaught) state.expedition.pendingNotices.push('Red Flanders spends the rest of the night swearing the Bald Knobbers still owe him a pair of pants.');
+        else state.expedition.pendingNotices.push('By dawn everybody in Marmaros knows Red Flanders lost his pants before he lost his nerve.');
+      }
+    }
+    if (window.GameState && window.GameState.save) window.GameState.save();
+
+    return {
+      label: result.label,
+      summary: result.summary,
+      redLine: result.redLine,
+      cash: cashReward,
+      morale: moraleReward,
+      healthPenalty: healthPenalty,
+      citizensSaved: result.citizensSaved || 0,
+      pantsBundles: result.pantsBundles || 0,
+      redCaught: !!result.redCaught,
+      items: itemsReward
+    };
+  }
+
+  function buildFireInTheHoleSummary(result) {
+    result = result || getFallbackFireInTheHoleResult();
+    var lead = result.summary || 'You get people clear and come out of the smoke with a story worth telling.';
+    var note = result.redLine || (result.redCaught ? 'Red got his pants back.' : 'Red is still yelling about the pants.');
+    var body = '<div class="detail-card-grid detail-card-grid--two">';
+    body += buildDetailCard('Saved', String(result.citizensSaved || 0), 'pulled clear', 'good');
+    body += buildDetailCard('Pants', String(result.pantsBundles || 0), 'bonus bundles', 'warn');
+    body += buildDetailCard('Cash', UI.formatMoney(result.cash || 0), 'town gratitude', 'good');
+    body += buildDetailCard('Morale', '+' + (result.morale || 0), 'story for the tavern', 'good');
+    if (result.healthPenalty) body += buildDetailCard('Burns', '+' + result.healthPenalty, 'singed on the run', 'danger');
+    body += '</div>';
+    return {
+      title: result.label || 'Fire In The Hole',
+      lead: lead,
+      note: note,
+      bodyHtml: '<div style="margin-top:12px">' + body + '</div>'
+    };
+  }
+
+  function resolveSurfaceSetPiece(state, setPiece, result, options) {
+    options = options || {};
+    if (window.Audio_Manager) Audio_Manager.play('town');
+    var applied = applyFireInTheHoleResult(state, result, options);
+    var summary = buildFireInTheHoleSummary(applied);
+    UI.render(renderReadablePanel(
+      summary.title,
+      summary.lead,
+      {
+        kicker: setPiece.kicker || 'Special Event',
+        narrow: true,
+        note: summary.note,
+        bodyHtml: summary.bodyHtml
+      }
+    ));
+    UI.pressEnter(function () {
+      if (state && state.gameOver) {
+        gameOverScreen(state.gameOverReason || 'Burned fighting the Marmaros fire');
+      } else if (typeof options.onComplete === 'function') {
+        options.onComplete();
+      } else {
+        statusScreen();
+      }
+    });
+  }
+
+  function launchSurfaceSetPiece(state, setPiece, options) {
+    options = options || {};
+    UI.hideBars();
+    UI.render(renderReadablePanel(
+      setPiece.title,
+      setPiece.text,
+      {
+        kicker: setPiece.kicker || 'Special Event',
+        narrow: true,
+        note: setPiece.note
+      }
+    ));
+    UI.pressEnter(function () {
+      var gameObj = window[setPiece.game];
+      if (window.Audio_Manager) Audio_Manager.play('minigame');
+      if (!gameObj || typeof gameObj.start !== 'function') {
+        resolveSurfaceSetPiece(state, setPiece, getFallbackFireInTheHoleResult(), options);
+        return;
+      }
+      gameObj.start({
+        day: window.GameState && window.GameState.getDisplayDayNumber ? window.GameState.getDisplayDayNumber(state) : Math.floor((state.totalDays || 0)) + 1,
+        threat: state.baldKnobberThreat || 0,
+        cash: state.cash || 0,
+        trainingMode: !!options.trainingMode
+      }, function (result) {
+        if (result == null) {
+          if (window.Audio_Manager) Audio_Manager.play('town');
+          if (typeof options.onComplete === 'function') options.onComplete();
+          else statusScreen();
+          return;
+        }
+        resolveSurfaceSetPiece(state, setPiece, result || getFallbackFireInTheHoleResult(), options);
+      });
+    });
+  }
+
+  function playFireInTheHole(options) {
+    var state = gs();
+    if (!state) { titleScreen(); return; }
+    if (window.Expedition && window.Expedition.ensureState) window.Expedition.ensureState(state);
+    launchSurfaceSetPiece(state, {
+      id: 'fire_in_the_hole_replay',
+      type: 'minigame',
+      game: 'FireInTheHoleGame',
+      title: 'Fire In The Hole',
+      kicker: options && options.trainingMode ? 'Town Drill' : 'Marmaros At Night',
+      text: options && options.trainingMode
+        ? 'Marmaros runs the bucket wagon drill again. Bells ring. Fire jumps the street. Red Flanders still swears somebody stole his pants.'
+        : 'Bald Knobbers torch Main Street, the depot is catching, and Red Flanders is already yelling about his stolen pants.',
+      note: options && options.trainingMode
+        ? 'Town drill only. Light reward. No real harm.'
+        : 'Save people first. Bonus bundles second.'
+    }, options || {});
+  }
+
+  function buildCrewRoster(state) {
+    var html = '<div class="hud-panel-block hud-crew-panel" id="hud-crew-panel" role="button" tabindex="0" aria-label="View crew details"><div class="hud-panel-title">Crew</div><div class="hud-roster">';
+    var roster = [{ member: state.foreman, role: 'Foreman' }];
+    for (var i = 0; i < state.crew.length; i++) {
+      roster.push({ member: state.crew[i], role: getCrewRoleLabel(state.crew[i], false) });
+    }
+    for (var j = 0; j < roster.length; j++) {
+      var member = roster[j].member;
+      var profile = window.Expedition && window.Expedition.getCrewData ? window.Expedition.getCrewData(state, member) : null;
+      var tone = member && member.alive ? getToneFromPct(getHealthPct(member)) : 'danger';
+      var status = member && member.alive && window.HealthSystem ? window.HealthSystem.getHealthLabel(member.health) : 'Dead';
+      var moodTone = member && member.alive && window.Expedition && window.Expedition.getCrewMoodTone ? window.Expedition.getCrewMoodTone(profile) : tone;
+      var meta = roster[j].role;
+      html += '<div class="hud-roster-row">' +
+        '<div class="hud-roster-id">' +
+        '<span class="hud-roster-name">' + UI.escapeHtml(member ? member.name : 'Unknown') + '</span>' +
+        '<span class="hud-roster-role">' + UI.escapeHtml(meta) + '</span>' +
+        '</div>' +
+        '<span class="hud-roster-status stat-tone-' + moodTone + '">' + UI.escapeHtml(status) + '</span>' +
+        '</div>';
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  function getDescendTargets(chamber) {
+    if (!chamber || !window.CaveData || !window.CaveData.getDescendTargets) return [];
+    return window.CaveData.getDescendTargets(chamber.id);
+  }
+
+  function canMineCurrentChamber(state) {
+    if (!state || !state.isUnderground) return false;
+    var chamber = getChamberData(state.currentChamber);
+    return !!(chamber && chamber.canMine);
+  }
+
+  function buildActionDeck(actions, selectedIdx) {
+    var html = '<div class="hud-action-grid">';
+    for (var i = 0; i < actions.length; i++) {
+      var action = actions[i];
+      html += '<button class="hud-action-tile' + (i === selectedIdx ? ' is-selected' : '') + (action.primary ? ' is-primary' : '') + (action.secondary ? ' is-secondary' : '') + (action.utility ? ' is-utility' : '') + (action.opportunity ? ' is-opportunity' : '') + (action.disabled ? ' is-disabled' : '') + '"' +
+        ' data-index="' + i + '"' + (action.disabled ? ' disabled aria-disabled="true"' : '') + '>' +
+        '<span class="hud-action-key">' + UI.escapeHtml(action.key) + '</span>' +
+        (action.badge ? '<span class="hud-action-badge">' + UI.escapeHtml(action.badge) + '</span>' : '') +
+        '<span class="hud-action-label">' + UI.escapeHtml(action.label) + '</span>' +
+        '</button>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function bindGameplayHud(actions, selectedIdx) {
+    var tiles = Array.prototype.slice.call(document.querySelectorAll('.hud-action-tile'));
+    var continueBtn = document.getElementById('hud-continue');
+    var crewPanel = document.getElementById('hud-crew-panel');
+
+    function setSelected(nextIdx) {
+      if (!tiles.length) return;
+      selectedIdx = (nextIdx + tiles.length) % tiles.length;
+      var state = gs();
+      if (state && actions[selectedIdx]) state.lastHudAction = actions[selectedIdx].value;
+      for (var i = 0; i < tiles.length; i++) {
+        tiles[i].classList.toggle('is-selected', i === selectedIdx);
+      }
+    }
+
+    function runSelected() {
+      if (!actions[selectedIdx]) return;
+      if (actions[selectedIdx].disabled) {
+        UI.showNotification(actions[selectedIdx].disabledLabel || 'Not available here', 1200);
+        return;
+      }
+      UI.clearKeyHandler();
+      handleAction(actions[selectedIdx].value);
+    }
+
+    tiles.forEach(function (tile, idx) {
+      tile.addEventListener('click', function (e) {
+        e.preventDefault();
+        setSelected(idx);
+        runSelected();
+      });
+    });
+
+    if (continueBtn) {
+      continueBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        runSelected();
+      });
+    }
+
+    function openCrewPanel() {
+      UI.clearKeyHandler();
+      handleAction('crew');
+    }
+
+    if (crewPanel) {
+      crewPanel.addEventListener('click', function (e) {
+        e.preventDefault();
+        openCrewPanel();
+      });
+      crewPanel.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openCrewPanel();
+        }
+      });
+    }
+
+    UI.setKeyHandler(function (e) {
+      var pressed = e.key.toLowerCase();
+      for (var i = 0; i < actions.length; i++) {
+        if (pressed === String(actions[i].key).toLowerCase()) {
+          e.preventDefault();
+          setSelected(i);
+          runSelected();
+          return;
+        }
+      }
+      if (pressed === 'arrowleft' || pressed === 'arrowup') {
+        e.preventDefault();
+        setSelected(selectedIdx - 1);
+        return;
+      }
+      if (pressed === 'arrowright' || pressed === 'arrowdown') {
+        e.preventDefault();
+        setSelected(selectedIdx + 1);
+        return;
+      }
+      if (pressed === 'enter' || pressed === ' ') {
+        e.preventDefault();
+        runSelected();
+      }
+    });
   }
 
   // =========================================
@@ -172,14 +1001,27 @@
     if (window.Audio_Manager) Audio_Manager.play('title');
 
     var html = '';
-    // Pixel art image
-    if (window.Images) html += Images.getImageHtml('title');
-
-    var art = (window.AsciiArt && window.AsciiArt.getTitleArt) ? window.AsciiArt.getTitleArt() : CAVE_ART;
-    html += '<div class="title-art">' + art + '</div>\n';
-    html += '<div class="title-name text-glow-strong">The Marvel Cave Mining Company</div>\n';
-    html += '<div class="subtitle">Stone County, Missouri &mdash; Anno Domini 1884</div>\n';
-    html += '<div style="margin-top:16px"></div>';
+    var titlePath = window.Images && Images.getImagePath ? Images.getImagePath('title') : '';
+    html += '<div class="title-hero">';
+    if (titlePath) {
+      html += '<div class="title-hero-frame"><img src="' + titlePath + '" class="title-hero-image" alt="" loading="eager" fetchpriority="high"></div>';
+    } else {
+      var titleArt = window.AsciiArt && window.AsciiArt.getTitleArt ? window.AsciiArt.getTitleArt() : '';
+      if (titleArt) {
+        html += '<div class="native-art-panel native-art-panel--title">';
+        html += '<pre class="title-art title-art--hero">' + UI.escapeHtml(titleArt) + '</pre>';
+        html += '</div>';
+      }
+    }
+    html += '<div class="title-kicker">Ozarks Contract Work · 1884</div>';
+    html += '<div class="title-name text-glow-strong">Marvel Cave Mining Co.</div>\n';
+    html += '<div class="title-lead">Take the contract. Beat the cave. Bring the haul home.</div>\n';
+    html += '<div class="title-stakes">';
+    html += '<div class="title-stake"><span class="title-stake-value">20</span><span class="title-stake-label">Days</span></div>';
+    html += '<div class="title-stake"><span class="title-stake-value">3</span><span class="title-stake-label">On The Line</span></div>';
+    html += '<div class="title-stake"><span class="title-stake-value">Your</span><span class="title-stake-label">Cut of the Haul</span></div>';
+    html += '</div>';
+    html += '<div style="margin-top:18px"></div>';
     UI.render(html);
     // CRT boot flicker effect
     var screen = UI.getScreen();
@@ -187,23 +1029,17 @@
     setTimeout(function () { screen.classList.remove('crt-boot'); }, 850);
     UI.animateBats();
     UI.promptChoice([
-      { key: '1', label: 'Start a New Expedition', value: 'new' },
-      { key: '2', label: 'Continue Saved Game', value: 'load' },
-      { key: '3', label: 'Learn About the Cave', value: 'learn' },
-      { key: '4', label: 'Top Ten Foremen', value: 'top' }
+      { key: '1', label: 'Sign the 20-Day Contract', value: 'new', tone: 'featured', badge: 'START' },
+      { key: '2', label: 'Top Ten Expeditions', value: 'top', tone: 'subtle' }
     ], function (val) {
       switch (val) {
-        case 'new': UI.transition(professionScreen); break;
-        case 'load':
-          if (window.GameState && window.GameState.hasSave()) {
-            window.GameState.load();
-            UI.transition(statusScreen);
-          } else {
-            UI.showNotification('No saved game found', 1500);
-          }
+        case 'new':
+          if (window.Characters && window.Characters.startDraft) window.Characters.startDraft();
+          UI.transition(professionScreen);
           break;
-        case 'learn': UI.transition(learnScreen); break;
-        case 'top': UI.transition(topTenScreen); break;
+        case 'top':
+          UI.transition(topTenScreen);
+          break;
       }
     });
   }
@@ -213,71 +1049,154 @@
   // =========================================
   function professionScreen() {
     UI.hideBars();
-    var profs = window.CaveData ? window.CaveData.PROFESSIONS : {};
-    var keys = ['mine_foreman', 'geologist', 'farmer', 'drifter'];
+    var draft = window.Characters && window.Characters.startDraft ? window.Characters.startDraft() : null;
+    var leads = draft ? draft.leads.slice().sort(function (a, b) {
+      return (a.gender === 'female' ? 1 : 0) - (b.gender === 'female' ? 1 : 0);
+    }) : [];
+    var options = [];
 
-    var html = '<div class="text-lg text-glow">Choose Your Background</div>';
-    html += '<hr class="separator-double">';
-    html += '<div class="text-dim" style="margin:6px 0">T. Hodges Jones offers a 30-day contract. Guano at $700 the ton. You provide the men. The cave provides the rest.</div>';
-
-    for (var i = 0; i < keys.length; i++) {
-      var p = profs[keys[i]];
-      if (!p) continue;
-      var crew = p.startingCrew + 1; // +1 for foreman
-      html += '<div class="box" style="margin:6px 0"><div class="box-title">' + (i + 1) + '. ' + UI.escapeHtml(p.name) + '</div>';
-      html += '<div class="text-bright">$' + p.startingMoney + ' &bull; ' + p.contractTarget + ' ton contract &bull; Crew: ' + crew + ' &bull; Score: x' + p.scoreMultiplier + '</div>';
-      html += '<div class="text-dim">' + UI.escapeHtml(p.description) + '</div></div>';
+    for (var i = 0; i < leads.length; i++) {
+      options.push({
+        key: String(i + 1),
+        label: leads[i].name,
+        value: leads[i].id,
+        description: leads[i].story,
+        badges: getCharacterBadges(leads[i]),
+        confirmOnClick: false
+      });
     }
 
-    UI.render(html);
-    UI.promptChoice([
-      { key: '1', label: 'Mine Foreman', value: 'mine_foreman' },
-      { key: '2', label: 'Geologist', value: 'geologist' },
-      { key: '3', label: 'Farmer Turned Miner', value: 'farmer' },
-      { key: '4', label: 'Drifter', value: 'drifter' }
-    ], function (val) {
-      window.GameState.init({ profession: val });
+    UI.render(renderReadablePanel(
+      'Choose Your Lead',
+      '',
+      {
+        kicker: 'Lead draft',
+        narrow: true,
+        brand: true
+      }
+    ));
+    UI.promptChoice(options, function (val) {
+      var selected = window.Characters && window.Characters.selectLead ? window.Characters.selectLead(val) : null;
+      if (!selected) {
+        UI.transition(titleScreen);
+        return;
+      }
+      window.GameState.init({
+        profession: selected.professionId || val,
+        runId: draft ? draft.runId : ''
+      });
+      if (window.Characters && window.Characters.applyDraftToState) {
+        window.Characters.applyDraftToState(gs());
+      }
       UI.transition(crewScreen);
+    }, {
+      cardGrid: true,
+      confirmOnClick: false,
+      hideGroups: true,
+      selectButtonLabel: 'SELECT'
     });
   }
 
   // =========================================
-  // 3. CREW NAMING
+  // 3. CREW DRAFT
   // =========================================
   function crewScreen() {
     UI.hideBars();
     var state = gs();
-    var crewCount = state ? state.crew.length : 4;
-    var totalCount = crewCount + 1; // +1 for foreman
-    var names = [];
-    UI.render('<div class="text-lg text-glow">Name Your Mining Crew</div><hr class="separator-double">' +
-      '<div class="text-dim" style="margin:6px 0">Every man goes into the dark with a name. Give yours theirs.</div>');
-    askName(0);
-
-    function askName(index) {
-      var labels = ['Foreman', 'Rope Man', 'Lamp Keeper', 'Blast Man', 'Cart Driver'];
-      var defaults = ['', 'Buck', 'Jesse', 'Hank', 'Earl'];
-      if (index >= totalCount) { finishCrew(); return; }
-      var label = labels[index] || ('Miner ' + index);
-      var defVal = defaults[index] || label;
-      UI.promptText(label + ': ', function (val) {
-        if (!val) val = defVal;
-        names.push(val);
-        UI.append('<div class="text-green"> -> ' + UI.escapeHtml(label) + ': ' + UI.escapeHtml(val) + '</div>');
-        if (index < totalCount - 1) askName(index + 1);
-        else finishCrew();
-      }, { defaultValue: defVal });
+    var draft = getCharacterDraft();
+    var lead = window.Characters && window.Characters.getSelectedLead ? window.Characters.getSelectedLead() : null;
+    if (!state || !draft || !lead) {
+      UI.transition(professionScreen);
+      return;
     }
 
-    function finishCrew() {
-      var state = gs();
-      if (state) {
-        state.foreman.name = names[0];
-        for (var i = 0; i < state.crew.length; i++) if (names[i + 1]) state.crew[i].name = names[i + 1];
+    var ropeChoices = window.Characters ? window.Characters.getChoices('ropeman').slice().sort(function (a, b) {
+      return (a.gender === 'female' ? 1 : 0) - (b.gender === 'female' ? 1 : 0);
+    }) : [];
+    var options = [];
+    for (var i = 0; i < ropeChoices.length; i++) {
+      options.push({
+        key: String(i + 1),
+        label: ropeChoices[i].name,
+        value: ropeChoices[i].id,
+        description: ropeChoices[i].story,
+        badges: getCharacterBadges(ropeChoices[i]),
+        confirmOnClick: false
+      });
+    }
+
+    UI.render(renderReadablePanel(
+      'Choose Your Rope Hand',
+      '',
+      {
+        kicker: 'Crew draft 1 of 2',
+        narrow: true,
+        brand: true
       }
-      UI.append('<div style="margin-top:10px" class="text-bright">Your crew stands assembled. God help them.</div>');
-      UI.pressEnter(function () { UI.transition(seasonScreen); });
+    ));
+    UI.promptChoice(options, function (val) {
+      if (window.Characters && window.Characters.selectCrew) {
+        window.Characters.selectCrew('ropeman', val);
+      }
+      if (window.Characters && window.Characters.applyDraftToState) {
+        window.Characters.applyDraftToState(state);
+      }
+      UI.transition(lampkeeperScreen);
+    }, {
+      cardGrid: true,
+      confirmOnClick: false,
+      hideGroups: true,
+      selectButtonLabel: 'SELECT'
+    });
+  }
+
+  function lampkeeperScreen() {
+    UI.hideBars();
+    var state = gs();
+    var lead = window.Characters && window.Characters.getSelectedLead ? window.Characters.getSelectedLead() : null;
+    if (!state || !lead) {
+      UI.transition(professionScreen);
+      return;
     }
+
+    var lampChoices = window.Characters ? window.Characters.getChoices('lampkeeper').slice().sort(function (a, b) {
+      return (a.gender === 'female' ? 1 : 0) - (b.gender === 'female' ? 1 : 0);
+    }) : [];
+    var options = [];
+    for (var i = 0; i < lampChoices.length; i++) {
+      options.push({
+        key: String(i + 1),
+        label: lampChoices[i].name,
+        value: lampChoices[i].id,
+        description: lampChoices[i].story,
+        badges: getCharacterBadges(lampChoices[i]),
+        confirmOnClick: false
+      });
+    }
+
+    UI.render(renderReadablePanel(
+      'Choose Your Lamp Keeper',
+      '',
+      {
+        kicker: 'Crew draft 2 of 2',
+        narrow: true,
+        brand: true
+      }
+    ));
+    UI.promptChoice(options, function (val) {
+      if (window.Characters && window.Characters.selectCrew) {
+        window.Characters.selectCrew('lampkeeper', val);
+      }
+      if (window.Characters && window.Characters.applyDraftToState) {
+        window.Characters.applyDraftToState(state);
+      }
+      UI.transition(seasonScreen);
+    }, {
+      cardGrid: true,
+      confirmOnClick: false,
+      hideGroups: true,
+      selectButtonLabel: 'SELECT'
+    });
   }
 
   // =========================================
@@ -285,18 +1204,20 @@
   // =========================================
   function seasonScreen() {
     UI.hideBars();
-    var html = '<div class="text-lg text-glow">Choose Starting Season</div><hr class="separator-double">';
-    html += '<div class="text-dim" style="margin:6px 0">Thirty days. Choose when you descend into the earth.</div>';
-    html += '<div class="box" style="margin:6px 0"><div class="box-title">1. Spring</div><div class="text-dim">March. The Ozarks thaw and the Lost River swells. Flash floods drown men in minutes down there.</div></div>';
-    html += '<div class="box" style="margin:6px 0"><div class="box-title">2. Summer</div><div class="text-dim">June. Forty thousand gray bats roost in the Mammoth Room. The ammonia will strip the lining from your throat.</div></div>';
-    html += '<div class="box" style="margin:6px 0"><div class="box-title">3. Fall</div><div class="text-dim">September. The bats settle into torpor. The cave goes still as a churchyard. Best season, if you believe in luck.</div></div>';
-    html += '<div class="box" style="margin:6px 0"><div class="box-title">4. Winter</div><div class="text-dim">December. Ice seals the Den. Prices double. Only the desperate or the foolish go underground in winter.</div></div>';
-    UI.render(html);
+    UI.render(renderReadablePanel(
+      'Choose Starting Season',
+      '',
+      {
+        kicker: 'Start month',
+        narrow: true,
+        brand: true
+      }
+    ));
     UI.promptChoice([
-      { key: '1', label: 'Spring (March)', value: 'spring' },
-      { key: '2', label: 'Summer (June)', value: 'summer' },
-      { key: '3', label: 'Fall (September)', value: 'fall' },
-      { key: '4', label: 'Winter (December)', value: 'winter' }
+      { key: '1', label: 'Spring (March)', value: 'spring', description: SEASON_PITCHES.spring, confirmOnClick: false },
+      { key: '2', label: 'Summer (June)', value: 'summer', description: SEASON_PITCHES.summer, confirmOnClick: false },
+      { key: '3', label: 'Fall (September)', value: 'fall', description: SEASON_PITCHES.fall, confirmOnClick: false, tone: 'featured', badge: 'RECOMMENDED' },
+      { key: '4', label: 'Winter (December)', value: 'winter', description: SEASON_PITCHES.winter, confirmOnClick: false }
     ], function (val) {
       var state = gs();
       if (state) {
@@ -305,7 +1226,47 @@
         state.date = new Date(1884, m[val], 1);
         state.startDate = new Date(1884, m[val], 1);
       }
+      UI.transition(doctrineScreen);
+    }, {
+      cardGrid: true,
+      hideNav: true,
+      confirmOnClick: false,
+      selectButtonLabel: 'SELECT'
+    });
+  }
+
+  function doctrineScreen() {
+    UI.hideBars();
+    var state = gs();
+    if (!state) { titleScreen(); return; }
+    var doctrine = window.Expedition && window.Expedition.getDoctrine ? window.Expedition.getDoctrine(state.expedition && state.expedition.doctrine) : null;
+    UI.render(renderReadablePanel(
+      'Choose Pace',
+      '',
+      {
+        kicker: 'Crew orders',
+        narrow: true,
+        brand: true
+      }
+    ));
+    var doctrineOptions = window.Expedition ? window.Expedition.getDoctrineOptions() : [];
+    for (var i = 0; i < doctrineOptions.length; i++) {
+      var current = window.Expedition.getDoctrine(doctrineOptions[i].value);
+      doctrineOptions[i].badges = [];
+      doctrineOptions[i].meta = '';
+      doctrineOptions[i].description = current.summary;
+      doctrineOptions[i].confirmOnClick = false;
+    }
+    UI.promptChoice(doctrineOptions, function (value) {
+      if (window.Expedition && window.Expedition.setDoctrine) {
+        window.Expedition.setDoctrine(state, value);
+      }
       UI.transition(storeScreen);
+    }, {
+      cardGrid: true,
+      hideNav: true,
+      confirmOnClick: false,
+      selectButtonLabel: 'SELECT'
     });
   }
 
@@ -335,59 +1296,40 @@
     UI.hideBars();
     var state = gs();
     var chamberId = state ? state.currentChamber : 'cathedral_entrance';
-
-    // Show chamber art line-by-line typewriter style
+    var chamber = getChamberData(chamberId);
     var art = getArt(chamberId);
     var seen = !!(state && state.visitedChambers && state.visitedChambers[chamberId]);
-    var lines = window.Content ? window.Content.getLandmarkText(chamberId) : ['You descend into the cave...'];
+    var lines = getSceneSummary(chamberId);
     if (seen) {
       var shortPool = RETURN_CHAMBER_TEXT[chamberId] || ['You return to familiar stone.', 'The chamber feels known now.', 'Back through the same passage, different day.'];
       lines = [pick(shortPool)];
     } else if (state && state.visitedChambers) {
       state.visitedChambers[chamberId] = true;
-      if (window.AsciiArt && window.AsciiArt.getGameplayArt) {
-        var disc = window.AsciiArt.getGameplayArt('discovery');
-        if (disc) lines = [disc, ''].concat(lines);
+    }
+    if (state && window.Expedition) {
+      window.Expedition.noteChamberVisit(state, chamberId);
+      var legacyEcho = window.Expedition.claimLegacyEcho(state, chamberId);
+      if (legacyEcho) {
+        lines[1] = legacyEcho.line;
+        if (legacyEcho.note) lines[2] = legacyEcho.note;
+      } else if (window.Expedition.getStoryLines) {
+        var story = window.Expedition.getStoryLines(state, chamberId);
+        if (story) {
+          lines[0] = story.headline || lines[0];
+          if (story.subline) lines[1] = story.subline;
+          if (story.note) lines[2] = story.note;
+        }
       }
     }
-
-    var html = '';
-    if (art) html += '<pre class="chamber-art" id="landmark-art"></pre>';
-    html += '<div id="landmark-text" style="white-space:pre-wrap;line-height:2"></div>';
-    UI.render(html);
-
-    var artEl = document.getElementById('landmark-art');
-    var textEl = document.getElementById('landmark-text');
-
-    // Typewriter: art lines, then description
-    var artLines = art ? art.split('\n') : [];
-    var artIdx = 0;
-
-    function typeArtLine() {
-      if (artIdx < artLines.length) {
-        artEl.textContent += (artIdx > 0 ? '\n' : '') + artLines[artIdx];
-        artIdx++;
-        setTimeout(typeArtLine, 60);
-      } else {
-        // Now typewriter the description
-        typeDescription(0);
-      }
-    }
-
-    function typeDescription(i) {
-      if (i < lines.length) {
-        textEl.textContent += (i > 0 ? '\n' : '') + lines[i];
-        setTimeout(function () { typeDescription(i + 1); }, 100);
-      } else {
-        UI.pressEnter(function () { UI.transition(statusScreen); });
-      }
-    }
-
-    if (artLines.length > 0) {
-      typeArtLine();
-    } else {
-      typeDescription(0);
-    }
+    renderScenePanel({
+      art: art,
+      artClass: 'title-art title-art--scene',
+      kicker: chamber ? chamber.name : 'Unmapped Stone',
+      headline: lines[0] || 'Fresh stone ahead.',
+      subline: lines[1] || '',
+      note: lines[2] || ''
+    });
+    UI.pressEnter(function () { UI.transition(statusScreen); });
   }
 
   // =========================================
@@ -399,26 +1341,16 @@
     var state = gs();
     if (!state) { titleScreen(); return; }
     if (state.gameOver) { gameOverScreen(state.gameOverReason); return; }
+    if (window.Expedition && window.Expedition.ensureState) window.Expedition.ensureState(state);
 
-    // Surface market fluctuation updates each new surface day
-    if (!state.isUnderground) {
-      if (state.lastMarketDay !== state.totalDays) {
-        state.lastMarketDay = state.totalDays;
-        state.marketPrice = 600 + Math.floor(Math.random() * 201);
-        state.marketHistory = state.marketHistory || [];
-        state.marketHistory.push({ day: state.totalDays, price: state.marketPrice });
-        if (state.marketHistory.length > 10) state.marketHistory.shift();
-      }
-    }
+    state.marketPrice = state.companySalePrice || state.marketPrice || (window.Economy ? window.Economy.GUANO_PRICE_PER_TON : 700);
 
     // Play context-appropriate music
     if (window.Audio_Manager) Audio_Manager.playForContext(state);
-
-    // Update status bar
-    UI.renderStatusBar(state);
+    UI.hideBars();
 
     var chamber = getChamberData(state.currentChamber);
-    var chamberName = chamber ? chamber.name : (state.isUnderground ? 'Unknown' : 'Marmaros');
+    var chamberName = getHudChamberName(state.currentChamber, chamber);
     var depth = chamber ? chamber.depth : 0;
 
     // Apply depth color theme
@@ -431,132 +1363,179 @@
       else screen.classList.add('depth-shallow');
     }
 
-    // === BUILD DASHBOARD ===
-    var html = '';
-    var duration = state.gameDuration || 30;
-    var dayNum = Math.min(state.totalDays + 1, duration);
-    var daysLeft = Math.max(0, duration - state.totalDays);
-
-    // Chamber image (compact for dashboard)
+    // === BUILD HUD ===
+    var duration = state.gameDuration || 20;
+    var dayNum = window.GameState && window.GameState.getDisplayDayNumber ? window.GameState.getDisplayDayNumber(state) : Math.min(Math.floor((state.totalDays || 0)) + 1, duration);
     var chamberId = state.currentChamber || 'marmaros';
-    if (window.Images) {
-      html += state.isUnderground ? Images.getCaveImage(chamberId, true) : Images.getCaveImage('marmaros', true);
-    }
-
-    // Day counter (large, prominent)
-    var dayClass = daysLeft <= 5 ? 'sb-danger' : (daysLeft <= 10 ? 'sb-warn' : '');
-    html += '<div class="day-counter ' + dayClass + '">DAY ' + dayNum + ' of ' + duration + '</div>';
-
-    // Date + location line
-    html += '<div class="dash-location">';
-    html += '<span class="text-dim">' + formatDate(state) + '</span> &bull; ';
-    html += '<span class="text-bright">' + UI.escapeHtml(chamberName) + '</span>';
-    if (state.isUnderground && depth > 0) html += ' <span class="text-dim">(' + depth + ' ft)</span>';
-    html += '</div>';
-
-    html += '<hr class="separator">';
-
-    // Crew health row — compact chips
-    html += '<div class="crew-row">';
-    html += crewChip(state.foreman.name, state.foreman.health, state.foreman.alive, true);
-    for (var i = 0; i < state.crew.length; i++) {
-      html += crewChip(state.crew[i].name, state.crew[i].health, state.crew[i].alive, false);
-    }
-    if (state.donkeys.count > 0) {
-      html += '<span class="crew-chip crew-chip-donkey">' + state.donkeys.count + ' donkey' + (state.donkeys.count > 1 ? 's' : '') + '</span>';
-    }
-    html += '</div>';
-
-    // Resources grid (compact 2-column)
     var partySize = countAlive(state);
     var foodPerDay = 2.4;
     if (state.rationLevel === 'half') foodPerDay = 1.2;
     else if (state.rationLevel === 'scraps') foodPerDay = 0.6;
     else if (state.rationLevel === 'none') foodPerDay = 0;
-    var totalFoodPerDay = foodPerDay * partySize + (state.donkeys ? state.donkeys.count : 0);
+    var totalFoodPerDay = foodPerDay * partySize;
     var foodDays = totalFoodPerDay > 0 ? Math.floor(state.food / totalFoodPerDay) : 99;
     var oilDays = state.lanternOil > 0 ? Math.floor(state.lanternOil / 0.5) : 0;
-    var foodCls = foodDays > 10 ? 'sb-ok' : (foodDays >= 4 ? 'sb-warn' : 'sb-danger');
-    var oilCls = oilDays > 8 ? 'sb-ok' : (oilDays >= 3 ? 'sb-warn' : 'sb-danger');
-
+    var ropeDrops = Math.floor(state.rope / 20);
     var morale = state.morale !== undefined ? state.morale : 50;
-    var moraleCls = morale > 60 ? 'morale-high' : (morale > 30 ? 'morale-mid' : 'morale-low');
-
-    html += '<div class="resource-grid">';
-    html += si('Cash', '$' + state.cash.toFixed(0));
-    html += si('Food', '<span class="' + foodCls + '">' + Math.round(state.food) + ' lbs (~' + foodDays + 'd)</span>');
-    html += si('Oil', '<span class="' + oilCls + '">' + state.lanternOil.toFixed(1) + ' gal (~' + oilDays + 'd)</span>');
-    html += si('Rope', state.rope + ' ft');
-    html += si('Pace', state.workPace);
-    html += si('Rations', state.rationLevel);
-    html += '</div>';
-
-    // Morale bar
-    html += '<div class="dash-morale"><span class="status-label">Morale:</span> ' +
-      '<span class="morale-bar"><span class="morale-fill ' + moraleCls + '" style="width:' + morale + '%"></span></span>' +
-      ' <span class="text-dim">' + morale + '%</span></div>';
-
-    // Guano contract progress (most prominent)
-    html += '<div class="guano-progress-wrap">';
-    html += '<div class="status-label">Contract: Guano ' + state.guanoShipped.toFixed(1) + ' / ' + state.contractTarget + ' tons';
-    if (state.guanoStockpile > 0.01) html += ' <span class="text-dim">(+' + state.guanoStockpile.toFixed(2) + ' stockpiled)</span>';
-    html += '</div>';
-    html += UI.progressBar(state.guanoShipped, state.contractTarget);
-    html += '</div>';
-
-    // Chamber description + ambient pool
-    if (state.lastAmbientDay !== state.totalDays || !state.currentAmbientText) {
-      state.lastAmbientDay = state.totalDays;
-      state.currentAmbientText = getAmbient(state.currentChamber);
+    var foodPct = clampPct((foodDays / 9) * 100);
+    var oilPct = clampPct((oilDays / 8) * 100);
+    var ropePct = clampPct((ropeDrops / 8) * 100);
+    var avgHealthPct = getAverageHealthPct(state);
+    var scenePath = '';
+    var sceneArt = '';
+    if (state.isUnderground) {
+      scenePath = window.Images && Images.getChamberImagePath ? Images.getChamberImagePath(chamberId) : '';
+    } else {
+      scenePath = window.Images ? (Images.getImagePath('town') || Images.getImagePath('surface')) : '';
     }
-    if (state.currentAmbientText) {
-      html += '<div class="zone-desc">' + UI.escapeHtml(state.currentAmbientText) + '</div>';
-    } else if (chamber && chamber.description) {
-      html += '<div class="zone-desc">' + UI.escapeHtml(chamber.description) + '</div>';
+    var summary = getSceneSummary(chamberId);
+    var headline = summary[0] || getStatusTagline(chamberId, chamber);
+    var subline = summary.length > 1 ? summary[1] : getStatusTagline(chamberId, chamber);
+    var doctrine = window.Expedition && window.Expedition.getDoctrine ? window.Expedition.getDoctrine(state.expedition && state.expedition.doctrine) : null;
+    var chamberPersona = window.Expedition && window.Expedition.getChamberPersona ? window.Expedition.getChamberPersona(chamberId) : null;
+    var expeditionStory = window.Expedition && window.Expedition.getStoryLines ? window.Expedition.getStoryLines(state, chamberId) : null;
+    var warnings = window.Expedition && window.Expedition.getWarnings ? window.Expedition.getWarnings(state) : [];
+    var avgPressure = 0;
+    if (window.Expedition && window.Expedition.getCrewData) {
+      var pressureMembers = [state.foreman].concat(state.crew || []);
+      var pressureTotal = 0;
+      var pressureCount = 0;
+      for (var pm = 0; pm < pressureMembers.length; pm++) {
+        if (!pressureMembers[pm]) continue;
+        var pressureProfile = window.Expedition.getCrewData(state, pressureMembers[pm]);
+        if (pressureProfile) {
+          pressureTotal += pressureProfile.pressure || 0;
+          pressureCount++;
+        }
+      }
+      avgPressure = pressureCount ? Math.round(pressureTotal / pressureCount) : 0;
     }
-
-    var statusArt = '';
-    if (window.AsciiArt && window.AsciiArt.getGameplayArt) {
-      if (!state.isUnderground) statusArt = window.AsciiArt.getGameplayArt('status_surface');
-      else if (state.workPace === 'careful') statusArt = window.AsciiArt.getGameplayArt('status_rest');
-      else statusArt = window.AsciiArt.getGameplayArt('status_mining');
+    if (expeditionStory) {
+      headline = expeditionStory.headline || headline;
+      subline = expeditionStory.subline || subline;
     }
-    if (statusArt) html += '<pre class="title-art" style="margin-top:6px">' + UI.escapeHtml(statusArt) + '</pre>';
+    if (!state.isUnderground && window.Expedition && window.Expedition.getTownSnapshot) {
+      var townSnapshot = window.Expedition.getTownSnapshot(state);
+      if (townSnapshot) {
+        headline = townSnapshot.headline || headline;
+        subline = '';
+      }
+    }
+    headline = trimStoryLine(headline, state.isUnderground ? 74 : 92);
+    subline = trimStoryLine(subline, state.isUnderground ? 96 : 116);
+    if (state.isUnderground) subline = '';
 
-
-    UI.render(html);
-
-    // === BUILD ACTION BAR ===
-    var actions;
+    var actions = [];
     var musicLabel = (window.Audio_Manager && Audio_Manager.isEnabled()) ? 'Music Off' : 'Music On';
     if (state.isUnderground) {
-      actions = [
-        { key: '1', label: 'Mine', value: 'mine', primary: true },
-        { key: '2', label: 'Descend', value: 'descend' },
-        { key: '3', label: 'Ascend', value: 'ascend' },
-        { key: '4', label: 'Pace', value: 'pace' },
-        { key: '5', label: 'Rations', value: 'rations' },
-        { key: '6', label: 'Rest', value: 'rest' },
-        { key: '7', label: 'Map', value: 'map' },
-        { key: '8', label: 'Crew', value: 'crew' },
-        { key: '9', label: musicLabel, value: 'music' }
-      ];
+      var deeperConnections = getDescendTargets(chamber);
+      if (chamberId === 'spring_room') {
+        actions.push({
+          label: 'Take the Spring',
+          value: 'spring_heal',
+          primary: true,
+          note: 'Clear water and a full day of healing'
+        });
+      } else {
+        var canMine = canMineCurrentChamber(state);
+        actions.push({
+          label: canMine ? 'Mine' : 'Go Deeper',
+          value: 'mine',
+          primary: true,
+          note: canMine ? (chamberPersona ? chamberPersona.title : 'Work the room') : 'Mining starts lower in the cave',
+          disabled: !canMine,
+          disabledLabel: 'Mining starts deeper in the cave'
+        });
+      }
+      if (deeperConnections.length > 0) {
+        actions.push({ label: 'Descend', value: 'descend', note: deeperConnections.length > 1 ? deeperConnections.length + ' routes open' : 'One route open' });
+      }
+      actions.push({ label: 'Ascend', value: 'ascend', note: 'Climb toward daylight' });
+      actions.push({ label: 'Pace', value: 'doctrine', note: doctrine ? doctrine.name : 'Set the pace' });
+      if (chamberId !== 'spring_room') {
+        actions.push({ label: 'Rest', value: 'rest', note: chamberPersona && chamberPersona.tags.indexOf('sanctuary') !== -1 ? 'This room can soothe them' : 'Recover for a day' });
+      }
+      actions.push({ label: musicLabel, value: 'music', note: 'Toggle soundtrack' });
     } else {
-      actions = [
-        { key: '1', label: 'Enter Cave', value: 'enter', primary: true },
-        { key: '2', label: 'Visit Town', value: 'town' },
-        { key: '3', label: 'Ship Guano', value: 'ship' },
-        { key: '4', label: 'Rest', value: 'rest' },
-        { key: '5', label: 'Supplies', value: 'supplies' },
-        { key: '6', label: 'Crew', value: 'crew' },
-        { key: '7', label: 'Save', value: 'save' },
-        { key: '8', label: musicLabel, value: 'music' }
-      ];
+      actions.push({ key: '1', label: 'Enter Cave', value: 'enter', primary: true });
+      actions.push({ key: '2', label: 'Rest Day', value: 'rest', secondary: true });
+      actions.push({ key: '3', label: 'Visit Town', value: 'town' });
+      actions.push({
+        key: '4',
+        label: 'Ship Guano',
+        value: 'ship',
+        disabled: state.guanoStockpile <= 0.01,
+        disabledLabel: 'Yard clear.',
+        opportunity: state.guanoStockpile > 0.01,
+        badge: state.guanoStockpile > 0.01 ? 'READY' : ''
+      });
+      actions.push({ key: '5', label: 'Pace', value: 'doctrine', utility: true });
+      actions.push({ key: '6', label: musicLabel, value: 'music', utility: true });
+    }
+    if (state.isUnderground) {
+      for (var a = 0; a < actions.length; a++) actions[a].key = String(a + 1);
     }
 
-    UI.renderActionBar(actions, function (val) {
-      handleAction(val);
-    });
+    var selectedIdx = 0;
+    if (state.lastHudAction) {
+      for (var s = 0; s < actions.length; s++) {
+        if (actions[s].value === state.lastHudAction) {
+          selectedIdx = s;
+          break;
+        }
+      }
+    }
+    if (actions[selectedIdx] && actions[selectedIdx].disabled) {
+      for (var ae = 0; ae < actions.length; ae++) {
+        if (!actions[ae].disabled) {
+          selectedIdx = ae;
+          break;
+        }
+      }
+    }
+
+    var html = '<div class="hud-shell">';
+    html += '<div class="hud-header">';
+    html += '<div class="hud-header-top"><span class="hud-header-day">Day ' + dayNum + ' of ' + duration + '</span><span class="hud-header-date">' + formatDate(state) + '</span></div>';
+    html += '<div class="hud-header-place">' + UI.escapeHtml(chamberName);
+    if (state.isUnderground && depth > 0) html += '<span class="hud-header-depth">' + depth + ' ft</span>';
+    html += '</div>';
+    html += '</div>';
+
+    html += '<div class="hud-body">';
+    html += '<aside class="hud-rail hud-rail-left">';
+    html += buildReadinessBlock(avgHealthPct, morale, foodDays, foodPct, oilDays, oilPct, ropeDrops, ropePct);
+    html += '</aside>';
+
+    html += '<main class="hud-center">';
+    html += '<div class="hud-scene-frame">';
+    if (sceneArt) {
+      html += '<pre class="title-art hud-scene-ascii">' + UI.escapeHtml(sceneArt) + '</pre>';
+    } else if (scenePath) {
+      html += '<img src="' + scenePath + '" class="hud-scene-image" alt="" loading="' + (dayNum <= 2 ? 'eager' : 'lazy') + '" fetchpriority="' + (dayNum <= 2 ? 'high' : 'auto') + '">';
+    } else {
+      html += '<div class="hud-scene-fallback">No Image</div>';
+    }
+    html += '</div>';
+    html += '<div class="hud-story-panel">';
+    html += '<div class="hud-story-primary">' + UI.escapeHtml(headline) + '</div>';
+    if (subline) html += '<div class="hud-story-secondary">' + UI.escapeHtml(subline) + '</div>';
+    html += '</div>';
+    html += '</main>';
+
+    html += '<aside class="hud-rail hud-rail-right">';
+    html += buildLedgerPanel(state, dayNum, duration);
+    html += buildCrewRoster(state);
+    html += '</aside>';
+    html += '</div>';
+
+    html += buildActionDeck(actions, selectedIdx);
+    html += '<div class="hud-continue-wrap"><button class="hud-continue-btn" id="hud-continue">CONTINUE</button></div>';
+    html += '</div>';
+
+    UI.render(html);
+    state.lastHudAction = actions[selectedIdx] ? actions[selectedIdx].value : actions[0].value;
+    bindGameplayHud(actions, selectedIdx);
   }
 
   function si(label, value) {
@@ -579,20 +1558,25 @@
   // ACTION HANDLER - routes all actions
   // =========================================
   function handleAction(action) {
+    var state = gs();
     switch (action) {
-      case 'mine': chooseMiningApproach(); break;
+      case 'mine':
+        if (!canMineCurrentChamber(state)) {
+          UI.showNotification('Descend deeper before you can mine', 1200);
+          setTimeout(statusScreen, 1300);
+          break;
+        }
+        chooseMiningApproach();
+        break;
+      case 'spring_heal': springHealDay(); break;
       case 'descend': attemptDescent(); break;
       case 'ascend': attemptAscent(); break;
-      case 'pace': changePace(); break;
-      case 'rations': changeRations(); break;
-      case 'rest': restDay(); break;
-      case 'map': showCaveMap(); break;
+      case 'doctrine': doctrineAdjustScreen(); break;
       case 'crew': crewAssignmentScreen(); break;
+      case 'rest': restDay(); break;
       case 'enter': enterCave(); break;
       case 'town': visitTown(); break;
       case 'ship': shipGuano(); break;
-      case 'supplies': supplyScreen(); break;
-      case 'save': saveGame(); break;
       case 'music':
         if (window.Audio_Manager) {
           var on = Audio_Manager.toggle();
@@ -608,34 +1592,64 @@
   // ACTION IMPLEMENTATIONS
   // =========================================
 
-  function changePace() {
+  function doctrineAdjustScreen() {
     UI.hideBars();
-    UI.render('<div class="text-lg text-glow">Set Work Pace</div><hr class="separator">');
-    UI.promptChoice([
-      { key: '1', label: 'Careful — Half output. Men heal.', value: 'careful' },
-      { key: '2', label: 'Steady — Full output. Honest work.', value: 'steady' },
-      { key: '3', label: 'Grueling — Half again output. Bodies break.', value: 'grueling' }
-    ], function (v) {
-      var s = gs();
-      if (s) s.workPace = v;
-      UI.showNotification('Pace: ' + v, 1000);
-      setTimeout(function () { UI.transition(statusScreen); }, 1100);
+    var state = gs();
+    if (!state || !window.Expedition) { statusScreen(); return; }
+    var doctrine = window.Expedition.getDoctrine(state.expedition && state.expedition.doctrine);
+    UI.render(renderReadablePanel(
+      'Change Pace',
+      'Pick a new pace.',
+      {
+        kicker: 'Crew orders',
+        narrow: true
+      }
+    ));
+    UI.promptChoice(window.Expedition.getDoctrineOptions(), function (value) {
+      if (state.expedition && state.expedition.doctrine !== value) {
+        state.morale = Math.max(0, (state.morale || 50) - 2);
+        if (state.expedition && state.expedition.crew) {
+          var ids = Object.keys(state.expedition.crew);
+          for (var i = 0; i < ids.length; i++) {
+            state.expedition.crew[ids[i]].pressure = Math.min(100, (state.expedition.crew[ids[i]].pressure || 0) + 3);
+          }
+        }
+      }
+      window.Expedition.setDoctrine(state, value);
+      UI.showNotification('Pace: ' + window.Expedition.getDoctrine(value).name, 1200);
+      setTimeout(function () { UI.transition(statusScreen); }, 1300);
     });
   }
 
+  function changePace() { doctrineAdjustScreen(); }
+
   function changeRations() {
-    UI.hideBars();
-    UI.render('<div class="text-lg text-glow">Set Rations</div><hr class="separator">');
-    UI.promptChoice([
-      { key: '1', label: 'Full rations — Men eat proper. They work proper.', value: 'full' },
-      { key: '2', label: 'Half rations — Bellies grumble but nobody starves yet.', value: 'half' },
-      { key: '3', label: 'Scraps — Hardtack and prayer. They\'ll hate you for it.', value: 'scraps' }
-    ], function (v) {
-      var s = gs();
-      if (s) s.rationLevel = v;
-      UI.showNotification('Rations: ' + v, 1000);
-      setTimeout(function () { UI.transition(statusScreen); }, 1100);
-    });
+    doctrineAdjustScreen();
+  }
+
+  function handleDayAdvanceResult(state, result, onContinue, options) {
+    options = options || {};
+    if (!result) {
+      if (typeof onContinue === 'function') onContinue();
+      else statusScreen();
+      return true;
+    }
+    if (result.deaths && result.deaths.length > 0) {
+      showDayResults(result, function () {
+        var cause = options.deathCause || (result.eventsTriggered && result.eventsTriggered.length > 0 ? result.eventsTriggered[0].eventName : 'the cave');
+        deathScreen(result.deaths[0], cause);
+      });
+      return true;
+    }
+    if (state.gameOver) {
+      showDayResults(result, function () { gameOverScreen(state.gameOverReason); });
+      return true;
+    }
+    if (options.forceDisplay || (result.eventsTriggered && result.eventsTriggered.length > 0)) {
+      showDayResults(result, typeof onContinue === 'function' ? onContinue : statusScreen);
+      return true;
+    }
+    return false;
   }
 
   function enterCave() {
@@ -672,18 +1686,7 @@
     var chamber = getChamberData(state.currentChamber);
     if (!chamber) { UI.showNotification('Cannot descend', 1200); setTimeout(statusScreen, 1300); return; }
 
-    var curRouteIdx = window.CaveData ? window.CaveData.getMainRouteIndex(state.currentChamber) : -1;
-    var deeper = (chamber.connectedTo || []).filter(function (id) {
-      var c = getChamberData(id);
-      if (!c) return false;
-      if (c.depth > chamber.depth) return true;
-      // Allow same-depth progression if it's the next chamber on the main route
-      if (c.depth === chamber.depth && window.CaveData) {
-        var targetIdx = window.CaveData.getMainRouteIndex(id);
-        return targetIdx > curRouteIdx && targetIdx !== -1;
-      }
-      return false;
-    });
+    var deeper = getDescendTargets(chamber);
 
     if (deeper.length === 0) {
       UI.render('<div class="text-amber">The stone offers no passage deeper. This is as far as the earth opens.</div>');
@@ -696,39 +1699,79 @@
       return;
     }
 
-    var html = '<div class="text-lg text-glow">Descent</div><hr class="separator">';
-    html += '<div class="text-dim">Choose a passage:</div>';
-    var opts = [];
-    for (var i = 0; i < deeper.length; i++) {
-      var t = getChamberData(deeper[i]);
-      var label = (t ? t.name : deeper[i]) + ' (' + (t ? t.depth : '?') + ' ft)';
-      if (t && t.isOptional) label += ' [RISKY]';
-      opts.push({ key: String(i + 1), label: label, value: deeper[i] });
-    }
-    opts.push({ key: '0', label: 'Go back', value: 'back' });
-
-    UI.render(html);
-    UI.promptChoice(opts, function (val) {
-      if (val === 'back') { statusScreen(); return; }
+    function descendTo(targetId) {
+      var firstVisit = !state.visitedChambers || !state.visitedChambers[targetId];
       state.rope = Math.max(0, state.rope - 20);
-      state.currentChamber = val;
-      var nc = getChamberData(val);
+      state.currentChamber = targetId;
+      var nc = getChamberData(targetId);
       if (nc) state.currentZone = nc.zone;
-      if (state.discoveredChambers.indexOf(val) === -1) state.discoveredChambers.push(val);
+      if (state.discoveredChambers.indexOf(targetId) === -1) state.discoveredChambers.push(targetId);
 
-      // Check easter egg
       if (window.Content) {
-        var egg = window.Content.getEasterEgg(val);
+        var egg = window.Content.getEasterEgg(targetId);
         if (egg) {
           UI.render('<div class="event-highlight" style="margin:10px 0">' + egg.text.join('<br>') + '</div>');
           UI.pressEnter(function () { UI.transition(landmarkScreen); });
           return;
         }
       }
-      var dArt = (window.AsciiArt && window.AsciiArt.getGameplayArt) ? window.AsciiArt.getGameplayArt('descend') : '';
-      var dMsg = pick(TEXT_VARIANTS.descend);
-      UI.render((dArt ? '<pre class="title-art">' + UI.escapeHtml(dArt) + '</pre>' : '') + '<div class="text-bright">' + UI.escapeHtml(dMsg) + '</div>');
-      UI.pressEnter(function(){ UI.transition(landmarkScreen); });
+      state.travelDay = 'descend';
+      var result = window.Engine ? window.Engine.advanceDay() : null;
+      if (handleDayAdvanceResult(state, result, function () {
+        if (firstVisit) UI.transition(landmarkScreen);
+        else statusScreen();
+      }, {
+        forceDisplay: true,
+        deathCause: 'the climb down'
+      })) return;
+      if (firstVisit) UI.transition(landmarkScreen);
+      else statusScreen();
+    }
+
+    if (deeper.length === 1) {
+      descendTo(deeper[0].id);
+      return;
+    }
+
+    var html = renderReadablePanel(
+      'Descent',
+      deeper.length > 1 ? 'Pick the next passage.' : 'One route still goes on.',
+      {
+        kicker: chamber ? chamber.name : 'Underground',
+        narrow: true,
+        doubleRule: false
+      }
+    );
+    var opts = [];
+    for (var i = 0; i < deeper.length; i++) {
+      var option = deeper[i];
+      var targetId = option.id;
+      var t = option.chamber || getChamberData(targetId);
+      var label = t ? t.name : targetId;
+      var desc = t ? getStatusTagline(t.id, t) : 'Unknown route.';
+      var meta = '';
+      if (option.routeKind === 'branch') {
+        desc = 'Side branch. ' + desc;
+        meta = 'Optional branch';
+      } else {
+        desc = 'Main route. ' + desc;
+        meta = 'Main haul route';
+      }
+      if (t) {
+        if (option.routeKind === 'main' && t.depth <= chamber.depth) {
+          meta += ' - route continues below';
+        } else {
+          meta += ' - ' + t.depth + ' ft';
+        }
+      }
+      opts.push({ key: String(i + 1), label: label, value: targetId, description: desc, meta: meta });
+    }
+    opts.push({ key: '0', label: 'Stay here', value: 'back', description: 'Keep your footing and do not spend rope.' });
+
+    UI.render(html);
+    UI.promptChoice(opts, function (val) {
+      if (val === 'back') { statusScreen(); return; }
+      descendTo(val);
     });
   }
 
@@ -738,64 +1781,48 @@
     var chamber = getChamberData(state.currentChamber);
     if (!chamber) return;
 
-    var shallower = (chamber.connectedTo || []).filter(function (id) {
-      var c = getChamberData(id);
-      return c && c.depth < chamber.depth;
-    });
+    var ascentTarget = window.CaveData && window.CaveData.getAscendTarget
+      ? window.CaveData.getAscendTarget(state.currentChamber)
+      : null;
 
-    if (shallower.length === 0) {
+    if (!ascentTarget) {
       // At the top - exit cave
       state.isUnderground = false;
       state.currentChamber = 'marmaros';
       state.currentZone = 'surface';
-      if (window.Engine) window.Engine.advanceDay();
-      UI.hideBars();
-      if (state.gameOver) {
-        UI.render('<div class="text-bright">Daylight hits you like a fist. You stand blinking in the Missouri sun.</div>' +
-          '<div class="text-dim" style="margin-top:8px">A full day spent hauling rope, tools, and reeking guano sacks up the ladder. Every man moves like he\'s aged ten years.</div>');
-        UI.pressEnter(function () { gameOverScreen(state.gameOverReason); });
-        return;
-      }
-      var aArt0 = (window.AsciiArt && window.AsciiArt.getGameplayArt) ? window.AsciiArt.getGameplayArt('ascend') : '';
-      UI.render((aArt0 ? '<pre class="title-art">' + UI.escapeHtml(aArt0) + '</pre>' : '') + '<div class="text-bright">' + UI.escapeHtml(pick(TEXT_VARIANTS.ascend)) + '</div>' +
-        '<div class="text-dim" style="margin-top:8px">' + UI.escapeHtml(pick(TEXT_VARIANTS.dayAdvance)) + '</div>');
-      UI.pressEnter(function () { statusScreen(); });
+      state.travelDay = 'surface_ascent';
+      var surfaceResult = window.Engine ? window.Engine.advanceDay() : null;
+      if (handleDayAdvanceResult(state, surfaceResult, function () { statusScreen(); }, {
+        forceDisplay: true,
+        deathCause: 'the climb out'
+      })) return;
+      statusScreen();
       return;
     }
 
-    // Pick shallowest
-    var best = shallower[0];
-    var bestD = 9999;
-    for (var i = 0; i < shallower.length; i++) {
-      var c = getChamberData(shallower[i]);
-      if (c && c.depth < bestD) { bestD = c.depth; best = shallower[i]; }
-    }
-
-    state.currentChamber = best;
-    var t = getChamberData(best);
+    state.currentChamber = ascentTarget.id;
+    var t = getChamberData(ascentTarget.id);
     if (t) state.currentZone = t.zone;
 
-    if (best === 'marmaros' || !t) {
+    if (ascentTarget.id === 'marmaros' || !t) {
       state.isUnderground = false;
       state.currentChamber = 'marmaros';
       state.currentZone = 'surface';
-      if (window.Engine) window.Engine.advanceDay();
-      UI.hideBars();
-      var aArt1 = (window.AsciiArt && window.AsciiArt.getGameplayArt) ? window.AsciiArt.getGameplayArt('ascend') : '';
-      UI.render((aArt1 ? '<pre class="title-art">' + UI.escapeHtml(aArt1) + '</pre>' : '') + '<div class="text-bright">' + UI.escapeHtml(pick(TEXT_VARIANTS.ascend)) + '</div>' +
-        '<div class="text-dim" style="margin-top:8px">' + UI.escapeHtml(pick(TEXT_VARIANTS.dayAdvance)) + '</div>');
+      state.travelDay = 'surface_ascent';
+      var topResult = window.Engine ? window.Engine.advanceDay() : null;
+      if (handleDayAdvanceResult(state, topResult, function () { statusScreen(); }, {
+        forceDisplay: true,
+        deathCause: 'the climb out'
+      })) return;
     } else {
-      if (window.Engine) window.Engine.advanceDay();
-      UI.hideBars();
-      var aArt2 = (window.AsciiArt && window.AsciiArt.getGameplayArt) ? window.AsciiArt.getGameplayArt('ascend') : '';
-      UI.render((aArt2 ? '<pre class="title-art">' + UI.escapeHtml(aArt2) + '</pre>' : '') + '<div class="text-bright">' + UI.escapeHtml(pick(TEXT_VARIANTS.ascend) + ' You reach ' + (t ? t.name : 'the chamber above') + '.') + '</div>' +
-        '<div class="text-dim" style="margin-top:8px">' + UI.escapeHtml(pick(TEXT_VARIANTS.dayAdvance)) + '</div>');
+      state.travelDay = 'ascend';
+      var climbResult = window.Engine ? window.Engine.advanceDay() : null;
+      if (handleDayAdvanceResult(state, climbResult, function () { statusScreen(); }, {
+        forceDisplay: true,
+        deathCause: 'the climb'
+      })) return;
     }
-    if (state.gameOver) {
-      UI.pressEnter(function () { gameOverScreen(state.gameOverReason); });
-      return;
-    }
-    UI.pressEnter(function () { statusScreen(); });
+    statusScreen();
   }
 
   function restDay() {
@@ -820,25 +1847,72 @@
     resolveRestDay(state);
   }
 
-  function resolveRestDay(state) {
-    var orig = state.workPace;
+  function springHealDay() {
+    UI.hideBars();
+    var state = gs();
+    if (!state) return;
+    var worstBefore = getWorstHealthValue(state);
+    var originalPace = state.workPace;
     state.workPace = 'careful';
+    state.restingDay = true;
+    var result = window.Engine ? window.Engine.advanceDay() : null;
+    state.workPace = originalPace;
+    if (window.HealthSystem && window.HealthSystem.applyPartyHealing) {
+      var healed = window.HealthSystem.applyPartyHealing(state, 36);
+      if (result && healed.length) {
+        result.messages.unshift('The Spring Room gives the crew a day back.');
+        result.messages.splice(1, 0, getRecoveryShiftLine(worstBefore, getWorstHealthValue(state)));
+      }
+    }
+    if (handleDayAdvanceResult(state, result, statusScreen)) return;
+    renderScenePanel({
+      kicker: 'Sanctuary',
+      headline: 'The spring gives the line a day back.',
+      subline: getRecoveryShiftLine(worstBefore, getWorstHealthValue(state)),
+      note: ''
+    });
+    UI.pressEnter(function () { statusScreen(); });
+  }
+
+  function resolveRestDay(state) {
+    var worstBefore = getWorstHealthValue(state);
+    var orig = state.workPace;
+    var restingUnderground = !!state.isUnderground;
+    var chamberPersona = restingUnderground && window.Expedition && window.Expedition.getChamberPersona
+      ? window.Expedition.getChamberPersona(state.currentChamber)
+      : null;
+    state.workPace = 'careful';
+    state.restingDay = true;
 
     if (window.Engine) {
       var r = window.Engine.advanceDay();
       state.workPace = orig;
-      var dayArt = (window.AsciiArt && window.AsciiArt.getGameplayArt) ? window.AsciiArt.getGameplayArt(state.isUnderground ? 'night' : 'day') : '';
-      var html = (dayArt ? '<pre class="title-art">' + UI.escapeHtml(dayArt) + '</pre>' : '');
-      html += '<div class="text-bright">' + UI.escapeHtml(state.isUnderground ? pick(TEXT_VARIANTS.restUnderground) : pick(TEXT_VARIANTS.restSurface)) + '</div>';
-      if (r && r.messages.length > 0) {
-        html += '<div class="text-dim" style="margin-top:6px">';
-        for (var i = 0; i < r.messages.length; i++) html += UI.escapeHtml(r.messages[i]) + '<br>';
-        html += '</div>';
+      if (window.HealthSystem && window.HealthSystem.applyPartyHealing) {
+        var healAmount = restingUnderground
+          ? (chamberPersona && chamberPersona.tags && chamberPersona.tags.indexOf('sanctuary') !== -1 ? 24 : 20)
+          : 24;
+        var healed = window.HealthSystem.applyPartyHealing(state, healAmount);
+        if (healed.length > 0) {
+          r.messages.unshift('Real rest takes hold. The whole line comes back stronger.');
+          r.messages.splice(1, 0, getRecoveryShiftLine(worstBefore, getWorstHealthValue(state)));
+        }
       }
-      UI.render(html);
+      var dayArt = (window.AsciiArt && window.AsciiArt.getGameplayArt) ? window.AsciiArt.getGameplayArt(state.isUnderground ? 'night' : 'day') : '';
+      var restMessages = summarizeMessages(r && r.messages ? r.messages : [], 2);
+      renderScenePanel({
+        art: dayArt,
+        kicker: state.isUnderground ? 'Underground Rest' : 'Surface Rest',
+        headline: state.isUnderground ? pick(TEXT_VARIANTS.restUnderground) : pick(TEXT_VARIANTS.restSurface),
+        subline: restMessages[0] || '',
+        note: restMessages[1] || ''
+      });
     } else {
       state.workPace = orig;
-      UI.render('<div class="text-bright">The men rest. Wounds knit slow but they knit.</div>');
+      renderScenePanel({
+        kicker: 'Rest',
+        headline: 'The crew rests.',
+        subline: 'Slow recovery is still recovery.'
+      });
     }
     if (state.gameOver) {
       UI.pressEnter(function () { gameOverScreen(state.gameOverReason); });
@@ -847,211 +1921,232 @@
     UI.pressEnter(function () { statusScreen(); });
   }
 
-  function showCaveMap() {
-    UI.hideBars();
-    var state = gs();
-    if (!state || !window.CaveData || !window.CaveData.CHAMBERS) {
-      UI.render('<div class="text-dim">Map data unavailable.</div>');
-      UI.pressEnter(function () { statusScreen(); });
-      return;
-    }
-
-    var zoneLabels = {
-      zone1: 'Zone 1 - Cathedral Room',
-      zone2: 'Zone 2 - Upper Passages',
-      zone3: 'Zone 3 - Middle Depths',
-      zone4: 'Zone 4 - Deep Chambers',
-      zone5: 'Zone 5 - The Abyss'
-    };
-    var zoneOrder = ['zone1', 'zone2', 'zone3', 'zone4', 'zone5'];
-    var lines = [];
-    lines.push('SURVEYOR\'S MAP — Marvel Cave, Stone County MO');
-    lines.push('');
-
-    for (var z = 0; z < zoneOrder.length; z++) {
-      var zoneId = zoneOrder[z];
-      var zoneChambers = [];
-      for (var id in window.CaveData.CHAMBERS) {
-        if (!window.CaveData.CHAMBERS.hasOwnProperty(id)) continue;
-        var ch = window.CaveData.CHAMBERS[id];
-        if (ch.zone === zoneId) zoneChambers.push(ch);
-      }
-      zoneChambers.sort(function (a, b) { return a.depth - b.depth; });
-      if (zoneChambers.length === 0) continue;
-      lines.push(zoneLabels[zoneId] || zoneId);
-      for (var i = 0; i < zoneChambers.length; i++) {
-        var c = zoneChambers[i];
-        var discovered = state.discoveredChambers && state.discoveredChambers.indexOf(c.id) !== -1;
-        var name = discovered ? c.name : '???';
-        if (state.currentChamber === c.id) name = '[' + name + ']';
-        lines.push('  ' + c.depth + 'ft - ' + name);
-      }
-      lines.push('');
-    }
-
-    UI.render('<div class="text-lg text-glow">Surveyor\'s Cave Map</div><hr class="separator">' +
-      '<pre class="title-art" style="font-size:13px;line-height:1.25">' + UI.escapeHtml(lines.join('\n')) + '</pre>' +
-      '<div class="text-dim">[brackets] mark your current chamber.</div>');
-    UI.pressEnter(function () { statusScreen(); });
-  }
-
-  function shipGuano() {
+  function shipGuano(options) {
+    options = options || {};
     UI.hideBars();
     var state = gs();
     if (!state || state.guanoStockpile <= 0) {
-      UI.render('<div class="text-dim">No guano to ship.</div>');
-      UI.pressEnter(function () { statusScreen(); });
+      UI.render(renderReadablePanel(
+        'Turn In Guano',
+        'No sacks are ready for the company clerk.',
+        { kicker: 'Company yard', narrow: true, brand: true }
+      ));
+      UI.pressEnter(function () {
+        if (typeof options.onComplete === 'function') options.onComplete();
+        else statusScreen();
+      });
       return;
     }
 
-    var price = state.marketPrice || 700;
-    var net = Math.max(0, price - 50);
-    UI.render('<div class="text-lg text-glow">Ship Guano</div><hr class="separator">' +
-      '<div>Stockpile: <span class="text-bright">' + state.guanoStockpile.toFixed(2) + ' tons</span></div>' +
-      '<div>Market price: <span class="text-yellow">$' + price + '/ton</span> (changes each surface day)</div>' +
-      '<div>Net after shipping: $' + net + '/ton</div>' +
-      '<div class="text-dim">Hold too long and spoilage may hit your stockpile.</div>');
+    var companyRate = state.companySalePrice || (window.Economy ? window.Economy.GUANO_PRICE_PER_TON : 700);
+    var payPerTon = window.Economy && window.Economy.getEffectivePayPerTon
+      ? window.Economy.getEffectivePayPerTon(state)
+      : (window.Economy ? window.Economy.getPayPerTon(state) : Math.round(companyRate * 0.10 * 100) / 100);
+    var tons = state.guanoStockpile;
+    var payout = Math.round(tons * payPerTon * 100) / 100;
+    var loadClass = tons >= 3 ? 'Heavy load' : (tons >= 1.5 ? 'Good load' : 'Light load');
+    var shipBody = '<div class="detail-card-grid detail-card-grid--two">';
+    shipBody += '<div class="detail-card detail-card-good"><div class="detail-card-label">Load Ready</div><div class="detail-card-value">' + UI.escapeHtml(loadClass) + '</div><div class="detail-card-note">' + UI.escapeHtml(tons.toFixed(1) + ' tons stacked at the yard') + '</div></div>';
+    shipBody += '<div class="detail-card detail-card-warn"><div class="detail-card-label">Your Cut</div><div class="detail-card-value">' + UI.escapeHtml(UI.formatMoney(payout)) + '</div><div class="detail-card-note">Only today\'s yard load pays out.</div></div>';
+    shipBody += '</div>';
+    UI.render(renderReadablePanel(
+      'Turn In Guano',
+      'Hand the sacks over. Take your share.',
+      {
+        kicker: 'Company yard',
+        narrow: true,
+        brand: true,
+        bodyHtml: shipBody
+      }
+    ));
 
     UI.promptChoice([
-      { key: '1', label: 'Ship now at $' + price + '/ton', value: 'all' },
-      { key: '2', label: 'Hold for a better market', value: 'hold' },
-      { key: '3', label: 'Cancel', value: 'no' }
+      { key: '1', label: 'Settle the load', value: 'all' },
+      { key: '2', label: 'Hold until tomorrow', value: 'hold' },
+      { key: '0', label: 'Back', value: 'no' }
     ], function (v) {
-      if (v === 'no') { statusScreen(); return; }
+      if (v === 'no') {
+        if (typeof options.onComplete === 'function') options.onComplete();
+        else statusScreen();
+        return;
+      }
       if (v === 'hold') {
-        if (Math.random() < 0.18 && state.crewAssignment !== 'guarding') {
-          var spoiled = Math.min(state.guanoStockpile, 0.08 + Math.random() * 0.2);
-          state.guanoStockpile -= spoiled;
-          UI.render('<div class="text-amber">You hold the stockpile. Moisture ruins ' + spoiled.toFixed(2) + ' tons.</div>');
-        } else {
-          UI.render('<div class="text-bright">You hold your guano for a better market day.</div>');
-        }
-        UI.pressEnter(function () { statusScreen(); });
+      UI.render(renderReadablePanel(
+        'Hold The Load',
+        'You leave the sacks stacked for another day.',
+        { kicker: 'Company yard', narrow: true, brand: true }
+      ));
+        UI.pressEnter(function () {
+          if (typeof options.onComplete === 'function') options.onComplete();
+          else statusScreen();
+        });
         return;
       }
 
-      var tons = state.guanoStockpile;
-      var gross = tons * price;
-      var shipCost = tons * 50;
       state.guanoShipped += tons;
+      state.bestShipmentTons = Math.max(state.bestShipmentTons || 0, tons);
       state.guanoStockpile = 0;
-      state.cash = Math.round((state.cash + gross - shipCost) * 100) / 100;
-      UI.render('<div class="text-bright">Shipped ' + tons.toFixed(2) + ' tons at $' + price + '/ton.</div><div class="text-green">Net: $' + (gross - shipCost).toFixed(2) + '</div>');
-      UI.pressEnter(function () { statusScreen(); });
+      state.totalRevenue = Math.round(((state.totalRevenue || 0) + payout) * 100) / 100;
+      state.cash = Math.round((state.cash + payout) * 100) / 100;
+      state.companyGrossSales = Math.round(((state.companyGrossSales || 0) + (tons * companyRate)) * 100) / 100;
+      var settledBody = '<div class="detail-card-grid detail-card-grid--two">';
+      settledBody += '<div class="detail-card detail-card-warn"><div class="detail-card-label">Paid Out</div><div class="detail-card-value">' + UI.escapeHtml(UI.formatMoney(payout)) + '</div><div class="detail-card-note">Your cut for this yard load.</div></div>';
+      settledBody += '<div class="detail-card detail-card-good"><div class="detail-card-label">Yard</div><div class="detail-card-value">Cleared</div><div class="detail-card-note">' + UI.escapeHtml(tons.toFixed(1) + ' tons moved onto the company books') + '</div></div>';
+      settledBody += '</div>';
+      UI.render(renderReadablePanel(
+        'Load Settled',
+        'Campbell clears the yard and counts out your share.',
+        {
+          kicker: 'Company yard',
+          narrow: true,
+          brand: true,
+          bodyHtml: settledBody
+        }
+      ));
+      UI.pressEnter(function () {
+        if (typeof options.onComplete === 'function') options.onComplete();
+        else statusScreen();
+      });
     });
+    var shipMenu = document.getElementById('menu-choices');
+    if (shipMenu) shipMenu.classList.add('settlement-menu-options');
   }
 
   function crewAssignmentScreen() {
     UI.hideBars();
     var state = gs();
     if (!state) return;
-    UI.render('<div class="text-lg text-glow">Crew Assignment</div><hr class="separator"><div class="text-dim">Current: ' + UI.escapeHtml(state.crewAssignment || 'mining') + '</div>');
-    UI.promptChoice([
-      { key: '1', label: 'Mining (steady output)', value: 'mining' },
-      { key: '2', label: 'Scouting (reveal adjacent chambers)', value: 'scouting' },
-      { key: '3', label: 'Guarding supplies (anti-theft/spoilage)', value: 'guarding' }
-    ], function(v) {
-      state.crewAssignment = v;
-      if (v === 'scouting' && state.isUnderground && window.CaveData) {
-        var ch = window.CaveData.getChamber(state.currentChamber);
-        var found = 0;
-        if (ch && ch.connectedTo) {
-          for (var i = 0; i < ch.connectedTo.length; i++) {
-            if (state.discoveredChambers.indexOf(ch.connectedTo[i]) === -1) { state.discoveredChambers.push(ch.connectedTo[i]); found++; }
-          }
-        }
-        UI.showNotification(found > 0 ? ('Scouts reveal ' + found + ' adjacent chamber(s)!') : 'Scouting posted.', 1400);
-      } else {
-        UI.showNotification('Crew assignment set: ' + v, 1200);
+    var roster = [state.foreman].concat(state.crew || []);
+    var pressureTotal = 0;
+    var pressureCount = 0;
+    for (var i = 0; i < roster.length; i++) {
+      if (!roster[i] || !roster[i].alive) continue;
+      var profile = window.Expedition && window.Expedition.getCrewData ? window.Expedition.getCrewData(state, roster[i]) : null;
+      pressureTotal += profile ? (profile.pressure || 0) : 0;
+      pressureCount++;
+    }
+    var avgPressure = pressureCount ? Math.round(pressureTotal / pressureCount) : 0;
+    var moodSummary = window.Expedition && window.Expedition.getCrewMoodLabel
+      ? window.Expedition.getCrewMoodLabel({ pressure: avgPressure })
+      : 'Steady';
+    var moodTone = window.Expedition && window.Expedition.getCrewMoodTone
+      ? window.Expedition.getCrewMoodTone({ pressure: avgPressure })
+      : 'good';
+    var body = '<div class="detail-card-grid detail-card-grid--three">';
+    body += buildDetailCard('Crew', countAlive(state) + '/' + roster.length, 'still answering the roll', countAlive(state) === roster.length ? 'good' : 'warn');
+    body += buildDetailCard('Morale', clampPct(state.morale || 50) + '%', 'whole line mood', getToneFromPct(state.morale || 50));
+    body += buildDetailCard('Strain', moodSummary, 'how the line is holding', moodTone);
+    body += '</div>';
+    body += '<div class="roll-call-grid">';
+    for (var i = 0; i < roster.length; i++) {
+      var member = roster[i];
+      if (!member) continue;
+      body += buildCrewConditionCard(member, i === 0, state);
+    }
+    body += '</div>';
+    UI.render(renderReadablePanel(
+      'Crew Condition',
+      countAlive(state) === roster.length ? 'All hands answer the roll.' : 'The line is still carrying the cost of the cave.',
+      {
+        kicker: 'Roll call',
+        narrow: true,
+        meta: ['Pace ' + formatStateLabel(state.workPace || 'steady')],
+        bodyHtml: body
       }
-      setTimeout(function(){ statusScreen(); }, 1300);
-    });
+    ));
+    UI.pressEnter(function () { statusScreen(); });
   }
 
   function supplyScreen() {
     UI.hideBars();
     var state = gs();
     if (!state) return;
-    var html = '<div class="text-lg text-glow">Supply Inventory</div><hr class="separator-double">';
-    var items = [
-      ['Donkeys', state.donkeys.count],
-      ['Food', Math.round(state.food) + ' lbs'],
-      ['Lantern Oil', state.lanternOil.toFixed(1) + ' gal'],
-      ['Rope', state.rope + ' ft'],
-      ['Timber', state.timber],
-      ['Dynamite', state.dynamite]
-    ];
-    for (var i = 0; i < items.length; i++) {
-      html += '<div class="store-item"><span>' + items[i][0] + '</span><span class="text-bright">' + items[i][1] + '</span></div>';
-    }
-
-    // Equipment
-    if (state.equipment) {
-      html += '<hr class="separator"><div class="text-bright">Equipment:</div>';
-      var equips = [];
-      if (state.equipment.toolUpgrade) equips.push('Tool Upgrade');
-      if (state.equipment.huntingKnife) equips.push('Hunting Knife');
-      if (state.equipment.walkingStick) equips.push('Walking Stick');
-      html += '<div class="text-dim">' + (equips.length > 0 ? equips.join(', ') : 'None') + '</div>';
-    }
-
-    // Consumables
-    var morale = state.morale !== undefined ? state.morale : 50;
-    html += '<hr class="separator">';
-    html += '<div class="store-item"><span class="text-bright">Cash</span><span class="text-yellow">$' + state.cash.toFixed(2) + '</span></div>';
-    html += '<div class="store-item"><span>Guano stockpile</span><span class="text-bright">' + state.guanoStockpile.toFixed(2) + ' tons</span></div>';
-    html += '<div class="store-item"><span>Morale</span><span class="text-bright">' + morale + '%</span></div>';
-    if (state.taffy > 0) html += '<div class="store-item"><span>Taffy</span><span class="text-bright">' + state.taffy + '</span></div>';
-
-    UI.render(html);
+    var foodPerDay = state.rationLevel === 'half' ? 1.2 : state.rationLevel === 'scraps' ? 0.6 : state.rationLevel === 'none' ? 0 : 2.4;
+    var foodDays = foodPerDay > 0 ? Math.floor(state.food / (foodPerDay * Math.max(1, countAlive(state)))) : 99;
+    var oilShifts = Math.floor(state.lanternOil / 0.5);
+    var ropeDrops = Math.floor(state.rope / 20);
+    var body = '<div class="detail-card-grid detail-card-grid--two">';
+    body += buildDetailCard('Cash', UI.formatMoney(state.cash), 'on hand', state.cash >= 8 ? 'good' : 'warn');
+    body += buildDetailCard('Guano', state.guanoStockpile.toFixed(1) + ' tons', 'waiting in sacks', state.guanoStockpile >= 1 ? 'good' : 'warn');
+    body += buildDetailCard('Food & Water', String(foodDays) + ' days', 'at current rations', foodDays >= 4 ? 'good' : 'danger');
+    body += buildDetailCard('Oil', String(oilShifts) + ' shifts', 'lamp reserve', oilShifts >= 4 ? 'good' : 'warn');
+    body += buildDetailCard('Rope', String(ropeDrops) + ' drops', 'safe descents left', ropeDrops >= 4 ? 'good' : 'warn');
+    body += buildDetailCard('Pace', formatStateLabel(state.workPace || 'steady'), 'how the crew is working', state.workPace === 'careful' ? 'good' : (state.workPace === 'steady' ? 'warn' : 'danger'));
+    body += '</div>';
+    body += '<div class="summary-strip">';
+    body += '<div class="summary-strip-copy">Guano mined: <span class="text-bright">' + state.guanoMined.toFixed(1) + ' tons</span></div>';
+    body += '<div class="summary-strip-copy">Turned in: <span class="text-bright">' + state.guanoShipped.toFixed(1) + ' tons</span></div>';
+    body += '</div>';
+    UI.render(renderReadablePanel(
+      'Expedition Ledger',
+      'What keeps the crew working and paid.',
+      { kicker: 'Quick read', narrow: true, bodyHtml: body }
+    ));
     UI.pressEnter(function () { statusScreen(); });
   }
 
-  function saveGame() {
-    var state = gs();
-    if (state && window.GameState && window.GameState.save) {
-      var ok = window.GameState.save();
-      UI.showNotification(ok ? 'Game Saved!' : 'Save failed', 1200);
-    }
-    setTimeout(statusScreen, 1300);
-  }
-
   function chooseMiningApproach() {
-    UI.hideBars();
     var state = gs();
     if (!state) return;
-    UI.render('<div class="text-lg text-glow">Mining Plan</div><hr class="separator">');
-    UI.promptChoice([
-      { key: '1', label: 'Dig the main vein (safe, steady yield)', value: 'main_vein' },
-      { key: '2', label: 'Follow a side passage (risky bonus)', value: 'side_passage' },
-      { key: '3', label: 'Blast with powder (uses 1, high yield + danger)', value: 'blasting' }
-    ], function(v){
-      if (v === 'blasting' && state.dynamite <= 0) {
-        UI.showNotification('No blasting powder/dynamite available.', 1300);
-        setTimeout(statusScreen, 1400);
-        return;
+    state.miningChoice = 'main_vein';
+    runChoiceEncounterThenMine();
+  }
+
+  function runEncounter(encounter, onDone) {
+    var state = gs();
+    var art = (window.AsciiArt && window.AsciiArt.getEventArt) ? (window.AsciiArt.getEventArt('rockfall') || '') : '';
+    var html = '';
+    if (art) html += '<pre class="title-art">' + UI.escapeHtml(art) + '</pre>';
+    html += renderReadablePanel(
+      encounter.title,
+      encounter.text,
+      {
+        kicker: encounter.kicker || 'Decision',
+        narrow: true
       }
-      state.miningChoice = v;
-      runChoiceEncounterThenMine();
+    );
+    UI.render(html);
+    var opts = [];
+    for (var i = 0; i < encounter.options.length; i++) {
+      opts.push({ key: encounter.options[i].key, label: encounter.options[i].label, value: String(i) });
+    }
+    UI.promptChoice(opts, function (value) {
+      var result = encounter.options[parseInt(value, 10)].apply(state) || {};
+      var lines = result.lines || (Array.isArray(result) ? result : ['Done.']);
+      UI.render(renderReadablePanel(
+        encounter.title,
+        lines[0] || 'Done.',
+        {
+          kicker: encounter.kicker || 'Decision',
+          narrow: true
+        }
+      ));
+      UI.pressEnter(function () {
+        if (onDone) onDone(result);
+      });
     });
   }
 
   function runChoiceEncounterThenMine() {
     var state = gs();
-    if (!state || !window.EventSystem || !window.EventSystem.maybeGetChoiceEncounter) { advanceGame(); return; }
+    if (!state) { advanceGame(); return; }
+    if (window.Expedition && window.Expedition.maybeGetSetPiece) {
+      var setPiece = window.Expedition.maybeGetSetPiece(state);
+      if (setPiece) {
+        runEncounter(setPiece, function (result) {
+          if (result && result.advanceDay) {
+            advanceGame();
+          } else {
+            statusScreen();
+          }
+        });
+        return;
+      }
+    }
+    if (!window.EventSystem || !window.EventSystem.maybeGetChoiceEncounter) { advanceGame(); return; }
     var enc = window.EventSystem.maybeGetChoiceEncounter(state);
     if (!enc) { advanceGame(); return; }
-    var art = (window.AsciiArt && window.AsciiArt.getEventArt) ? (window.AsciiArt.getEventArt('rockfall') || '') : '';
-    var html = '<div class="text-lg text-glow">' + UI.escapeHtml(enc.title) + '</div><hr class="separator"><div class="text-amber">' + UI.escapeHtml(enc.text) + '</div>';
-    if (art) html = '<pre class="title-art">' + UI.escapeHtml(art) + '</pre>' + html;
-    UI.render(html);
-    var opts = [];
-    for (var i = 0; i < enc.options.length; i++) opts.push({ key: enc.options[i].key, label: enc.options[i].label, value: String(i) });
-    UI.promptChoice(opts, function(v){
-      var out = enc.options[parseInt(v,10)].apply(state) || ['Done.'];
-      UI.render('<div class="text-bright">' + UI.escapeHtml(out.join(' ')) + '</div>');
-      UI.pressEnter(function(){ advanceGame(); });
-    });
+    runEncounter(enc, function () { advanceGame(); });
   }
 
   // =========================================
@@ -1069,27 +2164,7 @@
       var r = window.Engine.advanceDay();
       window.Engine.BASE_MINING_RATE = prevBase;
       state.dailyYieldMultiplier = 0;
-      if (!r) { statusScreen(); return; }
-
-      if (r.deaths && r.deaths.length > 0) {
-        showDayResults(r, function () {
-          var cause = r.eventsTriggered && r.eventsTriggered.length > 0 ? r.eventsTriggered[0].eventName : 'the cave';
-          deathScreen(r.deaths[0], cause);
-        });
-        return;
-      }
-      if (state.gameOver) {
-        showDayResults(r, function () { gameOverScreen(state.gameOverReason); });
-        return;
-      }
-      if (state.guanoShipped >= state.contractTarget && state.contractTarget > 0) {
-        showDayResults(r, endingScreen);
-        return;
-      }
-      if (r.eventsTriggered && r.eventsTriggered.length > 0) {
-        showDayResults(r, function () { statusScreen(); });
-        return;
-      }
+      if (handleDayAdvanceResult(state, r, function () { statusScreen(); })) return;
       // Normal day - just go back to status
       statusScreen();
     } else {
@@ -1099,22 +2174,28 @@
       if (state.isUnderground) state.lanternOil = Math.max(0, state.lanternOil - 0.5);
       state.guanoMined += alive * 0.05;
       state.guanoStockpile += alive * 0.05;
-      state.totalDays++;
-      if (state.date) state.date = new Date(state.date.getTime() + 86400000);
+      if (window.GameState && window.GameState.advanceDate) window.GameState.advanceDate(1);
       statusScreen();
     }
   }
 
   function showDayResults(r, cb) {
     UI.hideBars();
-    var mineArt = (window.AsciiArt && window.AsciiArt.getGameplayArt) ? window.AsciiArt.getGameplayArt('mining') : '';
-    var html = (mineArt ? '<pre class="title-art">' + UI.escapeHtml(mineArt) + '</pre>' : '');
-    html += '<div class="text-bright">Day ' + (r.day || '?') + ' &mdash; ' + formatDate(gs()) + '</div><hr class="separator">';
-    html += '<div class="text-dim">' + UI.escapeHtml(pick(TEXT_VARIANTS.dayAdvance)) + '</div>';
-
-    if (r.guanoMinedToday && r.guanoMinedToday > 0) {
-      html += '<div class="text-green">' + UI.escapeHtml(pick(TEXT_VARIANTS.mining)) + '</div>';
-    }
+    var artKey = 'mining';
+    if (r.travelDay === 'descend') artKey = 'descend';
+    else if (r.travelDay === 'ascend' || r.travelDay === 'surface_ascent') artKey = 'ascend';
+    else if (r.guanoMinedToday <= 0) artKey = gs() && gs().isUnderground ? 'night' : 'day';
+    var mineArt = (window.AsciiArt && window.AsciiArt.getGameplayArt) ? window.AsciiArt.getGameplayArt(artKey) : '';
+    var leadLine = r.guanoMinedToday && r.guanoMinedToday > 0 ? pick(TEXT_VARIANTS.mining) : pick(TEXT_VARIANTS.dayAdvance);
+    if (r.travelDay === 'descend') leadLine = pick(TEXT_VARIANTS.descend);
+    else if (r.travelDay === 'ascend' || r.travelDay === 'surface_ascent') leadLine = pick(TEXT_VARIANTS.ascend);
+    var html = '<div class="scene-panel">';
+    if (mineArt) html += '<pre class="title-art">' + UI.escapeHtml(mineArt) + '</pre>';
+    html += '<div class="scene-kicker">Day ' + (r.day || '?') + ' &mdash; ' + formatDate(gs()) + '</div>';
+    html += '<div class="scene-copy">' + UI.escapeHtml(leadLine) + '</div>';
+    html += '<div class="result-stack">';
+    var shown = 0;
+    var limit = r.travelDay ? 2 : 3;
     for (var i = 0; i < r.messages.length; i++) {
       var msg = r.messages[i];
       if (msg.indexOf('MILESTONE_') === 0) {
@@ -1127,61 +2208,204 @@
         if (mArt) html += '<pre class="title-art">' + UI.escapeHtml(mArt) + '</pre>';
         continue;
       }
-      var cls = msg.indexOf('SHORTAGE') >= 0 || msg.indexOf('died') >= 0 || msg.indexOf('killed') >= 0 ? 'text-red' :
+      if (shown >= limit) continue;
+      var cls = msg.indexOf('SHORTAGE') >= 0 || msg.indexOf('collapse') >= 0 || msg.indexOf('dragged clear') >= 0 || msg.indexOf('hauled toward cleaner air') >= 0 ? 'text-red' :
         msg.indexOf('Payment') >= 0 || msg.indexOf('Mined') >= 0 ? 'text-green' : 'text-amber';
-      html += '<div class="' + cls + '">' + UI.escapeHtml(msg) + '</div>';
+      html += '<div class="result-line ' + cls + '">' + UI.escapeHtml(msg) + '</div>';
+      shown++;
     }
+    html += '</div>';
     if (r.eventsTriggered && r.eventsTriggered.length > 0 && window.AsciiArt && window.AsciiArt.getEventArt) {
       var eId = r.eventsTriggered[0].eventId || '';
       var eArt = window.AsciiArt.getEventArt(eId);
       if (eArt) html += '<pre class="title-art">' + UI.escapeHtml(eArt) + '</pre>';
     }
+    html += '</div>';
     UI.render(html);
     UI.pressEnter(cb);
   }
 
-  // =========================================
-  // DEATH SCREEN
-  // =========================================
-  function deathScreen(name, cause) {
+  function buildFinaleStat(label, value, toneClass, extraClass) {
+    return '<div class="finale-stat' + (extraClass ? ' ' + extraClass : '') + '">' +
+      '<div class="finale-stat-label">' + UI.escapeHtml(label) + '</div>' +
+      '<div class="finale-stat-value' + (toneClass ? ' ' + toneClass : '') + '">' + UI.escapeHtml(value) + '</div>' +
+      '</div>';
+  }
+
+  function getRunDebrief(state, outcome) {
+    if (!state) return '';
+    var totalCrew = 1 + (state.crew ? state.crew.length : 0);
+    var allAlive = countAlive(state) === totalCrew;
+    if (outcome === 'success') {
+      if (allAlive) return 'All three came home, and that decided the run.';
+      if ((state.bestShipmentTons || 0) >= 2) return 'One strong yard load carried the contract farther than anything else.';
+      if (state.expedition && state.expedition.moments && (state.expedition.moments.maxDepth || 0) >= 450) return 'The deepest chambers paid back the risk.';
+      if ((state.morale || 0) >= 65) return 'The line stayed steadier than the cave expected.';
+      return 'The lamps held long enough to make the haul count.';
+    }
+    if ((state.foodShortageDays || 0) >= 2 || /food|water/i.test(state.gameOverReason || '')) return 'Food & Water failed before anything else.';
+    if ((state.lanternOil || 0) <= 0 || /oil|lamp/i.test(state.gameOverReason || '')) return 'The lamps gave out before the mountain did.';
+    if ((state.rope || 0) <= 0 || /rope/i.test(state.gameOverReason || '')) return 'Rope ran short, and the cave got stronger from there.';
+    if ((state.morale || 0) <= 20 || /morale/i.test(state.gameOverReason || '')) return 'Morale broke before the line did.';
+    return 'Attrition beat the contract a little at a time.';
+  }
+
+  function getFinalePayload(outcome, state, reason, scoreData) {
+    var survivors = countAlive(state);
+    var totalCrew = 1 + state.crew.length;
+    var hauled = (state.guanoMined || 0).toFixed(1) + ' tons';
+    var cash = UI.formatMoney(state.cash || 0);
+    var allAlive = survivors === totalCrew;
+    var discovered = (state.discoveredChambers || []).length;
+    var rank = scoreData && window.Scoring ? window.Scoring.getRank(scoreData.finalScore) : '';
+    var archetype = window.Expedition && window.Expedition.getEndingArchetype ? window.Expedition.getEndingArchetype(state, outcome) : null;
+
+    if (archetype) {
+      return {
+        imageKey: outcome === 'success' ? 'victory' : 'town',
+        kicker: outcome === 'success' ? 'Books closed' : 'Expedition ended',
+        title: archetype.title,
+        lead: archetype.lead,
+        body: archetype.body,
+        rank: rank
+      };
+    }
+
+    if (outcome === 'success') {
+      var settlement = state.finalSettlement || { autoSoldTons: 0 };
+      var settlementNote = settlement.autoSoldTons > 0
+        ? ' The clerk weighs the last ' + settlement.autoSoldTons.toFixed(1) + ' tons still stacked in sacks.'
+        : '';
+      var successTitle = allAlive ? 'You Beat The Devil\'s Den' : 'Twenty Days Under';
+      var successLead = 'Twenty hard days end with ' + hauled + ' pulled out of the Den and the company books settled.';
+      var successBody = [
+        allAlive
+          ? 'All three come back into daylight, and Marmaros counts that as a win worth remembering.' + settlementNote
+          : 'The books close in your favor, even if the mountain made the line pay for it.' + settlementNote
+      ];
+
+      return {
+        imageKey: 'victory',
+        kicker: 'Books closed',
+        title: successTitle,
+        lead: successLead,
+        body: successBody,
+        rank: rank
+      };
+    }
+
+    var failureTitle = 'The Contract Breaks First';
+
+    var failureBody = [
+      hauled !== '0.0 tons'
+        ? 'You come back with enough to remember and not enough to call it a win.'
+        : 'The mountain keeps the haul and leaves you with the lesson.'
+    ];
+
+    return {
+      imageKey: 'town',
+      kicker: 'Expedition ended',
+      title: failureTitle,
+      lead: 'The twenty-day gamble is over.',
+      body: failureBody,
+      rank: rank
+    };
+  }
+
+  function finaleScreen(outcome, reason) {
     UI.hideBars();
-    if (window.Audio_Manager) Audio_Manager.play('gameover');
     var state = gs();
+    if (!state) { titleScreen(); return; }
 
-    // Try death art
-    var deathArt = '';
-    if (window.AsciiArt && window.AsciiArt.getDeathArt) {
-      var artCause = cause ? cause.toLowerCase().replace(/[\s-]+/g, '_') : '';
-      deathArt = window.AsciiArt.getDeathArt(artCause);
+    if (window.Economy && window.Economy.settleFinalAccounts && !state.finalSettlement) {
+      window.Economy.settleFinalAccounts(state);
     }
 
-    var art = GRAVESTONE_ART
-      .replace('~~~NAME~~~', padCenter(name || 'Unknown', 11))
-      .replace('~~~CAUSE~~~', padCenter(cause || '', 11))
-      .replace('~~~DATE~~~', padCenter(formatDate(state), 11));
+    if (window.Audio_Manager) {
+      Audio_Manager.play(outcome === 'success' ? 'title' : 'gameover');
+    }
 
+    var scoreData = window.Scoring ? window.Scoring.calculateScore(state) : null;
+    if (scoreData && window.Scoring && !state.finalScoreRecorded) {
+      window.Scoring.saveScore(state.foreman.name, scoreData.finalScore, getScoreDetails(state));
+      state.finalScoreRecorded = true;
+    }
+    if (window.Expedition && window.Expedition.recordLegacy) {
+      window.Expedition.recordLegacy(state, outcome, reason, scoreData);
+    }
+
+    var payload = getFinalePayload(outcome, state, reason, scoreData);
+    var debrief = getRunDebrief(state, outcome);
+    var crewHome = countAlive(state) + '/' + (1 + state.crew.length);
+    var maxDepth = getMaxDepthReached(state);
+    var finaleArt = window.AsciiArt && window.AsciiArt.getScoringArt
+      ? window.AsciiArt.getScoringArt(outcome === 'success' ? 'trophy' : 'ledger')
+      : '';
     var html = '';
-    if (window.Images) html += Images.getImageHtml('death');
-    if (deathArt) html += '<pre class="chamber-art">' + deathArt + '</pre>';
-    html += '<div class="gravestone">' + art + '</div>';
-    html += '<div class="text-center text-dim" style="margin-top:10px">';
-
-    if (window.Content && cause) {
-      var cid = cause.toLowerCase().replace(/[\s-]+/g, '_');
-      var dm = window.Content.getDeathMessage(cid);
-      if (dm && dm.message) html += dm.message.join('<br>');
-      else html += UI.escapeHtml(name) + ' has died of ' + UI.escapeHtml(cause) + '.';
-    } else {
-      html += UI.escapeHtml(name || 'A crew member') + ' has died.';
+    if (finaleArt) {
+      html += '<div class="native-art-panel native-art-panel--finale">';
+      html += '<pre class="title-art title-art--scene">' + UI.escapeHtml(finaleArt) + '</pre>';
+      html += '</div>';
     }
+    html += '<div class="finale-screen">';
+    html += '<div class="finale-kicker">' + UI.escapeHtml(payload.kicker) + '</div>';
+    html += '<div class="finale-title text-glow-strong">' + UI.escapeHtml(payload.title) + '</div>';
+    html += '<div class="finale-lead">' + UI.escapeHtml(payload.lead) + '</div>';
+    if (payload.rank) {
+      html += '<div class="finale-banner"><span class="finale-banner-label">Remembered As</span><span class="finale-banner-value">' + UI.escapeHtml(payload.rank) + '</span></div>';
+    }
+    html += '<div class="finale-body">';
+    var bodyLines = (payload.body || []).slice(0, 1);
+    for (var i = 0; i < bodyLines.length; i++) {
+      html += '<p class="finale-paragraph' + (i === 1 ? ' finale-paragraph--echo' : '') + '">' + UI.escapeHtml(bodyLines[i]) + '</p>';
+    }
+    html += '</div>';
+    if (debrief) {
+      html += '<div class="finale-debrief">' + UI.escapeHtml(debrief) + '</div>';
+    }
+    html += '<div class="finale-stat-grid">';
+    html += buildFinaleStat('Cut Earned', UI.formatMoney(state.cash || 0), state.cash >= 0 ? 'stat-tone-warn' : 'stat-tone-danger', 'finale-stat--featured');
+    html += buildFinaleStat('Guano Hauled', (state.guanoMined || 0).toFixed(1) + 't', 'stat-tone-good');
+    html += buildFinaleStat('Line Home', crewHome, countAlive(state) === (1 + state.crew.length) ? 'stat-tone-good' : 'stat-tone-danger');
+    html += buildFinaleStat('Depth Reached', maxDepth + ' ft', 'stat-tone-warn');
+    html += '</div>';
     html += '</div>';
 
     UI.render(html);
+    UI.promptChoice([
+      { key: '1', label: 'Top Ten', value: 'top' },
+      { key: '2', label: 'Play Again', value: 'again' },
+      { key: '3', label: 'Title', value: 'title' }
+    ], function (v) {
+      if (v === 'top') UI.transition(function () { topTenScreen(true); });
+      else if (v === 'again') UI.transition(professionScreen);
+      else UI.transition(titleScreen);
+    });
+    var finaleMenu = document.getElementById('menu-choices');
+    if (finaleMenu) finaleMenu.classList.add('finale-menu-options');
+  }
+
+  // =========================================
+  // RESCUE SCREEN
+  // =========================================
+  function deathScreen(name, cause) {
+    UI.hideBars();
+    if (window.Audio_Manager && window.Audio_Manager.playForContext) window.Audio_Manager.playForContext(gs());
+    var rescueLead = (name || 'The crewman') + ' goes down hard, but the line gets them back out of it.';
+    var rescueNote = cause
+      ? 'Too close on ' + cause + '. Everybody remembers it.'
+      : 'Too close for comfort. Close enough to change the next decision.';
+    UI.render(renderReadablePanel(
+      'Narrow Escape',
+      rescueLead,
+      {
+        kicker: 'Pulled clear',
+        narrow: true,
+        note: rescueNote
+      }
+    ));
     UI.pressEnter(function () {
-      var s = gs();
-      if (s && !s.foreman.alive) gameOverScreen('The foreman has died. The expedition is over.');
-      else if (s && countAlive(s) <= 1) gameOverScreen('All crew members have perished.');
-      else statusScreen();
+      statusScreen();
     });
   }
 
@@ -1189,62 +2413,15 @@
   // GAME OVER
   // =========================================
   function gameOverScreen(reason) {
-    UI.hideBars();
-    UI.render('<div class="text-center" style="margin-top:30px">' +
-      '<div class="text-red text-lg">THE MOUNTAIN HAS CLAIMED ITS DUE</div><hr class="separator">' +
-      '<div class="text-bright" style="margin:12px 0">' + UI.escapeHtml(reason || 'Your expedition is over.') + '</div></div>');
-    UI.promptChoice([
-      { key: '1', label: 'View final score', value: 'score' },
-      { key: '2', label: 'Return to title', value: 'title' }
-    ], function (v) {
-      if (v === 'score') scoringScreen();
-      else UI.transition(titleScreen);
-    });
+    var state = gs();
+    finaleScreen(state && state.completedRun ? 'success' : 'failure', reason);
   }
 
   // =========================================
-  // ENDING (contract fulfilled)
+  // ENDING
   // =========================================
   function endingScreen() {
-    UI.hideBars();
-    if (window.Audio_Manager) Audio_Manager.play('title');
-    var state = gs();
-
-    var trophyArt = '';
-    if (window.AsciiArt && window.AsciiArt.getScoringArt) trophyArt = window.AsciiArt.getScoringArt('trophy');
-
-    var html = '';
-    if (window.Images) html += Images.getImageHtml('victory');
-    if (trophyArt) html += '<pre class="title-art">' + trophyArt + '</pre>';
-    html += '<div class="text-lg text-glow text-center" style="margin-top:10px">CONTRACT FULFILLED</div><hr class="separator-double">';
-    html += '<div class="text-bright text-center" style="margin:12px 0">' + (state ? state.guanoShipped.toFixed(1) : '?') + ' tons of bat guano hauled from the belly of the earth. T. Hodges Jones tips his hat.</div>';
-    html += '<hr class="separator"><div class="text-dim text-center">The contract is done. But the cave is still there. What now?</div>';
-
-    UI.render(html);
-    UI.promptChoice([
-      { key: '1', label: 'Take the money and ride out', value: 'sell' },
-      { key: '2', label: 'Open the cave to paying visitors', value: 'tour' },
-      { key: '3', label: 'Go deeper. There\'s something down there.', value: 'deep' }
-    ], function (v) {
-      var h;
-      if (v === 'tour') {
-        h = '<div class="text-center text-glow" style="margin-top:20px"><div class="text-lg">The Visionary</div><br>' +
-          '<div class="text-dim">You saw what others could not. The cave itself was the fortune.<br><br>' +
-          'In 1889, William Henry Lynch will buy this mountain for $10,000 and open its wonders to the world.<br>' +
-          'In 1950, the Herschend family will build Silver Dollar City above the Den.<br>' +
-          'You were thirty years early and not a day wrong.</div></div>';
-      } else if (v === 'deep') {
-        h = '<div class="text-center text-glow" style="margin-top:20px"><div class="text-lg">The Seeker</div><br>' +
-          '<div class="text-dim">The Osage marked the trees for a reason. The Spanish left their ladders and never returned.<br>' +
-          'Below the Waterfall Room the river goes somewhere.<br>You mean to follow it.</div></div>';
-      } else {
-        h = '<div class="text-center text-glow" style="margin-top:20px"><div class="text-lg">The Survivor</div><br>' +
-          '<div class="text-dim">You settle accounts, pack your kit, and board the stage to Springfield.<br>' +
-          'Behind you Roark Mountain sits quiet under the stars, keeping its secrets.</div></div>';
-      }
-      UI.render(h);
-      UI.pressEnter(scoringScreen);
-    });
+    finaleScreen('success');
   }
 
   // =========================================
@@ -1258,7 +2435,7 @@
 
     var html = '<div class="text-lg text-glow text-center">Final Score</div><hr class="separator-double"><table class="score-table">';
     if (bd) {
-      html += sr('Survivors', bd.survivors) + sr('Resources', bd.resources) + sr('Contract', bd.contracts) + sr('Discoveries', bd.discoveries);
+      html += sr('Survivors', bd.survivors) + sr('Resources', bd.resources) + sr('Full Run', bd.contracts) + sr('Discoveries', bd.discoveries);
       html += '<tr class="score-total"><td>Subtotal</td><td>' + bd.subtotal + '</td></tr></table>';
       if (bd.multiplierReasons.length > 0) {
         html += '<div class="text-dim" style="margin:6px 0">Multipliers:</div>';
@@ -1266,7 +2443,7 @@
       }
       html += '<table class="score-table"><tr class="score-total"><td>FINAL SCORE</td><td>' + bd.finalScore + '</td></tr></table>';
       html += '<div class="text-center text-glow" style="margin:12px 0;font-size:14px">' + window.Scoring.getRank(bd.finalScore) + '</div>';
-      window.Scoring.saveScore(state.foreman.name, bd.finalScore, { profession: state.profession });
+      window.Scoring.saveScore(state.foreman.name, bd.finalScore, getScoreDetails(state));
     } else {
       var tot = Math.floor(state.guanoShipped * 100 + countAlive(state) * 200 + state.discoveredChambers.length * 50);
       html += sr('Guano', Math.floor(state.guanoShipped * 100)) + sr('Survivors', countAlive(state) * 200) + sr('Exploration', state.discoveredChambers.length * 50);
@@ -1293,7 +2470,7 @@
   function topTenScreen(fromScore) {
     UI.hideBars();
     var scores = window.Scoring ? window.Scoring.getTopTen() : [];
-    var html = '<div class="text-lg text-glow text-center">Top Ten Foremen</div><hr class="separator-double">';
+    var html = '<div class="text-lg text-glow text-center">Top Ten Expeditions</div><hr class="separator-double">';
     if (scores.length === 0) html += '<div class="text-center text-dim" style="margin:20px 0">No scores yet.</div>';
     else {
       for (var i = 0; i < scores.length; i++) {
@@ -1319,30 +2496,83 @@
   function learnScreen() {
     UI.hideBars();
     var pages = [
-      { title: 'The Osage and the Devil\'s Den', text: 'The Osage people recognized this ominous sinkhole atop Roark Mountain by 1500, calling it "Devil\'s Den." The fluttering of thousands of bat wings and the echoes of subterranean waterfalls emanating from the abyss led them to believe it was a gateway to the underworld.\n\nLegend tells of a young Osage brave who fell while chasing a bear into the sinkhole. The Osage marked surrounding trees with a sideways "V" as warning to all who passed.' },
-      { title: 'The Spanish Expeditions (1541)', text: 'In 1541, Spanish conquistadors descended into the cave seeking gold and the mythical Fountain of Youth. They found neither, but left behind notched pine tree ladders deep in the Mammoth Room.\n\nThese "Spanish ladders" were discovered three centuries later in 1869, providing physical proof of the earliest European exploration of Marvel Cave.' },
-      { title: 'The Blow Expedition (1869)', text: 'Henry T. Blow, a St. Louis lead mining magnate, led six miners into Devil\'s Den in 1869. They lowered themselves 200 feet by rope into the Cathedral Room.\n\nFinding no lead, they reached a chamber with a flat, polished ceiling. Deceived by lamplight, they identified it as pure marble. The "Marble Cave" misnomer was born -- it was ordinary Mississippian limestone.' },
-      { title: 'The Marble Cave Mining Co. (1884)', text: 'In 1882, T. Hodges Jones and Truman S. Powell tested the marble claims -- the "marble" was just limestone. But they found something better: massive deposits of nitrogen-rich bat guano.\n\nIn 1884, Jones founded the Marble Cave Mining and Manufacturing Company. Guano sold at $700 per ton for fertilizer and gunpowder. Donkeys were lowered by rope to pull ore carts through the passages.' },
-      { title: 'Marmaros: The Mining Town', text: 'The mining boom birthed Marmaros ("Greek for marble") in 1884 -- a settlement of 28 souls with a hotel, general store, school, pottery shop, and furniture factory.\n\nBy 1889, after four and a half years, the guano was exhausted and the company collapsed. Marmaros was abandoned, and its remnants were burned by the Bald Knobbers, the violent Ozark vigilante group.' },
-      { title: 'The Cathedral Room', text: 'The Cathedral Room is the largest cave entrance room in the United States: 204 feet high, 225 feet wide, 411 feet long. It could hold the Statue of Liberty with room to spare.\n\nA 124-foot conical debris pile called the "Underground Mountain" rises from the floor. In 1963, Don Piccard set an underground altitude record by flying a hot air balloon inside this chamber.' },
-      { title: 'The Lynch Era (1889-1927)', text: 'William Henry Lynch bought the cave and surrounding land for $10,000 in 1889, sight unseen. He opened it to tourists in 1894 -- early tours lasted eight exhausting hours by candlelight.\n\nLynch personally built Missouri Highway 76 to connect the cave to Branson. After his death in 1927, his daughters Genevieve and Miriam renamed it "Marvel Cave," saying "Marble was untrue! Marvel was all truth."' },
-      { title: 'Silver Dollar City (1950-Present)', text: 'In 1950, Hugo Herschend and his family secured a 99-year lease. They replaced wooden ladders with concrete walkways and in 1957 built a cable-train funicular to carry visitors up from 505 feet below.\n\nThe Army Corps of Engineers said it was impossible. The Herschends built it anyway. To entertain visitors waiting above ground, they recreated Marmaros as an 1880s craft village -- which became Silver Dollar City.' },
-      { title: 'The Living Cave', text: 'Marvel Cave is a "wet" active cave -- formations are still growing. The constant temperature is 58\u00B0F year-round. Over 40,000 gray bats (federally endangered) roost in the Mammoth Room, consuming 24 million insects nightly.\n\nThe cave descends 505 feet to the Waterfall Room, where a 50-foot waterfall fed by the Lost River marks the deepest accessible point. Lake Genevieve and Lake Miriam, named for Lynch\'s daughters, hold waters 34 feet deep with passages mapped to 110 feet below the surface.' }
+      { title: 'The Osage and the Devil\'s Den', text: 'Long before miners, the Osage marked this sinkhole as dangerous ground. Bat noise, cold air, and hidden water gave the place its underworld reputation.' },
+      { title: 'The Spanish Expeditions (1541)', text: 'Spanish explorers went down looking for gold and glory. They found neither, but their pine ladders turned up centuries later deep in the cave.' },
+      { title: 'The Blow Expedition (1869)', text: 'Henry T. Blow\'s men dropped into the cave searching for lead. Lamplight fooled them into thinking limestone was marble, and the wrong name stuck.' },
+      { title: 'Marvel Cave Mining Co. (Game Story)', text: 'In this telling, Jones and Powell turn the cave into a twenty-day guano contract business: company money up front, percentage pay on every load, and risk for everyone below.' },
+      { title: 'Marmaros: The Mining Town', text: 'Marmaros sprang up fast above the cave with stores, workshops, and hopeful families. When the guano ran out, the town died with it.' },
+      { title: 'The Cathedral Room', text: 'The Cathedral Room is so large it dwarfs anything the miners could build. Its debris cone, the Underground Mountain, rises like a second hill inside the cave.' },
+      { title: 'The Lynch Era (1889-1927)', text: 'William Henry Lynch bought the cave, opened tours, and forced a road into the hills. His daughters later dropped the word Marble and renamed it Marvel Cave.' },
+      { title: 'Silver Dollar City (1950-Present)', text: 'The Herschends modernized access, built the ride out, and turned the old mining settlement into a living 1880s town. That attraction became Silver Dollar City.' },
+      { title: 'The Living Cave', text: 'Marvel Cave is still active, still wet, and still full of bats. The deepest public rooms run down to the Lost River and the waterfall chambers more than 500 feet below the ridge.' }
     ];
-    show(0);
+    var notesState = getFieldNotesState();
+    showIndex();
+
+    function markRead(idx) {
+      notesState.readPages[idx] = true;
+      notesState.lastPage = idx;
+    }
+
+    function showIndex() {
+      UI.render(renderReadablePanel(
+        'Field Notes',
+        'Choose a page from the company folder.',
+        {
+          kicker: 'Reference file',
+          narrow: true,
+          meta: ['Pages ' + pages.length]
+        }
+      ));
+      var options = [];
+      for (var i = 0; i < pages.length; i++) {
+        options.push({
+          key: String(i + 1),
+          label: pages[i].title,
+          value: i,
+          description: notesState.readPages[i] ? 'Read' : 'Unread',
+          badge: notesState.lastPage === i ? 'CURRENT' : (notesState.readPages[i] ? 'READ' : 'NEW')
+        });
+      }
+      options.push({ key: '0', label: 'Back', value: 'quit' });
+      UI.promptChoice(options, function (v) {
+        if (v === 'quit') {
+          UI.transition(titleScreen);
+          return;
+        }
+        show(v);
+      }, {
+        hideNav: true,
+        extraKeys: {
+          r: function () {
+            show(notesState.lastPage || 0);
+          }
+        }
+      });
+    }
+
     function show(idx) {
-      UI.render('<div class="text-lg text-glow">' + UI.escapeHtml(pages[idx].title) + '</div>' +
-        '<div class="text-dim text-sm">Page ' + (idx + 1) + '/' + pages.length + '</div><hr class="separator">' +
-        '<div style="white-space:pre-wrap;line-height:2">' + UI.escapeHtml(pages[idx].text) + '</div>');
+      markRead(idx);
+      UI.render(renderReadablePanel(
+        pages[idx].title,
+        pages[idx].text,
+        {
+          kicker: 'Field notes',
+          narrow: true,
+          meta: ['Page ' + (idx + 1) + ' of ' + pages.length]
+        }
+      ));
       var o = [];
       if (idx < pages.length - 1) o.push({ key: 'n', label: 'Next', value: 'n' });
       if (idx > 0) o.push({ key: 'p', label: 'Previous', value: 'p' });
-      o.push({ key: 'q', label: 'Back', value: 'q' });
+      o.push({ key: 'i', label: 'Back to Index', value: 'i' });
+      o.push({ key: '0', label: 'Exit', value: 'q' });
       UI.promptChoice(o, function (v) {
         if (v === 'n') show(idx + 1);
         else if (v === 'p') show(idx - 1);
+        else if (v === 'i') showIndex();
         else UI.transition(titleScreen);
-      });
+      }, { hideNav: true });
     }
   }
 
@@ -1358,7 +2588,7 @@
     if (data.eventDescription) html += '<div class="text-amber">' + UI.escapeHtml(data.eventDescription) + '</div>';
     if (data.messages) {
       for (var i = 0; i < data.messages.length; i++) {
-        var cls = data.messages[i].indexOf('died') >= 0 || data.messages[i].indexOf('killed') >= 0 ? 'text-red' : 'text-bright';
+        var cls = data.messages[i].indexOf('collapse') >= 0 || data.messages[i].indexOf('dragged clear') >= 0 || data.messages[i].indexOf('hauled toward cleaner air') >= 0 ? 'text-red' : 'text-bright';
         html += '<div class="' + cls + '">' + UI.escapeHtml(data.messages[i]) + '</div>';
       }
     }
@@ -1374,6 +2604,7 @@
     profession: professionScreen,
     crew: crewScreen,
     season: seasonScreen,
+    doctrine: doctrineScreen,
     store: storeScreen,
     status: statusScreen,
     event: eventScreen,
@@ -1384,7 +2615,9 @@
     topTen: topTenScreen,
     learn: learnScreen,
     supply: supplyScreen,
+    shipGuano: shipGuano,
     advance: advanceGame,
-    landmark: landmarkScreen
+    landmark: landmarkScreen,
+    playFireInTheHole: playFireInTheHole
   };
 })();

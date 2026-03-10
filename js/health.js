@@ -1,5 +1,6 @@
 // health.js - Health system for The Marvel Cave Mining Company
-// Health scale: 0-140+. Lower is better. 140+ = death.
+// Health scale: 0-140+. Lower is better. 140+ = collapse threshold.
+// In this game, a collapse means the line drags you clear in time.
 
 window.HealthSystem = {
   // Health thresholds
@@ -15,7 +16,7 @@ window.HealthSystem = {
     if (value <= this.FAIR_MAX) return 'Fair';
     if (value <= this.POOR_MAX) return 'Poor';
     if (value <= this.VERY_POOR_MAX) return 'Very Poor';
-    return 'Dead';
+    return 'Critical';
   },
 
   // Get health label CSS class
@@ -24,7 +25,7 @@ window.HealthSystem = {
     if (value <= this.FAIR_MAX) return 'health-fair';
     if (value <= this.POOR_MAX) return 'health-poor';
     if (value <= this.VERY_POOR_MAX) return 'health-vpoor';
-    return 'health-dead';
+    return 'health-bad';
   },
 
   // Calculate ration penalty based on ration level
@@ -36,6 +37,12 @@ window.HealthSystem = {
       case 'none':   return 25;
       default:       return 0;
     }
+  },
+
+  getFoodWaterPenalty: function(foodShortageDays) {
+    if (!foodShortageDays || foodShortageDays <= 0) return 0;
+    if (foodShortageDays >= 2) return 26;
+    return 8;
   },
 
   // Calculate pace penalty based on work pace
@@ -92,11 +99,14 @@ window.HealthSystem = {
   },
 
   // Update health for a single crew member
-  // Returns the new health value and whether they died
-  updateHealth: function(member, state) {
+  // Returns the new health value and whether they hit collapse threshold
+  updateHealth: function(member, state, timeScale) {
     if (!member.alive) return { health: member.health, died: false };
+    timeScale = typeof timeScale === 'number' ? timeScale : 1;
+    var restingDay = !!(state && state.restingDay);
 
     var currentHealth = member.health;
+    var foodWaterPenalty = this.getFoodWaterPenalty(state.foodShortageDays || 0);
 
     // Base recovery: health trends toward 0 (good) at -10% of current
     var baseRecovery = -Math.floor(currentHealth * 0.10);
@@ -104,6 +114,9 @@ window.HealthSystem = {
     // Surface recovery bonus
     if (!state.isUnderground) {
       baseRecovery -= 5;  // extra recovery on surface
+    }
+    if (restingDay) {
+      baseRecovery -= state.isUnderground ? 14 : 12;
     }
 
     // Calculate all penalties
@@ -118,10 +131,28 @@ window.HealthSystem = {
       airPenalty = this.getAirQualityPenalty(state.currentZone, state.daysUnderground);
       depthPenalty = this.getDepthPenalty(state.currentZone);
       darknessPenalty = this.getDarknessPenalty(state.lanternOil);
+      if (restingDay) {
+        airPenalty = Math.round(airPenalty * 0.25);
+        depthPenalty = 0;
+        darknessPenalty = Math.round(darknessPenalty * 0.25);
+      }
+    }
+    if (restingDay) {
+      pacePenalty = 0;
     }
 
     // Sum total delta
-    var delta = baseRecovery + rationPenalty + pacePenalty + airPenalty + depthPenalty + darknessPenalty;
+    var dailyDelta = baseRecovery + rationPenalty + foodWaterPenalty + pacePenalty + airPenalty + depthPenalty + darknessPenalty;
+    var profession = window.CaveData && window.CaveData.PROFESSIONS ? window.CaveData.PROFESSIONS[state.profession] : null;
+    if (profession && profession.healthBonus) {
+      if (dailyDelta > 0) dailyDelta = Math.round(dailyDelta * (1 - profession.healthBonus));
+      else if (dailyDelta < 0) dailyDelta = Math.round(dailyDelta * (1 + profession.healthBonus));
+    }
+    if (window.Expedition && window.Expedition.modifyHealthDelta) {
+      dailyDelta = window.Expedition.modifyHealthDelta(member, state, dailyDelta);
+    }
+
+    var delta = Math.round(dailyDelta * timeScale * 100) / 100;
 
     // Apply delta
     var newHealth = currentHealth + delta;
@@ -129,36 +160,40 @@ window.HealthSystem = {
     // Clamp to minimum 0
     if (newHealth < 0) newHealth = 0;
 
-    member.health = newHealth;
+    member.health = Math.round(newHealth * 100) / 100;
+    if (restingDay && member.health < this.DEATH_THRESHOLD) {
+      member.needsRescue = false;
+    }
 
-    // Check death
+    // Check collapse threshold
     var died = this.checkDeath(member);
 
-    return { health: newHealth, died: died, delta: delta };
+    return { health: member.health, died: died, delta: delta };
   },
 
-  // Check if a crew member has died (health >= 140)
+  // Check if a crew member has hit collapse threshold (health >= 140)
   checkDeath: function(member) {
     if (member.health >= this.DEATH_THRESHOLD) {
-      member.alive = false;
+      member.health = this.DEATH_THRESHOLD;
+      member.needsRescue = true;
       return true;
     }
     return false;
   },
 
   // Update health for all living party members
-  updatePartyHealth: function(state) {
+  updatePartyHealth: function(state, timeScale) {
     var results = [];
 
     // Update foreman
-    var foremanResult = this.updateHealth(state.foreman, state);
+    var foremanResult = this.updateHealth(state.foreman, state, timeScale);
     foremanResult.name = state.foreman.name;
     foremanResult.role = 'foreman';
     results.push(foremanResult);
 
     // Update each crew member
     for (var i = 0; i < state.crew.length; i++) {
-      var crewResult = this.updateHealth(state.crew[i], state);
+      var crewResult = this.updateHealth(state.crew[i], state, timeScale);
       crewResult.name = state.crew[i].name;
       crewResult.role = state.crew[i].role;
       results.push(crewResult);
@@ -170,6 +205,10 @@ window.HealthSystem = {
   // Apply direct damage to a member (from events)
   applyDamage: function(member, amount) {
     if (!member.alive) return false;
+    var state = window.GameState && window.GameState.state ? window.GameState.state : null;
+    if (state && window.Expedition && window.Expedition.adjustDamage) {
+      amount = window.Expedition.adjustDamage(member, amount, state);
+    }
     member.health += amount;
     return this.checkDeath(member);
   },
@@ -178,39 +217,28 @@ window.HealthSystem = {
   applyHealing: function(member, amount) {
     if (!member.alive) return;
     member.health = Math.max(0, member.health - amount);
+    if (member.health <= this.POOR_MAX) member.needsRescue = false;
   },
 
-  // Update donkey health (simpler model)
-  updateDonkeyHealth: function(donkeys, state) {
-    if (donkeys.count <= 0) return;
+  applyPartyHealing: function(state, amount) {
+    var healed = [];
+    if (!state || !amount || amount <= 0) return healed;
 
-    var delta = 0;
-
-    // Base recovery
-    delta -= Math.floor(donkeys.health * 0.08);
-
-    // Ration penalty (donkeys also need food)
-    if (state.rationLevel === 'half') delta += 3;
-    else if (state.rationLevel === 'scraps') delta += 8;
-    else if (state.rationLevel === 'none') delta += 15;
-
-    // Pace penalty
-    if (state.workPace === 'grueling') delta += 5;
-
-    // Depth penalty for donkeys
-    if (state.isUnderground) {
-      delta += this.getDepthPenalty(state.currentZone) * 2; // donkeys suffer more underground
+    if (state.foreman && state.foreman.alive) {
+      this.applyHealing(state.foreman, amount);
+      healed.push(state.foreman.name);
     }
 
-    donkeys.health = Math.max(0, donkeys.health + delta);
-
-    // Donkeys can die too
-    if (donkeys.health >= this.DEATH_THRESHOLD) {
-      donkeys.count--;
-      donkeys.health = Math.floor(donkeys.health * 0.5); // surviving donkeys stressed
-      if (donkeys.count < 0) donkeys.count = 0;
-      return true; // a donkey died
+    for (var i = 0; i < (state.crew || []).length; i++) {
+      if (!state.crew[i].alive) continue;
+      this.applyHealing(state.crew[i], amount);
+      healed.push(state.crew[i].name);
     }
+
+    return healed;
+  },
+
+  updateDonkeyHealth: function() {
     return false;
   }
 };

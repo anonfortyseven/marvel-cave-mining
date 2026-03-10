@@ -6,11 +6,10 @@ window.Scoring = {
   POINTS: {
     SURVIVOR_FOREMAN: 100,
     SURVIVOR_CREW: 50,
-    SURVIVOR_DONKEY: 20,
     PER_TON_GUANO_MINED: 10,
     PER_TON_GUANO_SHIPPED: 15,
     PER_DOLLAR_CASH: 0.1,
-    CONTRACT_FULFILLED: 200,
+    FULL_RUN: 150,
     DISCOVERY_BASE: 50,
 
     // Specific discovery bonuses
@@ -28,7 +27,6 @@ window.Scoring = {
   MULTIPLIERS: {
     ALL_CREW_ALIVE: 1.5,
     NO_DEATHS: 2.0,
-    EARLY_FINISH: 1.25,    // finished before October
     ALL_DISCOVERIES: 2.0
   },
 
@@ -54,18 +52,14 @@ window.Scoring = {
         breakdown.survivors += this.POINTS.SURVIVOR_CREW;
       }
     }
-    breakdown.survivors += state.donkeys.count * this.POINTS.SURVIVOR_DONKEY;
-
     // --- Resource points ---
     breakdown.resources += Math.floor(state.guanoMined * this.POINTS.PER_TON_GUANO_MINED);
     breakdown.resources += Math.floor(state.guanoShipped * this.POINTS.PER_TON_GUANO_SHIPPED);
     breakdown.resources += Math.floor(state.cash * this.POINTS.PER_DOLLAR_CASH);
 
-    // --- Contract points ---
-    for (var c = 0; c < state.contracts.length; c++) {
-      if (state.contracts[c].fulfilled) {
-        breakdown.contracts += this.POINTS.CONTRACT_FULFILLED;
-      }
+    // --- Full run bonus ---
+    if (state.completedRun || state.totalDays >= (state.gameDuration || 20)) {
+      breakdown.contracts += this.POINTS.FULL_RUN;
     }
 
     // --- Discovery points --- (flags match GameState defaults)
@@ -96,16 +90,10 @@ window.Scoring = {
       breakdown.multiplierReasons.push('Every soul came back alive (x' + this.MULTIPLIERS.ALL_CREW_ALIVE + ')');
     }
 
-    // No deaths at all (including donkeys at full count)
-    if (allCrewAlive && state.foreman.alive && state.donkeys.count >= 2) {
+    // No deaths at all
+    if (allCrewAlive && state.foreman.alive) {
       breakdown.multiplier *= this.MULTIPLIERS.NO_DEATHS;
-      breakdown.multiplierReasons.push('Not a man nor beast lost to the mountain (x' + this.MULTIPLIERS.NO_DEATHS + ')');
-    }
-
-    // Early finish (before day 20 of 30)
-    if (state.totalDays < 20 && state.guanoShipped >= state.contractTarget) {
-      breakdown.multiplier *= this.MULTIPLIERS.EARLY_FINISH;
-      breakdown.multiplierReasons.push('Contract filled ahead of schedule (x' + this.MULTIPLIERS.EARLY_FINISH + ')');
+      breakdown.multiplierReasons.push('Not a soul lost to the mountain (x' + this.MULTIPLIERS.NO_DEATHS + ')');
     }
 
     // All discoveries (match GameState flags)
@@ -215,7 +203,7 @@ window.Scoring = {
     lines.push('');
     lines.push('Survivors:    ' + breakdown.survivors + ' pts');
     lines.push('Resources:    ' + breakdown.resources + ' pts');
-    lines.push('Contracts:    ' + breakdown.contracts + ' pts');
+    lines.push('Full run:     ' + breakdown.contracts + ' pts');
     lines.push('Discoveries:  ' + breakdown.discoveries + ' pts');
     lines.push('---');
     lines.push('Subtotal:     ' + breakdown.subtotal + ' pts');

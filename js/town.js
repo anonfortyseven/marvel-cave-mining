@@ -22,289 +22,49 @@
     '   ====================================='
   ].join('\n');
 
-  // ─── Tavern Micro-Scenes (family-friendly) ─────────────────────
-  // Random vignettes that can trigger on entering the Lantern Tavern.
-  // Small buffs/flags only; designed to keep the core loop intact.
-  var TAVERN_SCENES = [
-    {
-      id: 'red_rule',
-      who: 'Red Sullivan',
-      chance: 0.14,
-      cooldown: 2,
-      condition: function (state) { return !!state; },
-      text: [
-        'Red polishes a glass that will never be clean and studies your crew with eyes that have seen too many mining parties come through this door.',
-        '"I been pouring drinks in Marmaros since \'82. You know how many crews I\'ve outfitted? Fourteen. You know how many came back whole? Three. Steady wins this cave. The greedy ones are buried in it."'
-      ],
-      choices: [
-        {
-          key: '1',
-          label: '"We\'ll keep it steady. Your word on it."',
-          apply: function (state) {
-            state.workPace = 'steady';
-            state.morale = Math.min(100, (state.morale || 50) + 5);
-            return 'Red nods slowly. "That\'s what the smart ones say. Now let\'s see if you mean it."';
-          }
-        },
-        {
-          key: '2',
-          label: '"We\'ll be fine, Red."',
-          apply: function (state) {
-            state.morale = Math.max(0, (state.morale || 50) - 2);
-            return 'Red says nothing. He has heard those exact words before, from men who are not here to say them again.';
-          }
-        },
-        {
-          key: '3',
-          label: '"What have you heard about the deeper chambers?"',
-          apply: function (state) {
-            state.calmFocusDays = Math.max(state.calmFocusDays || 0, 2);
-            state.morale = Math.min(100, (state.morale || 50) + 3);
-            return 'Red lowers his voice. "Past the Serpentine, mark every turn. The cave repeats itself but not exactly. And if you hear water changing pitch -- don\'t think. Run."';
-          }
-        }
-      ]
-    },
-    {
-      id: 'red_stew',
-      who: 'Red Sullivan',
-      chance: 0.04,
-      cooldown: 5,
-      condition: function (state) {
-        var morale = state && state.morale !== undefined ? state.morale : 50;
-        return morale <= 35 || (state && state.food <= 15);
-      },
-      text: [
-        'Red slides a bowl of venison stew across the bar without being asked. It steams in the lamplight.',
-        '"On the house. I had a cousin in the lead mines at Granby. He said the hardest part wasn\'t the digging. It was remembering you was human. Eat."'
-      ],
-      choices: [
-        {
-          key: '1',
-          label: 'Accept (thank him)',
-          apply: function (state) {
-            state.morale = Math.min(100, (state.morale || 50) + 8);
-            if (state.foreman && state.foreman.alive) window.HealthSystem.applyHealing(state.foreman, 5);
-            return 'The stew tastes like the surface. Like daylight and woodsmoke and a world where things grow upward.';
-          }
-        },
-        {
-          key: '2',
-          label: 'Share it with the crew',
-          apply: function (state) {
-            state.morale = Math.min(100, (state.morale || 50) + 10);
-            return 'You split the bowl five ways. It is not enough for anyone and exactly enough for everyone. Someone laughs. It has been a while since anyone laughed.';
-          }
-        },
-        {
-          key: '3',
-          label: 'Decline (save it for someone worse off)',
-          apply: function (state) {
-            state.morale = Math.min(100, (state.morale || 50) + 2);
-            return 'Red nods. "That is the first kind thing I have seen a miner do all week. I will remember it."';
-          }
-        }
-      ]
-    },
-    {
-      id: 'penny_trivia',
-      who: 'Penny Mae',
-      chance: 0.12,
-      cooldown: 2,
-      condition: function (state) { return !!state; },
-      text: [
-        'Penny Mae appears beside your table like a small, determined ghost. Her taffy cart rattles behind her.',
-        '"My grandma used to sing a song about this cave. Wanna hear a piece? She said: \'The Devil built a house of stone, and filled it full of wings. He hid his treasure in the deep, where the blind fish sings.\' What do you reckon the treasure is?"'
-      ],
-      choices: [
-        {
-          key: '1',
-          label: '"Gold. It\'s always gold."',
-          apply: function (state) {
-            state.taffy = (state.taffy || 0) + 1;
-            state.morale = Math.min(100, (state.morale || 50) + 6);
-            return 'She wrinkles her nose. "That\'s what the Spaniards thought too. Here, have a taffy for trying." She presses a warm twist of molasses candy into your hand.';
-          }
-        },
-        {
-          key: '2',
-          label: '"The cave itself is the treasure."',
-          apply: function (state) {
-            state.morale = Math.min(100, (state.morale || 50) + 4);
-            return 'Her eyes go wide. "That\'s what Grandma said! She said the people who lived here first knew that. The Osage. They didn\'t dig. They just... listened."';
-          }
-        },
-        {
-          key: '3',
-          label: '"I don\'t know, but I aim to find out."',
-          apply: function (state) {
-            state.morale = Math.min(100, (state.morale || 50) + 6);
-            return 'She grins like someone who knows a secret. "The blind fish sings," she whispers. "In the lake at the bottom. If you ever get that deep, listen for it." She leaves a taffy on the table and vanishes back to her cart.';
-          }
-        }
-      ]
-    },
-    {
-      id: 'penny_sweet_deal',
-      who: 'Penny Mae',
-      chance: 0.08,
-      cooldown: 3,
-      condition: function (state) { return state && state.cash >= 1; },
-      text: [
-        'Penny Mae leans in conspiratorially, smelling of molasses and woodsmoke.',
-        '"I got a bravery bundle. Three taffies and a lucky penny I found by the sinkhole. Fifty cents. The penny is not negotiable."'
-      ],
-      choices: [
-        {
-          key: '1',
-          label: 'Pay $0.50 for the bundle',
-          apply: function (state) {
-            state.cash = Math.round((state.cash - 0.5) * 100) / 100;
-            state.taffy = (state.taffy || 0) + 3;
-            state.morale = Math.min(100, (state.morale || 50) + 4);
-            return 'She ties the bag tight with twine and drops in a penny worn smooth as a river stone. "The penny came from the cave. Grandma said things that come from the cave want to go back. So you take it down there and it\'ll show you the way home."';
-          }
-        },
-        {
-          key: '2',
-          label: 'Tell her a story from the cave instead',
-          apply: function (state) {
-            state.morale = Math.min(100, (state.morale || 50) + 5);
-            return 'You tell her about the Cathedral Room. How big it is. How the bats spiral at dusk. She listens with her mouth open and her eyes wide and for a moment you remember that wonder is possible even in a place that wants to kill you.';
-          }
-        },
-        {
-          key: '3',
-          label: 'Decline (save your money)',
-          apply: function (state) {
-            return '"Your loss," she says cheerfully. "The penny was real lucky. I only tripped twice carrying it."';
-          }
-        }
-      ]
-    },
-    {
-      id: 'eli_napkin_map',
-      who: 'Eli Wren',
-      chance: 0.10,
-      cooldown: 3,
-      condition: function (state) { return state && state.cash >= 1; },
-      text: [
-        'An old man sits alone in the corner, sketching lines on a napkin with a carpenter\'s pencil. His hands are scarred. His eyes are the pale blue of a man who has spent too long in the dark.',
-        '"I don\'t draw treasure," he says without looking up. "I draw exits. A man who knows his exits don\'t need treasure."'
-      ],
-      choices: [
-        {
-          key: '1',
-          label: 'Pay $1 for the napkin map',
-          apply: function (state) {
-            state.cash = Math.round((state.cash - 1) * 100) / 100;
-            if (!state.mappedChambers) state.mappedChambers = {};
-            state.mappedChambers[state.currentChamber] = 3;
-            state.morale = Math.min(100, (state.morale || 50) + 2);
-            return 'He slides the napkin across the table. The lines are crude but precise. You recognize the Serpentine Passage. A side passage is marked with an X and the words: "DO NOT." He offers no further explanation.';
-          }
-        },
-        {
-          key: '2',
-          label: 'Ask how he knows the cave so well',
-          apply: function (state) {
-            state.calmFocusDays = Math.max(state.calmFocusDays || 0, 1);
-            state.morale = Math.min(100, (state.morale || 50) + 3);
-            return '"I worked the Blow expedition in \'69. Thirty years ago. We found the Spanish ladders in the Mammoth Room. Three hundred year old pine and they was still standing." He pauses. "We found other things too. Things that wasn\'t Spanish and wasn\'t Osage and wasn\'t anything I got a word for. The cave repeats itself, friend. But not exactly."';
-          }
-        },
-        {
-          key: '3',
-          label: 'Decline politely',
-          apply: function (state) {
-            return 'He folds the napkin carefully into his vest pocket. "Suit yourself. But if you make it to the Waterfall Room, look behind the falls. There\'s markings. Old ones. Older than the Spaniards." He says nothing more.';
-          }
-        }
-      ]
-    },
-    {
-      id: 'eli_air_pockets',
-      who: 'Eli Wren',
-      chance: 0.07,
-      cooldown: 4,
-      condition: function (state) { return !!state; },
-      text: [
-        'Eli Wren catches your arm as you pass his table. His grip is stronger than an old man\'s grip should be.',
-        '"The air down there has moods. When your candle flame turns blue, the cave is breathing something you should not be. When the flame shrinks, there ain\'t enough air for both of you and the fire. When the flame goes out..." He trails off. "Don\'t let the flame go out."'
-      ],
-      choices: [
-        {
-          key: '1',
-          label: 'Listen carefully to every word',
-          apply: function (state) {
-            state.airAwareDays = Math.max(state.airAwareDays || 0, 2);
-            state.morale = Math.min(100, (state.morale || 50) + 2);
-            return 'He nods, satisfied. "Carry a wet cloth. When the ammonia hits, press it to your face and breathe through it. The men who died of lung sickness -- they breathed it raw. Don\'t be them." You pack cloths where you can reach them fast.';
-          }
-        },
-        {
-          key: '2',
-          label: 'Ask what he saw down there in 1869',
-          apply: function (state) {
-            state.airAwareDays = Math.max(state.airAwareDays || 0, 1);
-            return 'His pale eyes go distant. "We found the Spanish ladders. Three hundred years underground and the pine was still solid. But there was other wood down there too. Older. Hardwood that don\'t grow in Missouri. I never could figure how it got five hundred feet underground." He finishes his drink. "Stay together. Move slow. Get to a place you already know. That\'s all the wisdom I got."';
-          }
-        },
-        {
-          key: '3',
-          label: 'Nod and change the subject',
-          apply: function (state) {
-            return 'You pull your arm free gently. Eli watches you go with those pale cave-blind eyes. "The water remembers," he says to your back. You do not ask him what he means.';
-          }
-        }
-      ]
-    }
-  ];
+  var TAVERN_SCENES = [];
 
   // ─── Shop Definitions (3 shops) ─────────────────────────────────
   var SHOPS = [
     {
       id: 'general_store',
-      name: 'Marmaros Outfitters',
-      keeper: 'Herschel Barnes',
+      name: 'Company Office & Outfitters',
+      keeper: 'Jedidiah Campbell',
       useExistingStore: true,
       greetings: [
-        '"Herschel Barnes. I stock what you need to go underground and most of what you need to come back up. I don\'t extend credit."',
-        '"Fresh hemp rope in yesterday. Good and strong. You will want it. The cave eats rope like a mule eats oats."',
-        '"Back again? That means you\'re still alive. I consider that a personal recommendation for my merchandise."',
-        '"The smart ones buy oil first. The dead ones bought dynamite first. Draw your own conclusions."'
+        '"The company provides what the contract requires."',
+        '"Take what keeps the line moving and sign for it cleanly."'
       ]
     },
     {
       id: 'blacksmith',
-      name: 'Ozark Blacksmith & Forge',
-      keeper: 'Jebediah Colt',
+      name: 'Shad Heller\'s Forge',
+      keeper: 'Shad Heller',
       miniGame: 'SharpenGame',
       miniGamePrompt: 'Care to test your arm at the grindstone?',
       greetings: [
-        '"Jebediah Colt. I shoe mules and I sharpen steel. If you want conversation, go to Red\'s. If you want to live, come to me."',
-        '"Iron don\'t lie. Good steel keeps a man alive. Bad steel keeps a widow fed. Which do you want?"',
-        '"I forged every pickaxe that ever went into that cave. Most of them came back. Most of the men did too."',
-        '"Step in. Don\'t touch nothing hot. What do you need?"'
+        '"Steel first. Talking after."',
+        '"Bring me tools, not excuses."'
       ],
       items: [
         {
           name: 'Tool Upgrade',
-          price: 20,
+          price: 3.5,
           description: '+15% mining output',
+          featured: true,
           stateKey: 'toolUpgrade',
           equipment: true
         },
         {
           name: 'Hunting Knife',
-          price: 8,
+          price: 1.25,
           description: 'Reduces raid losses, +survival',
           stateKey: 'huntingKnife',
           equipment: true
         },
         {
           name: 'Walking Stick',
-          price: 6,
+          price: 0.75,
           description: '-20% fall damage',
           stateKey: 'walkingStick',
           equipment: true
@@ -312,42 +72,93 @@
       ]
     },
     {
-      id: 'tavern',
-      name: 'The Lantern Tavern',
-      keeper: 'Red Sullivan',
-      miniGame: 'CardsGame',
-      miniGamePrompt: 'Fancy a hand of Cave Draw?',
-      secondMiniGame: 'TaffyGame',
-      secondMiniGamePrompt: 'Penny Mae\'s taffy cart is here! Pull some taffy?',
+      id: 'sweets',
+      name: "June Ward's Sweet Shop",
+      keeper: 'June Ward',
+      miniGame: 'TaffyGame',
+      miniGamePrompt: 'Join June at the taffy hook?',
       greetings: [
-        '"The Lantern Tavern. Pull up a stool. You look like a man who has been underground. I can always tell by the eyes."',
-        '"Stew is hot. Penny Mae has fresh taffy. And old Eli is in his corner, drawing maps on napkins nobody asked for. Welcome."',
-        '"Ain\'t seen you in a while. I figured the cave got you. Glad to be wrong. Drink?"',
-        '"Come in. Leave your worries at the door. The Bald Knobbers leave theirs at the trail. We are all pretending here."'
+        '"Candy first. Complaints after."',
+        '"If the cave put you in a mood, I sell the cure by the ounce."'
       ],
       items: [
         {
-          name: 'Hot Meal',
-          price: 2,
-          description: '+5 morale, +5 health',
+          name: 'Peppermint Stick',
+          price: 0.02,
+          description: '+1 morale',
+          stateKey: null,
+          equipment: false,
+          consumable: false,
+          onPurchase: function (state) {
+            state.morale = Math.min(100, (state.morale || 50) + 1);
+            return 'June snaps a peppermint stick across the counter. "There. Now you can complain with style."';
+          }
+        },
+        {
+          name: 'Rock Candy',
+          price: 0.03,
+          description: '+2 morale',
+          stateKey: null,
+          equipment: false,
+          consumable: false,
+          onPurchase: function (state) {
+            state.morale = Math.min(100, (state.morale || 50) + 2);
+            return 'The sugar crunches loud enough to make the whole town seem less severe for a minute.';
+          }
+        },
+        {
+          name: 'Molasses Taffy',
+          price: 0.05,
+          description: '+4 morale',
+          stateKey: null,
+          equipment: false,
+          consumable: false,
+          onPurchase: function (state) {
+            state.morale = Math.min(100, (state.morale || 50) + 4);
+            return 'June wraps the warm pull in wax paper. "If this does not improve your temper, have another and lie about it."';
+          }
+        },
+        {
+          name: 'Coffee & Cinnamon Roll',
+          price: 0.10,
+          description: '+5 morale',
+          featured: true,
           stateKey: null,
           equipment: false,
           consumable: false,
           onPurchase: function (state) {
             state.morale = Math.min(100, (state.morale || 50) + 5);
-            if (state.foreman && state.foreman.alive) {
-              state.foreman.health = Math.max(0, state.foreman.health - 5);
+            return 'Hot coffee, sticky sugar, and one blessed hour where nobody smells like guano.';
+          }
+        }
+      ]
+    },
+    {
+      id: 'tavern',
+      name: 'The Lantern Tavern',
+      keeper: 'House table',
+      miniGame: 'CardsGame',
+      miniGamePrompt: 'Fancy a hand of Cave Draw?',
+      greetings: [
+        '"Stew is hot. Somebody is always listening."',
+        '"Eat first. Lose money after."'
+      ],
+      items: [
+        {
+          name: 'Hot Meal',
+          price: 0.2,
+          description: '+5 morale, +5 health',
+          featured: true,
+          stateKey: null,
+          equipment: false,
+          consumable: false,
+          onPurchase: function (state) {
+            state.morale = Math.min(100, (state.morale || 50) + 5);
+            if (window.HealthSystem && window.HealthSystem.applyPartyHealing) {
+              window.HealthSystem.applyPartyHealing(state, 5);
             }
             return 'A steaming plate of venison stew with cornbread. Warms you to the bone.';
           }
-        },
-        {
-          name: 'Taffy',
-          price: 0.50,
-          description: '+10 morale when consumed',
-          stateKey: 'taffy',
-          equipment: false,
-          consumable: true
         }
       ]
     }
@@ -377,6 +188,16 @@
     return g[Math.floor(Math.random() * g.length)];
   }
 
+  function detailCard(label, value, note, tone) {
+    var cls = 'detail-card' + (tone ? ' detail-card-' + tone : '');
+    var html = '<div class="' + cls + '">';
+    html += '<div class="detail-card-label">' + UI.escapeHtml(label) + '</div>';
+    html += '<div class="detail-card-value">' + UI.escapeHtml(value) + '</div>';
+    if (note) html += '<div class="detail-card-note">' + UI.escapeHtml(note) + '</div>';
+    html += '</div>';
+    return html;
+  }
+
   function getShopArt(shopId) {
     if (window.AsciiArt && window.AsciiArt.getShopArt) {
       return window.AsciiArt.getShopArt(shopId);
@@ -384,12 +205,53 @@
     return null;
   }
 
+  function buildPartySnapshot(state) {
+    var party = [];
+    if (!state) return party;
+
+    if (state.foreman) {
+      party.push({
+        name: state.foreman.name,
+        role: 'Foreman',
+        health: state.foreman.health,
+        alive: state.foreman.alive !== false
+      });
+    }
+
+    for (var i = 0; i < (state.crew || []).length; i++) {
+      party.push({
+        name: state.crew[i].name,
+        role: state.crew[i].role || 'Crew',
+        health: state.crew[i].health,
+        alive: state.crew[i].alive !== false
+      });
+    }
+
+    return party;
+  }
+
   function handleMiniGameResult(result) {
     var state = gs();
     if (!state || !result) return;
-    if (result.cash) state.cash += result.cash;
+    if (result.cash) state.cash = Math.round((state.cash + result.cash) * 100) / 100;
     if (result.morale) {
       state.morale = Math.min(100, Math.max(0, (state.morale || 50) + result.morale));
+    }
+    if (result.focusDays) {
+      state.calmFocusDays = Math.max(0, (state.calmFocusDays || 0) + result.focusDays);
+    }
+    if (result.airAwareDays) {
+      state.airAwareDays = Math.max(0, (state.airAwareDays || 0) + result.airAwareDays);
+    }
+    if (result.healing && window.HealthSystem) {
+      if (state.foreman && state.foreman.alive) {
+        window.HealthSystem.applyHealing(state.foreman, result.healing);
+      }
+      for (var i = 0; i < (state.crew || []).length; i++) {
+        if (state.crew[i].alive) {
+          window.HealthSystem.applyHealing(state.crew[i], result.healing);
+        }
+      }
     }
     if (result.items) {
       for (var k in result.items) {
@@ -407,6 +269,82 @@
     }
   }
 
+  function showMiniGameSummary(result, returnFn) {
+    var cards = '';
+    if (result.cashLabel) {
+      cards += '<div class="detail-card detail-card-warn"><div class="detail-card-label">Cash</div><div class="detail-card-value">' + UI.escapeHtml(result.cashLabel) + '</div></div>';
+    } else if (result.cash && result.cash > 0) {
+      cards += '<div class="detail-card detail-card-good"><div class="detail-card-label">Cash</div><div class="detail-card-value">Earned ' + UI.formatMoney(result.cash) + '</div></div>';
+    } else if (result.cash && result.cash < 0) {
+      cards += '<div class="detail-card detail-card-danger"><div class="detail-card-label">Cash</div><div class="detail-card-value">Lost ' + UI.formatMoney(Math.abs(result.cash)) + '</div></div>';
+    }
+    if (result.morale && result.morale > 0) {
+      cards += '<div class="detail-card detail-card-good"><div class="detail-card-label">Morale</div><div class="detail-card-value">+' + result.morale + '</div></div>';
+    } else if (result.morale && result.morale < 0) {
+      cards += '<div class="detail-card detail-card-danger"><div class="detail-card-label">Morale</div><div class="detail-card-value">' + result.morale + '</div></div>';
+    }
+    if (result.focusDays && result.focusDays > 0) {
+      cards += '<div class="detail-card detail-card-good"><div class="detail-card-label">Focus</div><div class="detail-card-value">+' + result.focusDays + ' days</div></div>';
+    }
+    if (result.airAwareDays && result.airAwareDays > 0) {
+      cards += '<div class="detail-card detail-card-good"><div class="detail-card-label">Air Sense</div><div class="detail-card-value">+' + result.airAwareDays + ' days</div></div>';
+    }
+    if (result.healingLabel) {
+      cards += '<div class="detail-card detail-card-good"><div class="detail-card-label">Healing</div><div class="detail-card-value">' + UI.escapeHtml(result.healingLabel) + '</div></div>';
+    } else if (result.healing && result.healing > 0) {
+      cards += '<div class="detail-card detail-card-good"><div class="detail-card-label">Healing</div><div class="detail-card-value">Party healed</div></div>';
+    }
+    if (result.items) {
+      for (var k in result.items) {
+        if (result.items.hasOwnProperty(k) && result.items[k] > 0) {
+          cards += '<div class="detail-card detail-card-good"><div class="detail-card-label">Gain</div><div class="detail-card-value">+' + result.items[k] + ' ' + UI.escapeHtml(k) + '</div></div>';
+        }
+      }
+    }
+
+    var html = '<div class="readable-screen readable-screen--narrow">';
+    html += '<div class="readable-frame">';
+    html += '<div class="readable-header">';
+    html += '<div class="readable-kicker">Town result</div>';
+    html += '<div class="readable-title text-glow">' + UI.escapeHtml(result.label || 'Marmaros Night') + '</div>';
+    html += '<hr class="separator-double">';
+    if (result.summary) html += '<div class="readable-lead">' + UI.escapeHtml(result.summary) + '</div>';
+    html += '</div>';
+    html += '<div class="readable-body"><div class="detail-card-grid detail-card-grid--two">' + cards + '</div></div>';
+    html += '</div>';
+    html += '</div>';
+
+    UI.render(html);
+    UI.pressEnter(function () { returnFn(); });
+  }
+
+  function launchTownMiniGame(gameGlobal, returnFn) {
+    var gameObj = window[gameGlobal];
+    if (!gameObj || typeof gameObj.start !== 'function') {
+      UI.showNotification('Mini-game unavailable', 1200);
+      setTimeout(function () { UI.transition(returnFn); }, 1300);
+      return;
+    }
+
+    var state = gs();
+    var params = {
+      playerCash: state ? state.cash : 0,
+      playerMorale: state ? (state.morale || 50) : 50,
+      party: buildPartySnapshot(state)
+    };
+
+    if (window.Audio_Manager) Audio_Manager.play('minigame');
+    gameObj.start(params, function (result) {
+      if (window.Audio_Manager) Audio_Manager.play('town');
+      if (!result) {
+        UI.transition(returnFn);
+        return;
+      }
+      handleMiniGameResult(result);
+      showMiniGameSummary(result, returnFn);
+    });
+  }
+
   // --- Tavern micro-scenes helpers ---
   function ensureTavernState(state) {
     if (!state.tavernSceneCooldowns) state.tavernSceneCooldowns = {};
@@ -415,118 +353,236 @@
     if (!state.airAwareDays) state.airAwareDays = 0;
   }
 
-  function canRunTavernScene(scene, state) {
-    if (!scene || !state) return false;
-    ensureTavernState(state);
-    if (state.tavernSceneCooldowns[scene.id] && state.tavernSceneCooldowns[scene.id] > 0) return false;
-    if (scene.condition && !scene.condition(state)) return false;
-    return true;
+  function showCastMoment(moment, returnFn) {
+    if (!moment) return false;
+    var html = '<div class="readable-screen readable-screen--narrow">';
+    html += '<div class="readable-frame">';
+    html += '<div class="readable-header">';
+    html += '<div class="readable-kicker">Lantern Tavern</div>';
+    html += '<div class="readable-title text-glow">' + UI.escapeHtml(moment.title || moment.speakerName || 'Town Talk') + '</div>';
+    html += '<hr class="separator-double">';
+    if (moment.speakerName) html += '<div class="readable-note">' + UI.escapeHtml(moment.speakerName) + '</div>';
+    html += '<div class="readable-lead">' + UI.escapeHtml(moment.text || '') + '</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    UI.render(html);
+
+    var choices = (moment.choices || []).map(function (choice) {
+      return {
+        key: choice.key,
+        label: choice.label,
+        value: choice.key
+      };
+    });
+    choices.push({ key: '0', label: 'Leave it there', value: 'leave' });
+    UI.promptChoice(choices, function (value) {
+      if (value === 'leave') {
+        UI.transition(returnFn);
+        return;
+      }
+      var selected = null;
+      for (var i = 0; i < (moment.choices || []).length; i++) {
+        if (moment.choices[i].key === value) {
+          selected = moment.choices[i];
+          break;
+        }
+      }
+      var summary = selected && selected.result ? selected.result : 'The talk lingers after the glasses stop moving.';
+      showMiniGameSummary({
+        label: moment.title || 'Town Talk',
+        summary: summary
+      }, returnFn);
+    });
   }
 
   function maybeRunTavernScene(shop) {
     var state = gs();
-    if (!state || !shop || shop.id !== 'tavern') return false;
-    ensureTavernState(state);
-
-    // 60%: no scene (go straight to menu)
-    if (Math.random() < 0.60) return false;
-
-    // Filter eligible scenes
-    var eligible = [];
-    for (var i = 0; i < TAVERN_SCENES.length; i++) {
-      if (canRunTavernScene(TAVERN_SCENES[i], state)) eligible.push(TAVERN_SCENES[i]);
-    }
-    if (eligible.length === 0) return false;
-
-    // Weighted roll by chance
-    var total = 0;
-    for (var j = 0; j < eligible.length; j++) total += (eligible[j].chance || 0);
-    if (total <= 0) return false;
-
-    var r = Math.random() * total;
-    var pick = eligible[0];
-    for (var k = 0; k < eligible.length; k++) {
-      r -= (eligible[k].chance || 0);
-      if (r <= 0) { pick = eligible[k]; break; }
-    }
-
-    // Render scene
-    UI.hideBars();
-    var html = '<div class="text-lg text-glow">The Lantern Tavern</div><hr class="separator">';
-    html += '<div class="text-amber" style="margin:6px 0">' + UI.escapeHtml(pick.who) + '</div>';
-    for (var t = 0; t < pick.text.length; t++) {
-      html += '<div class="text-bright" style="margin:4px 0">' + UI.escapeHtml(pick.text[t]) + '</div>';
-    }
-    UI.render(html);
-
-    var opts = [];
-    for (var c = 0; c < pick.choices.length; c++) {
-      opts.push({ key: pick.choices[c].key, label: pick.choices[c].label, value: String(c) });
-    }
-    UI.promptChoice(opts, function (val) {
-      var idx = parseInt(val, 10);
-      var choice = pick.choices[idx];
-      var msg = '';
-      if (choice && choice.apply) {
-        msg = choice.apply(state) || '';
-      }
-
-      // Set cooldown
-      state.tavernSceneCooldowns[pick.id] = pick.cooldown || 2;
-      save();
-
-      // Show result, then return to the shop menu
-      var html2 = '<div class="text-bright" style="margin:10px 0">' + UI.escapeHtml(msg || 'Done.') + '</div>';
-      UI.render(html2);
-      UI.pressEnter(function () { showShop(shop); });
-    });
-
+    if (!state || !window.NarrativeCast || !window.NarrativeCast.getArcMoment) return false;
+    if ((state.totalDays || 0) < 8) return false;
+    if (!state.expedition || !state.expedition.moments) return false;
+    if ((state.expedition.moments.townVisits || 0) % 3 !== 0) return false;
+    var moment = window.NarrativeCast.getArcMoment('william_lynch', state);
+    if (!moment) return false;
+    showCastMoment(moment, showTownHub);
     return true;
+  }
+
+  function getShopMeta(shop, state) {
+    return ['Cash ' + UI.formatMoney(state.cash)];
+  }
+
+  function buildShopOption(shop, item, idx) {
+    var state = gs();
+    var owned = item.equipment && item.stateKey && state && state.equipment && state.equipment[item.stateKey];
+    var note = item.description || '';
+    if (owned) note = 'Already packed.';
+    var badge = owned ? 'OWNED' : (item.featured ? 'BEST PICK' : '');
+    return {
+      key: String(idx),
+      label: item.name,
+      value: 'buy_' + (idx - 1),
+      description: note,
+      meta: UI.formatMoney(item.price),
+      badge: badge,
+      tone: item.featured && !owned ? 'featured' : '',
+      disabled: !!owned,
+      disabledLabel: item.name + ' is already packed.'
+    };
   }
 
   // ─── Town Hub Screen ─────────────────────────────────────────────
   function showTownHub(callback) {
     townCallback = callback || townCallback;
     var state = gs();
-
-    var html = '<pre class="title-art">' + TOWN_ART + '</pre>\n';
-    html += '<div class="text-bright text-center" style="margin:8px 0">';
-    html += 'Welcome to Marmaros!</div>\n';
-    html += '<div class="text-dim text-center" style="margin-bottom:4px">';
-    html += 'A small mining settlement perched above Marvel Cave.</div>\n';
-
-    if (state) {
-      html += '<div class="text-center">Cash: <span class="text-yellow">';
-      html += UI.formatMoney(state.cash) + '</span></div>\n';
+    if (window.Audio_Manager) Audio_Manager.play('town');
+    if (state && window.Expedition && window.Expedition.ensureState) {
+      window.Expedition.ensureState(state);
+      state.expedition.moments.townVisits = (state.expedition.moments.townVisits || 0) + 1;
     }
+    var townSnapshot = window.Expedition && window.Expedition.getTownSnapshot ? window.Expedition.getTownSnapshot(state) : null;
+    var townLine = window.NarrativeCast && window.NarrativeCast.getTownLine ? window.NarrativeCast.getTownLine('town_hub', state) : null;
+    var party = buildPartySnapshot(state);
+    var aliveCount = party.filter(function (member) {
+      return member && member.alive;
+    }).length;
+    var townArt = window.AsciiArt && window.AsciiArt.getTownArt ? window.AsciiArt.getTownArt() : getArt('marmaros');
 
-    html += '<hr class="separator">';
-    html += '<div class="text-bright" style="margin:4px 0">Where would you like to go?</div>\n';
+    var html = '';
+    html += '<div class="readable-screen">';
+    html += '<div class="readable-frame town-hub-screen">';
+    if (townArt) {
+      html += '<div class="native-art-panel native-art-panel--town">';
+      html += '<pre class="title-art title-art--town">' + UI.escapeHtml(townArt) + '</pre>';
+      html += '</div>';
+    }
+    html += '<div class="town-paper">';
+    html += '<div class="town-paper-masthead">THE MARMAROS GAZETTE</div>';
+    html += '<div class="town-paper-rule"></div>';
+    html += '<div class="town-paper-edition">Stone County, Missouri &bull; Evening Edition</div>';
+    html += '<div class="town-paper-headline">' + UI.escapeHtml(townSnapshot ? (townSnapshot.paperHeadline || townSnapshot.headline || 'Another shift opens over the Den') : 'Another shift opens over the Den') + '</div>';
+    html += '<div class="town-paper-subhead">' + UI.escapeHtml(townSnapshot ? (townSnapshot.paperSubhead || townSnapshot.rumor || 'Stock up, get patched, and head back below.') : 'Stock up, get patched, and head back below.') + '</div>';
+    html += '</div>';
+    if (townSnapshot && townSnapshot.opportunity) {
+      html += '<div class="town-opportunity-callout">';
+      html += '<div class="town-opportunity-kicker">Town Talk <span class="town-opportunity-key">T</span></div>';
+      html += '<div class="town-opportunity-title">' + UI.escapeHtml(townSnapshot.opportunity.label) + '</div>';
+      if (townSnapshot.opportunity.description) {
+        html += '<div class="town-opportunity-copy">' + UI.escapeHtml(townSnapshot.opportunity.description) + '</div>';
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+    html += '</div>';
 
     UI.render(html);
 
-    var options = [];
-    for (var i = 0; i < SHOPS.length; i++) {
-      var visited = visitedShops.indexOf(SHOPS[i].id) !== -1;
-      var label = SHOPS[i].name + ' - ' + SHOPS[i].keeper;
-      if (visited) label += ' [visited]';
-      options.push({
-        key: String(i + 1),
-        label: label,
-        value: i
-      });
-    }
-    options.push({
+    var options = [
+      {
+        key: '1',
+        group: 'Work',
+        label: 'Sell Guano',
+        value: 'ship_guano',
+        description: state && state.guanoStockpile > 0.01 ? state.guanoStockpile.toFixed(1) + ' tons waiting at the yard.' : 'Yard clear for now.',
+        disabled: !(state && state.guanoStockpile > 0.01),
+        disabledLabel: 'No load is waiting at the yard.',
+        tone: state && state.guanoStockpile > 0.01 ? 'warn' : 'muted',
+        badge: state && state.guanoStockpile > 0.01 ? 'READY' : ''
+      },
+      {
+        key: '2',
+        group: 'Work',
+        label: 'Company Office & Outfitters',
+        value: 0,
+        description: 'Ledger and supplies.'
+      },
+      {
+        key: '3',
+        group: 'Work',
+        label: 'Shad Heller\'s Forge',
+        value: 1,
+        description: 'Steel and warnings.'
+      },
+      {
+        key: '4',
+        group: 'Recovery',
+        label: "June Ward's Sweet Shop",
+        value: 2,
+        description: 'Sugar and coffee.'
+      },
+      {
+        key: '5',
+        group: 'Recovery',
+        label: 'The Lantern Tavern',
+        value: 3,
+        description: 'Stew and cards.'
+      },
+      {
+        key: '6',
+        group: 'Side Shows',
+        label: 'Fire In The Hole',
+        value: 'fire_in_the_hole',
+        description: 'Burning Main Street drill.'
+      },
+      {
+        key: '7',
+        group: 'Side Shows',
+        label: "Grandfather's Mansion",
+        value: 'grandfathers_mansion',
+        description: 'Beat the maze.'
+      },
+      {
       key: '0',
-      label: 'Return to cave',
-      value: 'leave'
-    });
+      group: 'Return',
+      label: 'Back Underground',
+      value: 'leave',
+      description: 'Head back to the Den.'
+    }];
+
+    function handleTownOpportunity() {
+      if (!(townSnapshot && townSnapshot.opportunity)) return;
+      var result = townSnapshot.opportunity.apply(state);
+      save();
+      UI.render(
+        '<div class="readable-screen readable-screen--narrow">' +
+          '<div class="readable-frame">' +
+            '<div class="readable-header">' +
+              '<div class="readable-kicker">Town talk</div>' +
+              '<div class="readable-title text-glow">' + UI.escapeHtml(townSnapshot.opportunity.label) + '</div>' +
+              '<hr class="separator-double">' +
+              '<div class="readable-lead">' + UI.escapeHtml(result) + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>'
+      );
+      UI.pressEnter(function () { UI.transition(showTownHub); });
+    }
 
     UI.promptChoice(options, function (val) {
       if (val === 'leave') {
         if (townCallback) {
           UI.transition(townCallback);
         }
+      } else if (val === 'ship_guano') {
+        if (window.Screens && window.Screens.shipGuano) {
+          window.Screens.shipGuano({
+            onComplete: function () { UI.transition(showTownHub); }
+          });
+        } else {
+          UI.transition(showTownHub);
+        }
+      } else if (val === 'fire_in_the_hole') {
+        if (window.Screens && window.Screens.playFireInTheHole) {
+          window.Screens.playFireInTheHole({
+            trainingMode: true,
+            onComplete: function () { UI.transition(showTownHub); }
+          });
+        } else {
+          UI.showNotification('Fire drill unavailable', 1200);
+          setTimeout(function () { UI.transition(showTownHub); }, 1300);
+        }
+      } else if (val === 'grandfathers_mansion') {
+        launchTownMiniGame('GrandfathersMansionGame', showTownHub);
       } else {
         var shop = SHOPS[val];
         trackVisit(shop.id);
@@ -534,7 +590,13 @@
           showShop(shop);
         });
       }
+    }, {
+      extraKeys: townSnapshot && townSnapshot.opportunity ? {
+        t: handleTownOpportunity
+      } : null
     });
+    var menu = document.getElementById('menu-choices');
+    if (menu) menu.classList.add('town-menu-options');
   }
 
   // ─── Generic Shop Screen ─────────────────────────────────────────
@@ -560,26 +622,27 @@
 
     // Build shop screen
     var art = getShopArt(shop.id);
-    var html = '';
-    // Pixel art shop image
-    if (window.Images) html += Images.getShopImage(shop.id);
+    var voice = window.NarrativeCast && window.NarrativeCast.getShopVoice ? window.NarrativeCast.getShopVoice(shop.id, state) : null;
+    var html = '<div class="readable-screen readable-screen--narrow">';
+    html += '<div class="readable-frame shop-screen shop-screen--' + UI.escapeHtml(shop.id) + '">';
     if (art) {
-      html += '<pre class="title-art">' + art + '</pre>\n';
+      html += '<div class="native-art-panel native-art-panel--shop">';
+      html += '<pre class="title-art title-art--shop">' + UI.escapeHtml(art) + '</pre>\n';
+      html += '</div>';
     }
-
-    html += '<div class="text-lg text-glow" style="margin:6px 0">';
-    html += UI.escapeHtml(shop.name) + '</div>\n';
-    html += '<div class="text-dim" style="margin-bottom:2px">';
-    html += 'Proprietor: ' + UI.escapeHtml(shop.keeper) + '</div>\n';
-
-    // Shopkeeper greeting
-    html += '<div class="text-amber" style="margin:8px 0;font-style:italic">';
-    html += UI.escapeHtml(randomGreeting(shop)) + '</div>\n';
-
-    // Cash display
-    html += '<div style="margin:4px 0">Cash: <span class="text-yellow">';
-    html += UI.formatMoney(state.cash) + '</span></div>\n';
-    html += '<hr class="separator">';
+    html += '<div class="readable-header">';
+    html += '<div class="readable-kicker">' + UI.escapeHtml(shop.id === 'sweets' ? 'Sweet Counter' : shop.id === 'tavern' ? 'Lantern Tavern' : shop.id === 'blacksmith' ? 'Forge' : 'Company Supply') + '</div>';
+    html += '<div class="readable-title text-glow">' + UI.escapeHtml(shop.name) + '</div>';
+    html += '<hr class="separator-double">';
+    html += '<div class="readable-lead">' + UI.escapeHtml((voice && voice.line) || randomGreeting(shop)) + '</div>';
+    html += '<div class="selection-meta-row">';
+    var shopMeta = getShopMeta(shop, state);
+    for (var s = 0; s < shopMeta.length; s++) {
+      html += '<div class="selection-meta-pill">' + UI.escapeHtml(shopMeta[s]) + '</div>';
+    }
+    html += '</div>';
+    html += '</div>';
+    html += '</div></div>';
 
     UI.render(html);
 
@@ -591,16 +654,9 @@
     // Items for sale
     for (var i = 0; i < (shop.items || []).length; i++) {
       var item = shop.items[i];
-      var owned = item.equipment && item.stateKey && state.equipment[item.stateKey];
-      var label = item.name + ' - ' + UI.formatMoney(item.price);
-      if (item.description) label += ' (' + item.description + ')';
-      if (owned) label += ' [OWNED]';
-
-      menuOptions.push({
-        key: String(idx),
-        label: label,
-        value: 'buy_' + i
-      });
+      var option = buildShopOption(shop, item, idx);
+      option.value = 'buy_' + i;
+      menuOptions.push(option);
       menuActions.push({ type: 'buy', index: i });
       idx++;
     }
@@ -656,6 +712,10 @@
         handlePurchase(shop, buyIdx);
       }
     });
+    var menu = document.getElementById('menu-choices');
+    if (menu) {
+      menu.classList.add('shop-menu-options', 'shop-menu-options--' + shop.id);
+    }
   }
 
   // ─── Purchase Handler ────────────────────────────────────────────
@@ -798,7 +858,8 @@
       shopId: shop.id,
       keeper: shop.keeper,
       playerCash: state ? state.cash : 0,
-      playerMorale: state ? (state.morale || 50) : 50
+      playerMorale: state ? (state.morale || 50) : 50,
+      party: buildPartySnapshot(state)
     };
 
     // Switch to mini-game music
@@ -810,29 +871,7 @@
 
       if (result) {
         handleMiniGameResult(result);
-
-        // Show result summary
-        var html = '<div class="text-bright" style="margin:10px 0">Results:</div>';
-        if (result.cash && result.cash > 0) {
-          html += '<div class="text-green">  Earned ' + UI.formatMoney(result.cash) + '</div>';
-        } else if (result.cash && result.cash < 0) {
-          html += '<div class="text-red">  Lost ' + UI.formatMoney(Math.abs(result.cash)) + '</div>';
-        }
-        if (result.morale && result.morale > 0) {
-          html += '<div class="text-green">  Morale +' + result.morale + '</div>';
-        } else if (result.morale && result.morale < 0) {
-          html += '<div class="text-red">  Morale ' + result.morale + '</div>';
-        }
-        if (result.items) {
-          for (var k in result.items) {
-            if (result.items.hasOwnProperty(k) && result.items[k] > 0) {
-              html += '<div class="text-green">  +' + result.items[k] + ' ' + k + '</div>';
-            }
-          }
-        }
-
-        UI.render(html);
-        UI.pressEnter(function () { showShop(shop); });
+        showMiniGameSummary(result, function () { showShop(shop); });
       } else {
         showShop(shop);
       }

@@ -2,7 +2,7 @@
  * cards-game.js - Blackjack at The Lantern Tavern
  * The Marvel Cave Mining Company
  *
- * Simple canvas-based blackjack (21) against Red Sullivan.
+ * Simple canvas-based blackjack (21) at the Lantern Tavern house table.
  */
 (function () {
   'use strict';
@@ -175,7 +175,7 @@
         handsWon++;
         break;
       case 'dealerBust':
-        resultText = 'Red busts! +$2';
+        resultText = 'House busts! +$2';
         resultColor = CLR.green;
         totalNet += 2;
         handsWon++;
@@ -186,7 +186,7 @@
         totalNet -= 2;
         break;
       case 'lose':
-        resultText = 'Red wins! -$2';
+        resultText = 'House wins! -$2';
         resultColor = CLR.red;
         totalNet -= 2;
         break;
@@ -245,6 +245,11 @@
   }
 
   function onKeyDown(e) {
+    if (e.code === 'Escape') {
+      e.preventDefault();
+      abortGame();
+      return;
+    }
     keys[e.code] = true;
 
     if (gamePhase === 'instructions') {
@@ -391,7 +396,7 @@
     var lines = [
       '$2 per hand  |  Up to 5 hands',
       '',
-      'Get closer to 21 than Red',
+      'Get closer to 21 than the house',
       'without going over.',
       '',
       'Aces = 1 or 11',
@@ -427,7 +432,7 @@
     ctx.fillStyle = CLR.white;
     ctx.font = Math.floor(9 * scale) + 'px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText("RED'S HAND", canvas.width / 2, 32 * scale);
+    ctx.fillText("HOUSE HAND", canvas.width / 2, 32 * scale);
     drawHand(dealerHand, 40 * scale, dealerHidden);
     drawTotal(dealerHand, 138 * scale, dealerHidden);
 
@@ -470,7 +475,7 @@
       ctx.fillStyle = CLR.amber;
       ctx.font = Math.floor(9 * scale) + 'px "Press Start 2P", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText('Red is thinking...', canvas.width / 2, 345 * scale);
+      ctx.fillText('House is thinking...', canvas.width / 2, 345 * scale);
     }
   }
 
@@ -507,11 +512,20 @@
     ctx.fillText('Press ENTER to leave', canvas.width / 2, 340 * scale);
   }
 
+  function drawEscHint() {
+    ctx.fillStyle = CLR.dim;
+    ctx.font = Math.floor(8 * scale) + 'px "Press Start 2P", monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText('ESC EXIT', 610 * scale, 390 * scale);
+    ctx.textAlign = 'left';
+  }
+
   function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (gamePhase === 'instructions') { drawInstructions(); return; }
-    if (gamePhase === 'final') { drawFinal(); return; }
+    if (gamePhase === 'instructions') { drawInstructions(); drawEscHint(); return; }
+    if (gamePhase === 'final') { drawFinal(); drawEscHint(); return; }
     drawPlayingPhase();
+    drawEscHint();
   }
 
   function update(dt) {
@@ -531,6 +545,19 @@
     var screen = document.getElementById('screen');
     if (screen) screen.classList.remove('hidden');
     setTimeout(function () { if (callback) callback(results); }, 1000);
+  }
+
+  function abortGame() {
+    gameRunning = false;
+    if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+    document.removeEventListener('keydown', onKeyDown);
+    document.removeEventListener('keyup', onKeyUp);
+    canvas.removeEventListener('touchstart', onTouchStart);
+    canvas.removeEventListener('mousedown', onMouseDown);
+    canvas.classList.add('hidden');
+    var screen = document.getElementById('screen');
+    if (screen) screen.classList.remove('hidden');
+    setTimeout(function () { if (callback) callback(null); }, 90);
   }
 
   function gameLoop(timestamp) {
